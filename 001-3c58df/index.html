@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>外壁塗装・屋根塗装の有限会社関根塗装｜さいたま市西区・桜区【デザイン刷新デモ】</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=Manrope:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#191a1c;
+  --ink-soft:#4c4e52;
+  --paper:#fafaf7;
+  --paper-2:#f0efea;
+  --line:#e2e0d9;
+  --accent:#d9481f;
+  --accent-ink:#b83a17;
+  --white:#ffffff;
+  --disp:"Zen Kaku Gothic New","Noto Sans JP",sans-serif;
+  --body:"Noto Sans JP",sans-serif;
+  --num:"Manrope","Noto Sans JP",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+html.lenis{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto}
+body{
+  font-family:var(--body);
+  background:var(--paper);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.9;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+
+/* ---------- demo strip ---------- */
+:root{--strip:34px}
+.demo-strip{
+  position:fixed;top:0;left:0;right:0;height:var(--strip);z-index:60;
+  background:var(--ink);color:#c9c8c2;
+  font-size:11px;letter-spacing:.06em;line-height:var(--strip);
+  padding:0 20px;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.demo-strip b{color:#fff;font-weight:700}
+
+/* ---------- header ---------- */
+header{
+  position:fixed;top:var(--strip);left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px clamp(20px,4vw,48px);
+  color:#fff;
+  transition:background .4s,box-shadow .4s,padding .4s,color .4s;
+}
+header.scrolled{background:rgba(250,250,247,.92);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line);padding:12px clamp(20px,4vw,48px);color:var(--ink)}
+.brand{display:flex;flex-direction:column;line-height:1.3}
+.brand .jp{font-family:var(--disp);font-weight:900;font-size:17px;letter-spacing:.04em}
+.brand .en{font-family:var(--num);font-weight:600;font-size:9px;letter-spacing:.32em;color:rgba(255,255,255,.62);text-transform:uppercase;transition:color .4s}
+header.scrolled .brand .en{color:var(--ink-soft)}
+nav{display:flex;gap:28px;font-size:13px;font-weight:500}
+nav a{position:relative;padding:4px 0}
+nav a::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .35s cubic-bezier(.2,.6,.2,1)}
+nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.head-right{display:flex;align-items:center;gap:20px}
+.head-tel{text-align:right;line-height:1.35}
+.head-tel .n{font-family:var(--num);font-weight:800;font-size:19px;letter-spacing:.02em}
+.head-tel .t{font-size:10px;color:rgba(255,255,255,.65);transition:color .4s}
+header.scrolled .head-tel .t{color:var(--ink-soft)}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--accent);color:#fff;
+  font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.08em;
+  padding:13px 26px;border-radius:999px;border:none;cursor:pointer;
+  transition:background .3s,transform .3s;
+}
+.btn:hover{background:var(--accent-ink);transform:translateY(-2px)}
+.btn .arw{font-family:var(--num);font-weight:600}
+@media(max-width:960px){nav{display:none}.head-tel{display:none}}
+@media(max-width:520px){
+  .brand .jp{font-size:14.5px}
+  .brand .en{font-size:8px;letter-spacing:.22em}
+  .btn{padding:10px 18px;font-size:12px;white-space:nowrap}
+  header{padding:12px 20px}
+}
+
+/* ---------- loader ---------- */
+#loader{
+  position:fixed;inset:0;z-index:100;background:var(--ink);
+  display:flex;align-items:center;justify-content:center;color:var(--paper);
+}
+#loader .mark{
+  font-family:var(--disp);font-weight:900;font-size:clamp(28px,5vw,52px);letter-spacing:.12em;
+  will-change:transform,opacity;
+}
+#loader .count{
+  position:absolute;right:clamp(24px,5vw,60px);bottom:clamp(20px,4vw,44px);
+  font-family:var(--num);font-weight:600;font-size:13px;letter-spacing:.2em;
+}
+
+/* ---------- section commons ---------- */
+.sec{padding:clamp(96px,13vw,190px) clamp(20px,5vw,72px)}
+.inner{max-width:1240px;margin:0 auto}
+.eyebrow{
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:26px;
+}
+.eyebrow::before{content:"";width:34px;height:2px;background:var(--accent)}
+.sec-title{
+  font-family:var(--disp);font-weight:900;
+  font-size:clamp(26px,3.6vw,44px);line-height:1.45;letter-spacing:.02em;
+  margin-bottom:18px;
+}
+.sec-lead{max-width:620px;color:var(--ink-soft);font-size:14px}
+
+/* ---------- hero ---------- */
+#hero{position:relative;height:100svh;min-height:640px;overflow:hidden;background:var(--ink)}
+#hero .ph{position:absolute;inset:0;overflow:hidden}
+#hero .ph img{width:100%;height:114%;object-fit:cover;will-change:transform;filter:saturate(.82) brightness(1.02)}
+#hero .veil{position:absolute;inset:0;background:linear-gradient(75deg,rgba(20,21,23,.62) 0%,rgba(20,21,23,.34) 46%,rgba(20,21,23,.05) 78%)}
+#hero .hero-in{
+  position:relative;z-index:2;height:100%;max-width:1240px;margin:0 auto;
+  padding:0 clamp(20px,5vw,72px);
+  display:flex;flex-direction:column;justify-content:center;color:#fff;
+}
+.hero-area{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.26em;
+  margin-bottom:30px;color:rgba(255,255,255,.85);
+}
+.hero-area::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+h1{
+  font-family:var(--disp);font-weight:900;
+  font-size:clamp(38px,6.4vw,84px);line-height:1.28;letter-spacing:.02em;
+}
+h1 .line{display:block;overflow:hidden}
+h1 .line em{display:inline-block;font-style:normal;will-change:transform}
+h1 .kicker{display:block;font-size:clamp(15px,1.6vw,20px);font-weight:700;letter-spacing:.14em;margin-bottom:18px;color:rgba(255,255,255,.9)}
+.hero-sub{max-width:560px;margin-top:28px;font-size:14px;line-height:2.1;color:rgba(255,255,255,.88)}
+.hero-cta{display:flex;align-items:center;gap:22px;margin-top:38px;flex-wrap:wrap}
+.hero-cta .tel{
+  font-family:var(--num);font-weight:800;font-size:clamp(20px,2.4vw,28px);letter-spacing:.02em;color:#fff;
+  border-bottom:2px solid rgba(255,255,255,.4);padding-bottom:2px;
+}
+.hero-cta .tel small{display:block;font-family:var(--body);font-weight:400;font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.7)}
+.hero-badges{
+  position:absolute;z-index:2;left:0;right:0;bottom:0;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid rgba(255,255,255,.22);
+}
+.hero-badges div{
+  padding:20px clamp(14px,2vw,32px);font-size:11.5px;letter-spacing:.05em;color:rgba(255,255,255,.9);
+  border-left:1px solid rgba(255,255,255,.22);
+}
+.hero-badges div:first-child{border-left:none}
+.hero-badges b{display:block;font-family:var(--disp);font-weight:700;font-size:13.5px;margin-bottom:2px;color:#fff}
+@media(max-width:760px){
+  #hero{height:auto;min-height:100svh;display:flex;flex-direction:column}
+  #hero .hero-in{padding-top:150px;padding-bottom:48px;flex:1}
+  .hero-badges{position:static;grid-template-columns:1fr 1fr}
+  .hero-badges div{border-top:1px solid rgba(255,255,255,.22)}
+}
+
+/* ---------- 写真の器（汎用） ---------- */
+.breaker{position:relative;height:54vh;min-height:340px;overflow:hidden}
+.breaker img{position:absolute;left:0;top:-11%;width:100%;height:122%;object-fit:cover;filter:saturate(.82);will-change:transform}
+.breaker .bline{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-weight:900;color:#fff;
+  font-size:clamp(20px,2.8vw,34px);letter-spacing:.06em;text-align:center;padding:0 24px;
+  background:rgba(20,21,23,.32);
+}
+
+/* ---------- check ---------- */
+#check .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:56px}
+#check .cell{background:var(--paper);padding:36px 30px 40px;position:relative}
+#check .cell .ph{width:86px;height:86px;border-radius:50%;overflow:hidden;margin-bottom:20px;background:var(--paper-2)}
+#check .cell .ph img{width:100%;height:100%;object-fit:cover;filter:saturate(.82)}
+#check .cell .no{font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.24em;color:var(--accent);margin-bottom:16px}
+#check .cell h3{font-family:var(--disp);font-weight:700;font-size:16.5px;line-height:1.6;margin-bottom:10px}
+#check .cell p{font-size:13px;color:var(--ink-soft)}
+#check .after{margin-top:44px;font-family:var(--disp);font-weight:700;font-size:clamp(16px,2vw,21px);letter-spacing:.04em}
+#check .after span{border-bottom:3px solid var(--accent);padding-bottom:3px}
+@media(max-width:900px){#check .grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){#check .grid{grid-template-columns:1fr}}
+
+/* ---------- reasons: stacking sheets ---------- */
+#reasons{padding:0;background:var(--ink)}
+#reasons .rhead{padding:clamp(96px,13vw,180px) clamp(20px,5vw,72px) clamp(48px,6vw,90px);color:var(--paper)}
+#reasons .rhead .eyebrow{color:rgba(255,255,255,.6)}
+.sheet-wrap{position:relative}
+.sheet{
+  position:sticky;top:0;height:100svh;min-height:560px;
+  display:flex;align-items:center;overflow:hidden;
+  border-radius:44px 44px 0 0;
+  box-shadow:0 -30px 70px rgba(8,10,14,.28);
+  will-change:transform;
+}
+.sheet:nth-child(odd){background:var(--paper)}
+.sheet:nth-child(even){background:var(--paper-2)}
+.sheet .s-in{
+  max-width:1240px;margin:0 auto;width:100%;
+  padding:0 clamp(24px,6vw,80px);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(28px,5vw,80px);align-items:center;
+}
+.sheet .s-no{
+  font-family:var(--num);font-weight:800;font-size:clamp(84px,13vw,170px);line-height:1;
+  color:transparent;-webkit-text-stroke:1.5px rgba(25,26,28,.28);
+}
+.sheet .s-label{font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin:18px 0 14px}
+.sheet h3{font-family:var(--disp);font-weight:900;font-size:clamp(24px,3.2vw,40px);line-height:1.5;margin-bottom:20px}
+.sheet p{color:var(--ink-soft);font-size:14px;max-width:480px}
+.sheet .s-fig{aspect-ratio:4/3;overflow:hidden;border-radius:6px;background:var(--line)}
+.sheet .s-fig img{width:100%;height:100%;object-fit:cover;filter:saturate(.82)}
+.sheet .s-count{font-family:var(--num);font-weight:600;font-size:12px;letter-spacing:.2em;color:var(--ink-soft);position:absolute;right:clamp(24px,5vw,60px);top:34px}
+@media(max-width:860px){
+  .sheet .s-in{grid-template-columns:1fr;gap:26px;padding-top:64px;align-content:center}
+  .sheet .s-no{font-size:64px}
+  .sheet .s-fig{max-height:32svh;aspect-ratio:16/9}
+  .sheet h3{font-size:21px}
+}
+
+/* ---------- facts band (dark) ---------- */
+#facts{background:var(--ink);color:var(--paper);padding:clamp(110px,14vw,200px) clamp(20px,5vw,72px)}
+#facts .eyebrow{color:rgba(255,255,255,.55)}
+#facts .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,56px);margin:64px 0 96px}
+#facts .num .v{font-family:var(--num);font-weight:800;font-size:clamp(56px,8vw,110px);line-height:1;letter-spacing:-.01em}
+#facts .num .v small{font-family:var(--disp);font-weight:700;font-size:.32em;letter-spacing:.06em;margin-left:6px}
+#facts .num .k{margin-top:14px;font-size:12.5px;letter-spacing:.08em;color:rgba(255,255,255,.65);border-top:1px solid rgba(255,255,255,.2);padding-top:14px}
+#facts .num:last-child .v{font-size:clamp(30px,4.4vw,58px);padding-top:.35em}
+@media(max-width:760px){#facts .nums{grid-template-columns:1fr;gap:36px}}
+.cmp{width:100%;border-collapse:collapse;font-size:13.5px}
+.cmp th,.cmp td{padding:20px 18px;text-align:left;border-bottom:1px solid rgba(255,255,255,.16);vertical-align:top}
+.cmp thead th{font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.55);border-bottom:1px solid rgba(255,255,255,.4)}
+.cmp td.us{color:#fff;font-weight:700}
+.cmp td.them{color:rgba(255,255,255,.55)}
+.cmp td.us::before{content:"◎ ";color:var(--accent)}
+.cmp-note{margin-top:18px;font-size:11px;color:rgba(255,255,255,.45)}
+@media(max-width:700px){.cmp th:nth-child(2),.cmp td:nth-child(2){display:none}}
+
+/* ---------- services alt rows ---------- */
+#service .row{
+  display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,96px);
+  align-items:center;margin-top:clamp(72px,9vw,130px);
+}
+#service .row:nth-child(even of .row){direction:rtl}
+#service .row>*{direction:ltr}
+#service .fig{overflow:hidden;border-radius:6px;aspect-ratio:4/3;background:var(--paper-2)}
+#service .fig img{width:100%;height:118%;object-fit:cover;will-change:transform;filter:saturate(.82)}
+#service .row .no{font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.3em;color:var(--accent);margin-bottom:14px}
+#service .row h3{font-family:var(--disp);font-weight:900;font-size:clamp(22px,2.6vw,32px);line-height:1.5;margin-bottom:16px}
+#service .row p{color:var(--ink-soft);font-size:14px;max-width:460px}
+#service .row .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+#service .row .tags span{font-size:11.5px;letter-spacing:.06em;border:1px solid var(--line);border-radius:999px;padding:6px 14px;color:var(--ink-soft)}
+@media(max-width:820px){#service .row{grid-template-columns:1fr;gap:22px}}
+
+/* ---------- works slider ---------- */
+#works{background:var(--paper-2);overflow:hidden}
+#works .head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.drag-hint{font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.28em;color:var(--ink-soft);display:flex;align-items:center;gap:10px}
+.drag-hint::before{content:"←";letter-spacing:0}.drag-hint::after{content:"→";letter-spacing:0}
+.slider{margin-top:56px;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.slider:active{cursor:grabbing}
+.track{display:flex;gap:clamp(16px,2vw,28px);width:max-content;will-change:transform}
+.card-w{width:clamp(260px,30vw,420px);flex:none}
+.card-w .fig{aspect-ratio:4/3;overflow:hidden;border-radius:6px;background:var(--line)}
+.card-w .fig img{width:100%;height:100%;object-fit:cover;filter:saturate(.82);pointer-events:none}
+.card-w .cap{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;gap:12px}
+.card-w .cap b{font-family:var(--disp);font-weight:700;font-size:14px}
+.card-w .cap span{font-family:var(--num);font-weight:600;font-size:10px;letter-spacing:.2em;color:var(--ink-soft)}
+.card-w .meta{font-size:11.5px;color:var(--ink-soft);margin-top:4px}
+#works .note{margin-top:40px;font-size:11px;color:var(--ink-soft)}
+
+/* ---------- price ---------- */
+#price .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2vw,28px);margin-top:60px;align-items:stretch}
+.plan{border:1px solid var(--line);border-radius:8px;padding:40px 32px 36px;background:var(--white);position:relative;display:flex;flex-direction:column}
+.plan.reco{border-color:var(--ink);box-shadow:0 24px 60px rgba(25,26,28,.09)}
+.plan .flag{
+  position:absolute;top:-13px;left:32px;background:var(--accent);color:#fff;
+  font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.12em;
+  padding:5px 14px;border-radius:999px;
+}
+.plan .pname{font-family:var(--disp);font-weight:900;font-size:20px;margin-bottom:4px}
+.plan .pfor{font-size:12px;color:var(--ink-soft);margin-bottom:26px}
+.plan .pv{font-family:var(--num);font-weight:800;font-size:clamp(24px,2.4vw,30px);line-height:1.2;letter-spacing:-.01em}
+.plan .pv small{font-family:var(--body);font-weight:500;font-size:11px;letter-spacing:.04em;color:var(--ink-soft);display:block;margin-top:6px}
+.plan .dur{margin:22px 0;padding:12px 16px;background:var(--paper);border-radius:6px;font-size:12.5px;font-weight:700}
+.plan .dur span{color:var(--accent)}
+.plan ul{font-size:13px;color:var(--ink-soft);display:grid;gap:10px;margin-bottom:8px}
+.plan ul li{padding-left:20px;position:relative}
+.plan ul li::before{content:"";position:absolute;left:0;top:.72em;width:10px;height:2px;background:var(--accent)}
+#price .pnote{margin-top:36px;font-size:11px;color:var(--ink-soft);max-width:820px}
+@media(max-width:860px){#price .plans{grid-template-columns:1fr}}
+
+/* ---------- flow & area ---------- */
+#flow .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:56px}
+#flow .step{background:var(--paper);padding:28px 24px 36px}
+#flow .step .thumb{aspect-ratio:16/10;overflow:hidden;border-radius:4px;margin-bottom:18px;background:var(--paper-2)}
+#flow .step .thumb img{width:100%;height:100%;object-fit:cover;filter:saturate(.82)}
+#flow .step .no{font-family:var(--num);font-weight:800;font-size:30px;color:transparent;-webkit-text-stroke:1.2px rgba(25,26,28,.35);margin-bottom:18px}
+#flow .step h3{font-family:var(--disp);font-weight:700;font-size:15px;margin-bottom:8px;line-height:1.5}
+#flow .step p{font-size:12px;color:var(--ink-soft)}
+@media(max-width:900px){#flow .steps{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){#flow .steps{grid-template-columns:1fr}}
+.area-box{margin-top:clamp(72px,9vw,120px);border-top:1px solid var(--line);padding-top:56px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);gap:clamp(24px,4vw,64px)}
+.area-box h3{font-family:var(--disp);font-weight:900;font-size:clamp(20px,2.2vw,26px)}
+.area-box .chips{display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start}
+.area-box .chips span{font-family:var(--disp);font-weight:700;font-size:13px;border:1px solid var(--ink);border-radius:999px;padding:9px 20px}
+.area-box .chips span.sub{border-color:var(--line);color:var(--ink-soft);font-weight:500}
+@media(max-width:760px){.area-box{grid-template-columns:1fr}}
+
+/* ---------- faq ---------- */
+#faq{background:var(--paper-2)}
+#faq .list{margin-top:48px;border-top:1px solid var(--line)}
+#faq details{border-bottom:1px solid var(--line)}
+#faq summary{
+  list-style:none;cursor:pointer;display:flex;gap:22px;align-items:baseline;
+  padding:26px 8px;font-family:var(--disp);font-weight:700;font-size:15.5px;line-height:1.6;
+}
+#faq summary::-webkit-details-marker{display:none}
+#faq summary .q{font-family:var(--num);font-weight:800;color:var(--accent);font-size:13px;flex:none}
+#faq summary .tg{margin-left:auto;flex:none;font-family:var(--num);font-weight:600;color:var(--ink-soft);transition:transform .3s}
+#faq details[open] summary .tg{transform:rotate(45deg)}
+#faq .a{overflow:hidden}
+#faq .a p{padding:0 8px 28px 51px;font-size:13.5px;color:var(--ink-soft);max-width:760px}
+
+/* ---------- contact ---------- */
+#contact{background:var(--ink);color:var(--paper);padding-bottom:0;position:relative;overflow:hidden}
+#contact .cbg{position:absolute;inset:0}
+#contact .cbg img{width:100%;height:108%;object-fit:cover;opacity:.14;filter:saturate(.55);will-change:transform}
+#contact .cbg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(25,26,28,.3) 0%,rgba(25,26,28,.92) 72%)}
+#contact .inner{position:relative;z-index:2}
+#contact .eyebrow{color:rgba(255,255,255,.55)}
+#contact .big{
+  font-family:var(--disp);font-weight:900;
+  font-size:clamp(30px,5vw,64px);line-height:1.4;letter-spacing:.02em;
+}
+#contact .big .line{display:block;overflow:hidden}
+#contact .big .line em{display:inline-block;font-style:normal}
+#contact .sub{margin-top:24px;color:rgba(255,255,255,.7);font-size:14px;max-width:560px}
+#contact .ways{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.16);margin-top:64px}
+#contact .way{background:var(--ink);padding:clamp(32px,4vw,56px)}
+#contact .way .k{font-family:var(--num);font-weight:600;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:22px}
+#contact .way .tel-big{font-family:var(--num);font-weight:800;font-size:clamp(30px,3.6vw,46px);letter-spacing:0;color:#fff}
+#contact .way p{font-size:12.5px;color:rgba(255,255,255,.6);margin-top:12px}
+#contact .way .btn{margin-top:22px}
+@media(max-width:760px){#contact .ways{grid-template-columns:1fr}}
+.company{max-width:1240px;margin:clamp(72px,9vw,120px) auto 0;border-top:1px solid rgba(255,255,255,.16);padding-top:64px}
+.company h3{font-family:var(--disp);font-weight:900;font-size:20px;margin-bottom:32px}
+.company table{width:100%;border-collapse:collapse;font-size:13.5px}
+.company th,.company td{padding:16px 8px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left;vertical-align:top}
+.company th{width:180px;font-weight:500;color:rgba(255,255,255,.55);font-family:var(--num);font-size:11px;letter-spacing:.18em}
+.company td{color:rgba(255,255,255,.88)}
+@media(max-width:600px){.company th{width:110px}}
+footer{max-width:1240px;margin:0 auto;padding:56px 0 44px}
+footer .disc{font-size:10.5px;line-height:2;color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:18px 22px;margin-bottom:36px}
+footer .foot-row{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-end}
+footer .fb .jp{font-family:var(--disp);font-weight:900;font-size:16px}
+footer .fb .en{font-family:var(--num);font-weight:600;font-size:9px;letter-spacing:.32em;color:rgba(255,255,255,.45);text-transform:uppercase}
+footer .fb p{font-size:11.5px;color:rgba(255,255,255,.5);margin-top:10px}
+footer .cr{font-family:var(--num);font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.35)}
+
+/* ---------- reveal base ---------- */
+.rv{opacity:0;transform:translateY(28px)}
+@media (prefers-reduced-motion: reduce){
+  .rv{opacity:1;transform:none}
+  #loader{display:none}
+}
+
+/* ---------- shot mode（headless検証用・?shot=1） ---------- */
+html.shot .rv,html.shot .rv-hero{opacity:1 !important;transform:none !important}
+html.shot *{animation:none !important;transition:none !important}
+html.shot #loader{display:none}
+html.shot #hero{height:820px;min-height:820px}
+html.shot #hero h1 .line em{transform:none !important}
+html.shot .sheet{position:relative;height:auto;min-height:0;padding:90px 0;border-radius:0;box-shadow:none}
+html.shot #faq .a{height:auto !important;opacity:1 !important}
+html.shot .breaker{height:430px;min-height:0}
+</style>
+</head>
+<body>
+
+<div id="loader" aria-hidden="true">
+  <div class="mark">関根塗装</div>
+  <div class="count"><span id="lc">00</span> — 100</div>
+</div>
+
+<div class="demo-strip">🖥 <b>デザイン刷新デモ</b>　有限会社関根塗装様の公開情報をもとにスタジオサイタマが作成した見本です（公式サイトではありません）</div>
+
+<header id="gh">
+  <a class="brand" href="#hero">
+    <span class="jp">有限会社関根塗装</span>
+    <span class="en">Sekine Painting · Saitama Nishi</span>
+  </a>
+  <nav>
+    <a href="#check">住まいの点検</a>
+    <a href="#reasons">選ばれる理由</a>
+    <a href="#service">対応工事</a>
+    <a href="#works">施工事例</a>
+    <a href="#price">料金</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <div class="head-right">
+    <div class="head-tel">
+      <div class="n">048-622-8729</div>
+      <div class="t">お気軽にお電話ください</div>
+    </div>
+    <a class="btn" href="#contact">無料相談 <span class="arw">→</span></a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="ph"><img id="heroimg" src="img/hero.jpg" alt="外壁を塗装する職人"></div>
+  <div class="veil"></div>
+  <div class="hero-in">
+    <div class="hero-area rv-hero">さいたま市西区・桜区｜塗装＋補修まるごと</div>
+    <h1>
+      <span class="kicker rv-hero">明日も、10年先も。</span>
+      <span class="line"><em>住まいの美しさと安心を、</em></span>
+      <span class="line"><em>確かな塗装で守り続ける。</em></span>
+    </h1>
+    <p class="hero-sub rv-hero">さいたま市西区・桜区で創業約38年。自社職人による多能工体制で、外壁・屋根塗装に加え雨樋・軒天・軽微な大工仕事まで一貫対応。「塗装ついでにここも直して」が叶う、必要な工事だけをご提案します。</p>
+    <div class="hero-cta rv-hero">
+      <a class="btn" href="#contact">無料の現地調査を申し込む <span class="arw">→</span></a>
+      <a class="tel" href="tel:0486228729">048-622-8729<small>お見積り無料・相談のみ歓迎</small></a>
+    </div>
+  </div>
+  <div class="hero-badges">
+    <div class="rv-hero"><b>創業約38年</b>地域密着の実績</div>
+    <div class="rv-hero"><b>多能工の自社職人</b>塗装＋雨樋・軒天・大工まで</div>
+    <div class="rv-hero"><b>建設業許可</b>第058162号（塗装・防水）</div>
+    <div class="rv-hero"><b>現地調査・見積 無料</b>押し売りなし・相談のみOK</div>
+  </div>
+</section>
+
+<!-- CHECK -->
+<section id="check" class="sec">
+  <div class="inner">
+    <div class="eyebrow rv">Check — 住まいのサイン</div>
+    <h2 class="sec-title rv">こんなお悩みは<br>ありませんか？</h2>
+    <p class="sec-lead rv">ひとつでも当てはまれば、一度プロの目で見てもらう時期かもしれません。</p>
+    <div class="grid">
+      <div class="cell rv"><div class="ph"><img src="img/ch1.jpg" alt="" loading="lazy" onerror="this.style.display='none'"></div><div class="no">Check 01</div><h3>外壁がひび割れてきた</h3><p>放っておくと雨水が入り込み、下地の傷みや雨漏りにつながることがあります。</p></div>
+      <div class="cell rv"><div class="ph"><img src="img/ch2.jpg" alt="" loading="lazy" onerror="this.style.display='none'"></div><div class="no">Check 02</div><h3>壁を触ると白い粉がつく</h3><p>チョーキング（塗膜の劣化）のサイン。塗り替えの目安といわれています。</p></div>
+      <div class="cell rv"><div class="ph"><img src="img/ch3.jpg" alt="" loading="lazy" onerror="this.style.display='none'"></div><div class="no">Check 03</div><h3>色あせ・コケ・汚れが目立つ</h3><p>見た目だけでなく、建物を守る塗膜の力が弱っている可能性があります。</p></div>
+      <div class="cell rv"><div class="ph"><img src="img/ch4.jpg" alt="" loading="lazy" onerror="this.style.display='none'"></div><div class="no">Check 04</div><h3>前回の塗装から10年以上</h3><p>一般的な塗り替えの目安は約10年。そろそろ点検をおすすめする時期です。</p></div>
+      <div class="cell rv"><div class="ph"><img src="img/ch5.jpg" alt="" loading="lazy" onerror="this.style.display='none'"></div><div class="no">Check 05</div><h3>いくらかかるか分からず不安</h3><p>相場が見えず一歩踏み出せない——まずは無料の現地調査でご確認ください。</p></div>
+      <div class="cell rv"><div class="ph"><img src="img/ch6.jpg" alt="" loading="lazy" onerror="this.style.display='none'"></div><div class="no">Check 06</div><h3>どの業者に頼めばいいか迷う</h3><p>資格・許可・自社施工かどうか。判断材料をお伝えするだけでも歓迎です。</p></div>
+    </div>
+    <p class="after rv">その気になるところ、<span>さいたま市西区の関根塗装</span>にご相談ください。</p>
+  </div>
+</section>
+
+<!-- REASONS: stacking sheets -->
+<section id="reasons">
+  <div class="rhead">
+    <div class="inner">
+      <div class="eyebrow rv">Reason — 選ばれる理由</div>
+      <h2 class="sec-title rv" style="color:var(--paper)">価格の安さだけでは分からない、<br>「誰が・どう施工するか」。</h2>
+    </div>
+  </div>
+  <div class="sheet-wrap">
+    <div class="sheet">
+      <div class="s-count">01 / 05</div>
+      <div class="s-in">
+        <div>
+          <div class="s-no">01</div>
+          <div class="s-label">In-house</div>
+          <h3>完全自社施工の一貫対応</h3>
+          <p>営業・診断・施工・アフターまで下請けに出さず自社で対応。中間マージンが乗りにくく、職人と直接話しながら進められます。</p>
+        </div>
+        <div class="s-fig"><img src="img/w1.jpg" alt="自社職人による外壁塗装" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="s-count">02 / 05</div>
+      <div class="s-in">
+        <div>
+          <div class="s-no">02</div>
+          <div class="s-label">Diagnosis</div>
+          <h3>有資格者による外壁診断</h3>
+          <p>一級建築塗装技能士・外壁診断士が建物の状態を見極め、いま必要な工事とそうでない工事を切り分けてご提案します。</p>
+        </div>
+        <div class="s-fig"><img src="img/c5.jpg" alt="屋根・外壁の診断" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="s-count">03 / 05</div>
+      <div class="s-in">
+        <div>
+          <div class="s-no">03</div>
+          <div class="s-label">Multi-craft</div>
+          <h3>塗装＋補修まで一貫対応</h3>
+          <p>塗装に加え雨樋・軒天の補修や軽微な大工仕事まで自社職人が対応。「塗装ついでにここも直して」が一度に叶うのが強みです。</p>
+        </div>
+        <div class="s-fig"><img src="img/w3.jpg" alt="雨樋の補修" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="s-count">04 / 05</div>
+      <div class="s-in">
+        <div>
+          <div class="s-no">04</div>
+          <div class="s-label">Local</div>
+          <h3>地元さいたま市西区に、<br>根ざして38年。</h3>
+          <p>さいたま市西区・桜区を中心に、創業約38年の地域密着。地域の気候や住まいの傾向をふまえ、長く付き合える距離感でお手伝いします。</p>
+        </div>
+        <div class="s-fig"><img src="img/c1.jpg" alt="さいたま市西区の住宅" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="sheet">
+      <div class="s-count">05 / 05</div>
+      <div class="s-in">
+        <div>
+          <div class="s-no">05</div>
+          <div class="s-label">Honest</div>
+          <h3>必要な工事だけを提案</h3>
+          <p>過剰な工事はおすすめしません。建物の状態から、いま本当に必要な工事だけを分かりやすくご提案します。</p>
+        </div>
+        <div class="s-fig"><img src="img/w4.jpg" alt="必要な補修だけを行う大工仕事" loading="lazy"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FACTS (dark band) -->
+<section id="facts">
+  <div class="inner">
+    <div class="eyebrow rv">Fact — 数字と体制</div>
+    <div class="nums">
+      <div class="num rv"><div class="v"><span data-count="38">0</span><small>年</small></div><div class="k">創業からの実績（1988年頃〜）</div></div>
+      <div class="num rv"><div class="v"><span data-count="10">0</span><small>年</small></div><div class="k">外壁塗り替えの目安周期</div></div>
+      <div class="num rv"><div class="v">第058162号</div><div class="k">建設業許可（塗装工事業・防水工事業）</div></div>
+    </div>
+    <div class="rv" style="overflow-x:auto">
+      <table class="cmp">
+        <thead><tr><th>比べるポイント</th><th>よくある塗装業者</th><th>関根塗装</th></tr></thead>
+        <tbody>
+          <tr><td>施工体制</td><td class="them">下請けに委託することがある</td><td class="us">完全自社施工で一貫対応</td></tr>
+          <tr><td>診断する人</td><td class="them">営業担当のみのことも</td><td class="us">自社職人が診断・多能工で対応</td></tr>
+          <tr><td>許可・資格</td><td class="them">明示されていない場合がある</td><td class="us">建設業許可 第058162号（塗装・防水）</td></tr>
+          <tr><td>対応範囲</td><td class="them">塗装のみ</td><td class="us">塗装・足場・防水・各種改修まで</td></tr>
+        </tbody>
+      </table>
+      <p class="cmp-note">※「よくある塗装業者」は一般的な傾向を示したデモ用の比較で、特定の業者を指すものではありません。</p>
+    </div>
+  </div>
+</section>
+
+<!-- BREAKER 1 -->
+<section class="breaker" aria-hidden="true">
+  <img src="img/c5.jpg" alt="" loading="lazy">
+  <p class="bline">足場を一度で、住まいをまるごと。</p>
+</section>
+
+<!-- SERVICE -->
+<section id="service" class="sec">
+  <div class="inner">
+    <div class="eyebrow rv">Service — 対応できる工事</div>
+    <h2 class="sec-title rv">足場を一度で有効に使う、<br>住まいまわりの一括対応。</h2>
+    <p class="sec-lead rv">外壁・屋根の塗り替えを軸に、足場・防水・シーリング・付帯部の補修まで、住まいまわりの工事をまとめて一括対応。ムダを抑えて長持ちさせます。</p>
+
+    <div class="row">
+      <div class="fig"><img src="img/w1.jpg" alt="外壁塗装" loading="lazy"></div>
+      <div>
+        <div class="no">Service 01</div>
+        <h3>外壁塗装</h3>
+        <p>ひび割れ・チョーキングなど劣化のサインを診断し、下地補修から仕上げまで自社職人が丁寧に塗り替えます。</p>
+        <div class="tags"><span>下地補修</span><span>高圧洗浄</span><span>シリコン／フッ素／無機</span></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="fig"><img src="img/w2.jpg" alt="屋根塗装" loading="lazy"></div>
+      <div>
+        <div class="no">Service 02</div>
+        <h3>屋根塗装</h3>
+        <p>紫外線と雨風を最も受ける屋根を、素材に合った塗料で保護。外壁との同時施工で足場代のムダを抑えられます。</p>
+        <div class="tags"><span>遮熱塗料対応</span><span>棟板金点検</span><span>外壁と同時施工</span></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="fig"><img src="img/w3.jpg" alt="防水・シーリング・雨樋補修" loading="lazy"></div>
+      <div>
+        <div class="no">Service 03</div>
+        <h3>防水・シーリング・雨樋</h3>
+        <p>ベランダ防水やシーリング打ち替え、雨樋・軒天の補修まで。雨水の侵入経路をまとめて塞ぎます。</p>
+        <div class="tags"><span>防水工事</span><span>シーリング打ち替え</span><span>雨樋・軒天補修</span></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="fig"><img src="img/w4.jpg" alt="軽微な大工仕事・各種改修" loading="lazy"></div>
+      <div>
+        <div class="no">Service 04</div>
+        <h3>足場組立・各種改修</h3>
+        <p>足場の組立から軽微な大工仕事まで多能工の自社職人が対応。「塗装ついでにここも直して」にお応えします。</p>
+        <div class="tags"><span>足場組立</span><span>付帯部塗装</span><span>軽微な大工工事</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKS -->
+<section id="works" class="sec">
+  <div class="inner">
+    <div class="head-row">
+      <div>
+        <div class="eyebrow rv">Works — 施工事例</div>
+        <h2 class="sec-title rv" style="margin-bottom:0">施工事例ギャラリー</h2>
+      </div>
+      <div class="drag-hint rv">Drag</div>
+    </div>
+  </div>
+  <div class="slider">
+    <div class="track" id="wtrack">
+      <div class="card-w"><div class="fig"><img src="img/c1.jpg" alt="施工事例1" loading="lazy"></div><div class="cap"><b>さいたま市西区・外壁塗装</b><span>Case 01</span></div><div class="meta">シリコン塗料／付帯部塗装</div></div>
+      <div class="card-w"><div class="fig"><img src="img/c2.jpg" alt="施工事例2" loading="lazy"></div><div class="cap"><b>桜区・外壁塗装＋雨樋補修</b><span>Case 02</span></div><div class="meta">外壁塗装／雨樋交換</div></div>
+      <div class="card-w"><div class="fig"><img src="img/c3.jpg" alt="施工事例3" loading="lazy"></div><div class="cap"><b>西区・外壁塗装＋軒天補修</b><span>Case 03</span></div><div class="meta">フッ素塗料／軒天張り替え</div></div>
+      <div class="card-w"><div class="fig"><img src="img/c4.jpg" alt="施工事例4" loading="lazy"></div><div class="cap"><b>大宮区・外壁ツートン塗装</b><span>Case 04</span></div><div class="meta">2色塗り分け／シーリング打ち替え</div></div>
+      <div class="card-w"><div class="fig"><img src="img/c5.jpg" alt="施工事例5" loading="lazy"></div><div class="cap"><b>さいたま市・屋根塗装</b><span>Case 05</span></div><div class="meta">遮熱塗料／棟板金補修</div></div>
+      <div class="card-w"><div class="fig"><img src="img/c6.jpg" alt="施工事例6" loading="lazy"></div><div class="cap"><b>中央区・付帯部・軒天塗装</b><span>Case 06</span></div><div class="meta">軒天・破風・雨樋の塗り替え</div></div>
+    </div>
+  </div>
+  <div class="inner"><p class="note rv">※ 施工事例は現在デモ用の生成イメージです。公開時は実際の施工写真・地域・工事内容に差し替えます。</p></div>
+</section>
+
+<!-- PRICE -->
+<section id="price" class="sec">
+  <div class="inner">
+    <div class="eyebrow rv">Price — 料金の目安</div>
+    <h2 class="sec-title rv">外壁塗装の料金の目安</h2>
+    <p class="sec-lead rv">塗料のグレードで耐久年数と費用が変わります。まずは目安からご覧ください。</p>
+    <div class="plans">
+      <div class="plan rv">
+        <div class="pname">シリコンプラン</div>
+        <div class="pfor">まずは費用を抑えたい方に</div>
+        <div class="pv">約80〜120<span style="font-size:.5em">万円台</span><small>30坪目安</small></div>
+        <div class="dur">耐久の目安 <span>約10〜13年</span></div>
+        <ul><li>足場・養生・高圧洗浄</li><li>下地補修・シリコン塗料</li><li>付帯部塗装</li></ul>
+      </div>
+      <div class="plan reco rv">
+        <div class="flag">迷ったらこちら</div>
+        <div class="pname">フッ素プラン</div>
+        <div class="pfor">耐久と費用のバランス重視</div>
+        <div class="pv">約120〜170<span style="font-size:.5em">万円台</span><small>30坪目安</small></div>
+        <div class="dur">耐久の目安 <span>約15〜18年</span></div>
+        <ul><li>足場・養生・高圧洗浄</li><li>下地補修・フッ素塗料</li><li>付帯部塗装</li></ul>
+      </div>
+      <div class="plan rv">
+        <div class="pname">無機プラン</div>
+        <div class="pfor">塗り替え回数を減らしたい方に</div>
+        <div class="pv" style="font-size:20px;padding-top:.3em">上位グレード<small>現地診断でお見積り</small></div>
+        <div class="dur">耐久の目安 <span>約18〜20年超</span></div>
+        <ul><li>足場・養生・高圧洗浄</li><li>下地補修・無機系塗料</li><li>付帯部塗装</li></ul>
+      </div>
+    </div>
+    <p class="pnote rv">※ 上記は一般的な相場の目安をもとにしたデモ用の参考値であり、確定価格ではありません。実際の費用は建物の大きさ・劣化状態・塗料・付帯工事の有無で変わります。正確な金額は無料の現地調査のうえお見積りでご提示します（30坪＝延べ床の目安。㎡単価の目安: シリコン約1,700〜2,200円／㎡・フッ素約3,000円／㎡）。</p>
+  </div>
+</section>
+
+<!-- BREAKER 2 -->
+<section class="breaker" aria-hidden="true">
+  <img src="img/c4.jpg" alt="" loading="lazy">
+</section>
+
+<!-- FLOW + AREA -->
+<section id="flow" class="sec" style="padding-top:0">
+  <div class="inner">
+    <div class="eyebrow rv">Flow — お問い合わせから完成まで</div>
+    <h2 class="sec-title rv">ご相談から、お引き渡しまで。</h2>
+    <div class="steps">
+      <div class="step rv"><div class="thumb"><img src="img/c2.jpg" alt="" loading="lazy"></div><div class="no">1</div><h3>お問い合わせ</h3><p>お電話・メールでご連絡。相談だけでも歓迎です。</p></div>
+      <div class="step rv"><div class="thumb"><img src="img/c5.jpg" alt="" loading="lazy"></div><div class="no">2</div><h3>無料 現地調査</h3><p>有資格者が建物の状態を診断します。</p></div>
+      <div class="step rv"><div class="thumb"><img src="img/c3.jpg" alt="" loading="lazy"></div><div class="no">3</div><h3>お見積り・ご提案</h3><p>必要な工事とプランを分かりやすくご説明。</p></div>
+      <div class="step rv"><div class="thumb"><img src="img/w1.jpg" alt="" loading="lazy"></div><div class="no">4</div><h3>施工</h3><p>足場・洗浄・下地補修・塗装まで自社で。</p></div>
+      <div class="step rv"><div class="thumb"><img src="img/c1.jpg" alt="" loading="lazy"></div><div class="no">5</div><h3>お引き渡し・アフター</h3><p>仕上がりをご確認いただき、その後もフォロー。</p></div>
+    </div>
+    <div class="area-box">
+      <div class="rv">
+        <div class="eyebrow">Area — 対応エリア</div>
+        <h3>さいたま市西区・桜区を中心に。</h3>
+        <p style="font-size:13px;color:var(--ink-soft);margin-top:14px">近隣エリアもお気軽にご相談ください。</p>
+      </div>
+      <div class="chips rv">
+        <span>さいたま市西区</span><span>桜区</span><span class="sub">大宮区</span><span class="sub">中央区</span><span class="sub">さいたま市内</span><span class="sub">近隣は要相談</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="sec">
+  <div class="inner">
+    <div class="eyebrow rv">FAQ — よくあるご質問</div>
+    <h2 class="sec-title rv">よくあるご質問</h2>
+    <div class="list rv">
+      <details>
+        <summary><span class="q">Q1</span>相談や見積りだけでもいいですか？<span class="tg">＋</span></summary>
+        <div class="a"><p>はい。現地調査・お見積りは無料です。その場で契約を迫るようなことはしません。判断はゆっくりなさってください。</p></div>
+      </details>
+      <details>
+        <summary><span class="q">Q2</span>塗り替えの時期の目安はありますか？<span class="tg">＋</span></summary>
+        <div class="a"><p>一般的には前回の塗装から約10年が目安といわれます。チョーキング（壁を触ると白い粉がつく）やひび割れが出てきたら、一度点検をおすすめします。</p></div>
+      </details>
+      <details>
+        <summary><span class="q">Q3</span>工事中は家にいないとダメですか？<span class="tg">＋</span></summary>
+        <div class="a"><p>基本的に在宅でなくても施工は可能です。ご不在時の対応も、事前にご相談のうえ進めさせていただきます。</p></div>
+      </details>
+      <details>
+        <summary><span class="q">Q4</span>どのくらいの期間かかりますか？<span class="tg">＋</span></summary>
+        <div class="a"><p>建物の大きさや工事内容によりますが、一般的な戸建ての外壁塗装で概ね2週間前後が目安です。天候により前後します。</p></div>
+      </details>
+      <details>
+        <summary><span class="q">Q5</span>対応エリア外でも相談できますか？<span class="tg">＋</span></summary>
+        <div class="a"><p>さいたま市西区・桜区を中心とした近隣地域に対応しています。近隣エリアもまずはお問い合わせください。可否をお伝えします。</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="sec">
+  <div class="cbg" aria-hidden="true"><img src="img/hero.jpg" alt="" loading="lazy"></div>
+  <div class="inner">
+    <div class="eyebrow rv">Contact — まずは無料の現地調査から</div>
+    <h2 class="big">
+      <span class="line rv"><em>「うちはまだ大丈夫？」の</em></span>
+      <span class="line rv"><em>確認だけでも、構いません。</em></span>
+    </h2>
+    <p class="sub rv">押し売りはいたしません。現地調査・お見積りは無料です。</p>
+    <div class="ways">
+      <div class="way rv">
+        <div class="k">Tel — お電話で</div>
+        <a class="tel-big" href="tel:0486228729">048-622-8729</a>
+        <p>お気軽にお電話ください（不在時は折り返します）</p>
+      </div>
+      <div class="way rv">
+        <div class="k">Form — フォームで</div>
+        <p style="font-size:14px;color:rgba(255,255,255,.85);margin-top:0">現地調査のご希望日時・気になる箇所をお送りください。<br>1営業日以内にご連絡します。</p>
+        <a class="btn" href="#" onclick="return false">フォームで相談する <span class="arw">→</span></a>
+        <p>※ これはデモサイトです。フォームは送信されません。</p>
+      </div>
+    </div>
+
+    <div class="company rv">
+      <h3>会社概要</h3>
+      <table>
+        <tr><th>会社名</th><td>有限会社関根塗装</td></tr>
+        <tr><th>代表者</th><td>関根 弘</td></tr>
+        <tr><th>所在地</th><td>〒331-0054 埼玉県さいたま市西区大字島根748-3</td></tr>
+        <tr><th>連絡先</th><td>TEL 048-622-8729</td></tr>
+        <tr><th>創業</th><td>創業約38年（1988年頃）</td></tr>
+        <tr><th>建設業許可</th><td>埼玉県知事許可 第058162号（塗装工事業・防水工事業）</td></tr>
+        <tr><th>業務内容</th><td>外壁塗装／屋根塗装／防水工事／雨樋・軒天補修／軽微な大工工事</td></tr>
+        <tr><th>対応エリア</th><td>さいたま市西区・桜区を中心とした近隣地域</td></tr>
+      </table>
+    </div>
+
+    <footer>
+      <div class="disc">🖥 本ページは有限会社関根塗装様の公開情報（実データ）をもとに、スタジオサイタマが作成した<b>デザイン刷新イメージの見本（デモ）</b>です。施工事例の写真は生成イメージ、料金は相場をもとにしたデモ用の参考値であり、御社の公式サイトではありません。</div>
+      <div class="foot-row">
+        <div class="fb">
+          <div class="jp">有限会社関根塗装</div>
+          <div class="en">Sekine Painting · Saitama Nishi</div>
+          <p>〒331-0054 埼玉県さいたま市西区大字島根748-3<br>建設業許可 第058162号（塗装・防水）｜048-622-8729</p>
+        </div>
+        <div class="cr">DESIGN DEMO BY STUDIO SAITAMA — 2026</div>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const SHOT = /(?:\?|&)shot=1/.test(location.search);
+if (SHOT) {
+  document.documentElement.classList.add('shot');
+  document.querySelectorAll('#faq details').forEach(d => d.open = true);
+}
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches || SHOT;
+
+/* Lenis × ScrollTrigger 統合 */
+const lenis = new Lenis({ lerp: 0.09 });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(t => lenis.raf(t * 1000));
+gsap.ticker.lagSmoothing(0);
+
+/* 撮影フック: ?shot=<sectionId>&off=<px> で該当節へ初回描画前に即時スクロール（headless検証用） */
+const shotParams = new URLSearchParams(location.search);
+const shotTarget = shotParams.get('shot');
+if (shotTarget) {
+  const t = document.getElementById(shotTarget);
+  if (t) {
+    lenis.stop();
+    window.scrollTo(0, t.getBoundingClientRect().top + window.scrollY + (+shotParams.get('off') || 0));
+  }
+}
+
+/* header state */
+const gh = document.getElementById('gh');
+ScrollTrigger.create({ start: 80, onToggle: s => gh.classList.toggle('scrolled', s.isActive) });
+
+/* anchor links via lenis */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (!t) return;
+    e.preventDefault();
+    lenis.scrollTo(t, { offset: -60, duration: 1.1 });
+  });
+});
+
+/* ---------- loader → hero 入場 ---------- */
+const loader = document.getElementById('loader');
+const lc = document.getElementById('lc');
+const heroEls = gsap.utils.toArray('.rv-hero');
+gsap.set(heroEls, { opacity: 0, y: 26 });
+gsap.set('#hero h1 .line em', { yPercent: 110 });
+
+function enterHero(){
+  gsap.to('#hero h1 .line em', { yPercent: 0, duration: 1, stagger: 0.09, ease: 'power4.out' });
+  gsap.to(heroEls, { opacity: 1, y: 0, duration: 0.9, stagger: 0.07, ease: 'power3.out', delay: 0.15 });
+}
+
+if (reduced) {
+  loader.remove();
+  gsap.set(heroEls, { opacity: 1, y: 0 });
+  gsap.set('#hero h1 .line em', { yPercent: 0 });
+} else {
+  lenis.stop();
+  document.fonts.ready.then(() => {
+    const mark = loader.querySelector('.mark');
+    const n = { v: 0 };
+    gsap.timeline({ defaults: { ease: 'power3.inOut' },
+      onComplete: () => { loader.remove(); lenis.start(); } })
+      .to(n, { v: 100, duration: 1.5, ease: 'power2.inOut',
+        onUpdate: () => lc.textContent = String(Math.round(n.v)).padStart(2, '0') })
+      .to(mark, { scale: 1.18, duration: 1.5, ease: 'none' }, 0)
+      .to(mark, { scale: 22, opacity: 0, duration: 0.8, ease: 'power4.in' })
+      .to(loader, { yPercent: -100, duration: 0.85, ease: 'power4.inOut' }, '-=0.2')
+      .add(enterHero, '<+0.15');
+  });
+}
+
+/* ---------- hero photo: 引きズーム＋パララックス ---------- */
+if (!reduced) {
+  gsap.fromTo('#heroimg', { scale: 1.12 }, { scale: 1, duration: 2.6, ease: 'power2.out', delay: 1.9 });
+  gsap.to('#heroimg', { yPercent: 10, ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+}
+
+/* ---------- 汎用リビール ---------- */
+gsap.utils.toArray('.rv').forEach(el => {
+  if (reduced) { gsap.set(el, { opacity: 1, y: 0 }); return; }
+  gsap.to(el, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 86%', once: true } });
+});
+
+/* ---------- stacking sheets 入場 ---------- */
+gsap.utils.toArray('.sheet').forEach(card => {
+  if (reduced) return;
+  gsap.from(card, { y: 70, scale: 0.96, duration: 0.7, ease: 'back.out(1.2)',
+    scrollTrigger: { trigger: card, start: 'top 82%', once: true } });
+});
+
+/* ---------- サービス写真パララックス（オーバーサイズ窓） ---------- */
+gsap.utils.toArray('#service .fig img, .breaker img, #contact .cbg img').forEach(img => {
+  if (reduced) return;
+  gsap.fromTo(img, { yPercent: -8 }, { yPercent: 8, ease: 'none',
+    scrollTrigger: { trigger: img.closest('.fig') || img.closest('section'), start: 'top bottom', end: 'bottom top', scrub: true } });
+});
+
+/* ---------- カウントアップ ---------- */
+gsap.utils.toArray('[data-count]').forEach(el => {
+  const obj = { v: 0 };
+  ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
+    onEnter: () => gsap.to(obj, { v: +el.dataset.count, duration: reduced ? 0 : 1.6, ease: 'power2.out',
+      onUpdate: () => el.textContent = Math.round(obj.v) }) });
+});
+
+/* ---------- ドラッグ無限スライダー ---------- */
+(() => {
+  const track = document.getElementById('wtrack');
+  track.innerHTML += track.innerHTML;               // 2セット連結で継ぎ目を消す
+  let half = 0, pos = 0, dragging = false, lastX = 0, vel = 0, inertia;
+  const measure = () => half = track.scrollWidth / 2;
+  measure(); addEventListener('resize', measure);
+  const apply = () => track.style.transform = `translateX(${-(((pos % half) + half) % half)}px)`;
+
+  track.addEventListener('pointerdown', e => {
+    dragging = true; lastX = e.clientX; vel = 0; inertia?.kill();
+    track.setPointerCapture(e.pointerId);
+  });
+  addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - lastX; lastX = e.clientX; pos -= dx; vel = dx;
+  });
+  addEventListener('pointerup', () => {
+    if (!dragging) return; dragging = false;
+    const iv = { v: vel };
+    inertia = gsap.to(iv, { v: 0, duration: 1.2, ease: 'power2.out', onUpdate: () => pos -= iv.v });
+  });
+  gsap.ticker.add(() => { if (!dragging && !reduced) pos += 0.35; apply(); });
+})();
+
+/* ---------- FAQ 開閉（触ると応える） ---------- */
+document.querySelectorAll('#faq details').forEach(d => {
+  const a = d.querySelector('.a');
+  d.querySelector('summary').addEventListener('click', e => {
+    e.preventDefault();
+    if (d.open) {
+      gsap.to(a, { height: 0, opacity: 0, duration: 0.35, ease: 'power2.inOut', onComplete: () => d.open = false });
+    } else {
+      d.open = true;
+      gsap.fromTo(a, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: 0.45, ease: 'power2.out' });
+    }
+  });
+});
+</script>
+</body>
+</html>
