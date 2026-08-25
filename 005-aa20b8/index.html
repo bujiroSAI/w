@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>おとはた — 和音あそび</title>
+<meta name="description" content="2歳からの絶対音感あそび。和音を聞いて色の旗をあげる、江口式にもとづくミニゲーム。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="おとはた">
+<meta name="theme-color" content="#FAF3E3">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ ホーム ============ -->
+<section id="screen-home" class="screen active">
+  <div class="bunting" aria-hidden="true"></div>
+  <div class="home-inner">
+    <h1 class="logo">
+      <svg class="logo-flag" viewBox="0 0 48 60" aria-hidden="true">
+        <rect x="21" y="4" width="5" height="54" rx="2.5" fill="#8A6544"/>
+        <path class="logo-cloth" d="M26 6 C36 4, 44 8, 45 9 L45 27 C44 26, 36 22, 26 24 Z" fill="#E8382F"/>
+        <circle cx="23.5" cy="4.5" r="4" fill="#B9A57F"/>
+      </svg>
+      <span>おとはた</span>
+    </h1>
+    <p class="tagline">わおんを きいて、はたを あげよう</p>
+    <div id="home-char" class="home-char"></div>
+    <button id="btn-play" class="big-flag-btn" type="button">
+      <span class="big-flag-btn-label">あそぶ</span>
+    </button>
+    <div id="today-dots" class="today-dots" title="きょうのセッション"></div>
+  </div>
+  <button id="btn-stickers" class="corner-btn corner-left" type="button" aria-label="シールちょう">
+    <span class="corner-icon">🦁</span><span class="corner-text">シール</span>
+  </button>
+  <button id="btn-parent" class="corner-btn corner-right" type="button" aria-label="おうちのかた（3びょう ながおし）">
+    <svg viewBox="0 0 24 24" class="gear-icon" aria-hidden="true"><path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm9.4 4c0-.5 0-.9-.1-1.4l2-1.6-2-3.5-2.4 1a7.6 7.6 0 0 0-2.4-1.4L16 2.6h-4l-.5 2.5c-.9.3-1.7.8-2.4 1.4l-2.4-1-2 3.5 2 1.6c-.1.5-.1.9-.1 1.4s0 .9.1 1.4l-2 1.6 2 3.5 2.4-1c.7.6 1.5 1.1 2.4 1.4l.5 2.5h4l.5-2.5c.9-.3 1.7-.8 2.4-1.4l2.4 1 2-3.5-2-1.6c.1-.5.1-.9.1-1.4Z"/></svg>
+    <span class="corner-text">おうちのかた</span>
+    <span class="gate-ring" aria-hidden="true"></span>
+    <span id="parent-badge" class="badge hidden" aria-hidden="true"></span>
+  </button>
+  <div class="ground" aria-hidden="true"><div class="track-line"></div></div>
+</section>
+
+<!-- ============ プレイ ============ -->
+<section id="screen-play" class="screen">
+  <div class="bunting" aria-hidden="true"></div>
+  <header class="play-top">
+    <button id="btn-home" class="round-btn" type="button" aria-label="ホームへ">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3L12 3Z"/></svg>
+    </button>
+    <div id="trial-dots" class="trial-dots" aria-hidden="true"></div>
+    <div class="play-top-spacer"></div>
+  </header>
+  <div class="stage-area">
+    <div id="speech" class="speech">きいてね</div>
+    <button id="char-btn" class="char-btn" type="button" aria-label="もういちど きく"></button>
+  </div>
+  <div id="flags" class="flags"></div>
+  <div class="ground ground-play" aria-hidden="true"><div class="track-line"></div></div>
+</section>
+
+<!-- ============ ごほうび（シール選び） ============ -->
+<section id="screen-reward" class="screen">
+  <div class="bunting" aria-hidden="true"></div>
+  <div class="reward-inner">
+    <h2 id="reward-title" class="reward-title">よくできました！</h2>
+    <p class="reward-sub">すきな シールを 1まい えらんでね</p>
+    <div id="sticker-choices" class="sticker-choices"></div>
+    <div id="reward-actions" class="reward-actions hidden">
+      <button id="btn-again" class="pill-btn pill-primary" type="button">もういっかい</button>
+      <button id="btn-finish" class="pill-btn" type="button">おしまい</button>
+    </div>
+  </div>
+  <div class="ground" aria-hidden="true"></div>
+</section>
+
+<!-- ============ シールちょう ============ -->
+<section id="screen-stickers" class="screen">
+  <header class="sub-top">
+    <button class="round-btn js-back-home" type="button" aria-label="もどる">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m14 6-6 6 6 6 1.4-1.4L10.8 12l4.6-4.6L14 6Z"/></svg>
+    </button>
+    <h2 class="sub-title">シールちょう</h2>
+    <div class="play-top-spacer"></div>
+  </header>
+  <div id="sticker-book" class="sticker-book"></div>
+</section>
+
+<!-- ============ おうちのかた ============ -->
+<section id="screen-parent" class="screen screen-parent">
+  <header class="sub-top">
+    <button class="round-btn js-back-home" type="button" aria-label="もどる">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m14 6-6 6 6 6 1.4-1.4L10.8 12l4.6-4.6L14 6Z"/></svg>
+    </button>
+    <h2 class="sub-title">おうちのかたへ</h2>
+    <div class="play-top-spacer"></div>
+  </header>
+  <div class="parent-scroll">
+    <div id="advance-banner" class="advance-banner hidden"></div>
+    <section class="p-card">
+      <h3>きょう</h3>
+      <div id="p-today" class="p-today"></div>
+    </section>
+    <section class="p-card">
+      <h3>すすみぐあい <span id="p-stage-label" class="p-stage-label"></span></h3>
+      <div id="p-chords" class="p-chords"></div>
+      <p class="p-note">正答率は各和音の直近20回。すべて95%以上×2週間以上×80回以上で次の旗を提案する（原法「100%正答が2週間つづいたら1つ追加」の機械化）。</p>
+    </section>
+    <section class="p-card">
+      <h3>カレンダー <span class="p-hint">1日3〜5回・毎日つづけるのがいちばん効く</span></h3>
+      <div id="p-cal" class="p-cal"></div>
+    </section>
+    <section class="p-card">
+      <h3>せってい</h3>
+      <div class="p-settings" id="p-settings"></div>
+    </section>
+    <section class="p-card">
+      <h3>このアプリの使いかた（メソッドの要点）</h3>
+      <div id="p-guide" class="p-guide"></div>
+    </section>
+    <section class="p-card">
+      <h3>データ</h3>
+      <div class="p-data-actions">
+        <button id="btn-export" class="pill-btn" type="button">記録をコピー</button>
+        <button id="btn-reset" class="pill-btn pill-danger" type="button">はじめから</button>
+      </div>
+      <p id="p-data-msg" class="p-note"></p>
+    </section>
+  </div>
+</section>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script src="chords.js"></script>
+<script src="piano.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
