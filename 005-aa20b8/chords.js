@@ -1,7 +1,7 @@
 // おとはた — 和音カリキュラムデータ
-// 江口式（一音会）の和音あて訓練に準拠。色↔和音の対応と導入順序が教材の本体。
+// 和音同定法（Chord Identification Method）の公刊研究に準拠。色↔和音の対応と導入順序が教材の本体。
 // 白鍵9和音 = ハ長調 I(ドミソ)/IV(ファラド)/V(ソシレ) の全転回形。
-// 対応の出典: Sakakibara 2014 (Psychology of Music) ほか（research/方法論リサーチ参照）。
+// 対応の出典: 榊原 1999/2004（教育心理学研究）・Sakakibara 2014 (Psychology of Music)。
 
 'use strict';
 
@@ -41,7 +41,7 @@ const CHORDS = [
 const CHORD_BY_ID = Object.fromEntries(CHORDS.map(c => [c.id, c]));
 
 // 進級（新しい和音の追加）基準。
-// 江口式の原則「既出和音が100%正答になるまで足さない・追加間隔は最低2週間」の機械化。
+// 原法の原則「既出和音が100%正答になるまで足さない・追加間隔は最低2週間」の機械化。
 // 2歳児の誤タップを考慮し、100%ではなく直近20回で95%を下限にしている。
 const ADVANCE_RULE = {
   perChordWindow: 20,   // 和音ごとの直近n試行

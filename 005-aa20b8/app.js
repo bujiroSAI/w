@@ -168,6 +168,7 @@
 
   // ============ セッション（試行の状態機械） ============
   let S = null;
+  let lastDemo = null; // 直近の「おためし」設定（もういっかい用）
   let wakeLock = null;
 
   async function keepAwake(on) {
@@ -181,19 +182,23 @@
     } catch (e) { /* 非対応なら諦める */ }
   }
 
-  function startSession() {
+  // demo = {flags: n} を渡すと「おためしモード」: 先頭n本の旗で出題し、記録を一切残さない
+  function startSession(demo) {
     const st = Store.data.settings;
     Piano.ensure();
     Piano.setVolume(st.volume);
+    const intro = !demo && Store.data.introPending;
     S = {
       id: Date.now(),
       start: Date.now(),
+      demo: demo || null,
+      pool: demo ? CHORDS.slice(0, demo.flags).map(c => c.id) : Store.data.unlocked.slice(),
       idx: 0,
       total: st.trialsPerSession,
       correct: 0,
-      mode: Store.data.introPending ? 'intro' : 'mix',
-      introChord: Store.data.introPending,
-      introLeft: Store.data.introPending ? INTRO_TRIALS : 0,
+      mode: intro ? 'intro' : 'mix',
+      introChord: intro ? Store.data.introPending : null,
+      introLeft: intro ? INTRO_TRIALS : 0,
       current: null,
       corrective: false,
       locked: true,
@@ -201,6 +206,7 @@
       autoReplays: 0,
       waitTimer: null,
     };
+    $('#demo-badge').classList.toggle('hidden', !S.demo);
     keepAwake(true);
     renderDots();
     show('screen-play');
@@ -227,7 +233,7 @@
 
   function visibleChords() {
     if (S.mode === 'intro') return [CHORD_BY_ID[S.introChord]];
-    return Store.data.unlocked.map(id => CHORD_BY_ID[id]);
+    return S.pool.map(id => CHORD_BY_ID[id]);
   }
 
   function renderFlags() {
@@ -247,11 +253,14 @@
   }
 
   function pickChord() {
-    const ids = Store.data.unlocked;
+    const ids = S.pool;
     if (ids.length === 1) return ids[0];
     const newest = ids[ids.length - 1];
-    const { acc, n } = Store.chordAccuracy(newest, NEW_CHORD_BOOST.window);
-    const boost = (n < NEW_CHORD_BOOST.window) || (acc !== null && acc < NEW_CHORD_BOOST.untilAccuracy);
+    let boost = false;
+    if (!S.demo) {
+      const { acc, n } = Store.chordAccuracy(newest, NEW_CHORD_BOOST.window);
+      boost = (n < NEW_CHORD_BOOST.window) || (acc !== null && acc < NEW_CHORD_BOOST.untilAccuracy);
+    }
     for (let tries = 0; tries < 6; tries++) {
       let pick;
       if (boost && Math.random() < NEW_CHORD_BOOST.probability) {
@@ -366,6 +375,7 @@
   }
 
   function logTrial(ok, corr, tapped) {
+    if (S.demo) return; // おためしは記録しない
     Store.addTrial({
       t: Date.now(),
       chord: S.current,
@@ -439,6 +449,19 @@
                     '🍎', '🐤', '⚽', '🧁', '🦖', '🚒', '🐢', '🎈', '🍌', '🐸'];
 
   function endSession() {
+    if (S.demo) {
+      // おためし: 記録・シールなしでそのまま締める
+      lastDemo = S.demo;
+      stopSession();
+      if (Store.data.settings.sfx) Piano.sfxFanfare();
+      $('#reward-title').textContent = 'おためし おしまい';
+      $('.reward-sub').classList.add('hidden');
+      $('#sticker-choices').innerHTML = '';
+      $('#reward-actions').classList.remove('hidden');
+      show('screen-reward');
+      return;
+    }
+    lastDemo = null;
     const sess = {
       id: S.id, start: S.start, end: Date.now(),
       total: S.total, correct: S.correct,
@@ -448,6 +471,8 @@
     stopSession();
     if (Store.data.settings.sfx) Piano.sfxFanfare();
     Voice.speak('よくできました！');
+    $('#reward-title').textContent = 'よくできました！';
+    $('.reward-sub').classList.remove('hidden');
 
     const box = $('#sticker-choices');
     box.innerHTML = '';
@@ -623,7 +648,13 @@
       <div class="p-set-row"><span class="p-set-label">進級の提案<small>基準を満たしたら知らせる</small></span>
         <button type="button" class="switch ${st.autoSuggest ? 'on' : ''}" id="set-suggest" aria-label="進級の提案"></button></div>
       <div class="p-set-row"><span class="p-set-label">旗を手動で追加<small>基準を待たずに次の和音へ（非推奨）</small></span>
-        <button type="button" class="pill-btn" id="set-force-add" style="padding:8px 20px;font-size:14px">追加</button></div>`;
+        <button type="button" class="pill-btn" id="set-force-add" style="padding:8px 20px;font-size:14px">追加</button></div>
+      <div class="p-set-row"><span class="p-set-label">おためしプレイ<small>おとなの確認用。全部の旗を先に見られる・記録には一切残らない</small></span>
+        <span class="seg" id="set-demo">
+          <button type="button" data-v="3">3本</button>
+          <button type="button" data-v="9">9本</button>
+          <button type="button" data-v="14">14本</button>
+        </span></div>`;
 
     $('#set-pitch').addEventListener('click', (e) => {
       const b = e.target.closest('button');
@@ -665,17 +696,22 @@
     $('#set-force-add').addEventListener('click', () => {
       const next = CHORDS[Store.data.unlocked.length];
       if (!next) { alert('すべての旗を解放済みです。'); return; }
-      if (confirm(`「${next.label}（${next.yomi}）」を追加しますか？\n方法論上は、いまの旗が全て90%を超えてから足すのが安全です。`)) {
+      if (confirm(`「${next.label}（${next.yomi}）」を追加しますか？\n方法論上は、いまの旗が全て95%を超えてから足すのが安全です。`)) {
         Store.unlockNext();
         renderParent();
       }
+    });
+    $('#set-demo').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      startSession({ flags: parseInt(b.dataset.v, 10) });
     });
   }
 
   function renderGuide() {
     $('#p-guide').innerHTML = `
       <ol>
-        <li><b>1日4〜5回、1回2〜3分。</b>原法（江口式・和音同定法）の処方どおり。長く1回やるより、短く毎日。このアプリは${Store.data.settings.trialsPerSession}問で自動的に終わる。</li>
+        <li><b>1日4〜5回、1回2〜3分。</b>原法（和音同定法）の処方どおり。長く1回やるより、短く毎日。このアプリは${Store.data.settings.trialsPerSession}問で自動的に終わる。</li>
         <li><b>必ずおとなが隣に。</b>2〜5歳のメディア利用は「親と一緒に」が小児科学会・WHOの原則。正解したら一緒によろこぶのが最強のごほうび。設定「すすめかた: おとなと」にすると出題テンポをおとなが握れる。</li>
         <li><b>始まりは「あか（ドミソ）」1本だけ。</b>全部の旗が正解し続けるようになってから1本足す（原法は「100%正答が2週間」・アプリは95%×2週間で提案）。あせって増やさないことが一番の近道。</li>
         <li><b>間違えても教え直すだけ。</b>アプリは正解の旗を光らせて同じ和音をもう一度鳴らす。叱る・がっかりした顔を見せない。</li>
@@ -685,40 +721,41 @@
       </ol>
       <p class="p-warn">⚠️ 開始年齢がすべて: 縦断研究で習得が確認されているのは2〜6歳開始（Sakakibara 2014・継続22人全員が習得）。7歳以降の開始は急に難しくなる。<br>
       ⚠️ 絶対音感は万能ではない: 音楽性の必須条件ではなく、移調が苦手になる等の指摘もある。このアプリは習得後に相対音感の段階へ進むロードマップを前提にしている。<br>
-      ⚠️ 1日の合計は10〜15分（WHOの「2〜4歳は1日60分以内」の枠内）。</p>`;
+      ⚠️ 1日の合計は10〜15分（WHOの「2〜4歳は1日60分以内」の枠内）。<br>
+      ※ 本アプリは公刊の学術論文（和音同定法の縦断研究）に基づく独立実装であり、特定の教室・団体・書籍の公認や提携によるものではない。</p>`;
   }
 
   // ============ ペアレンタルゲート（3秒ながおし） ============
   (() => {
     const btn = $('#btn-parent');
     let t0 = null;
-    let raf = null;
+    let timer = null;
     const HOLD = 2600;
-    function loop() {
+    // rAFでなくintervalで進める: ホールド中に画面が非表示になっても止まらない
+    function tick() {
       const p = Math.min(1, (Date.now() - t0) / HOLD);
       btn.style.setProperty('--hold', p);
       if (p >= 1) {
         cancel();
         renderParent();
         show('screen-parent');
-        return;
       }
-      raf = requestAnimationFrame(loop);
     }
     function cancel() {
-      if (raf) cancelAnimationFrame(raf);
-      raf = null;
+      if (timer) clearInterval(timer);
+      timer = null;
       btn.classList.remove('holding');
       btn.style.setProperty('--hold', 0);
     }
     btn.addEventListener('pointerdown', () => {
       t0 = Date.now();
       btn.classList.add('holding');
-      raf = requestAnimationFrame(loop);
+      if (timer) clearInterval(timer);
+      timer = setInterval(tick, 90);
     });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev =>
       btn.addEventListener(ev, () => {
-        if (raf && Date.now() - t0 < HOLD) {
+        if (timer && Date.now() - t0 < HOLD) {
           const txt = btn.querySelector('.corner-text');
           if (txt) {
             txt.textContent = '3びょう おす';
@@ -757,7 +794,7 @@
     renderHome();
     show('screen-home');
   });
-  $('#btn-again').addEventListener('pointerdown', () => startSession());
+  $('#btn-again').addEventListener('pointerdown', () => startSession(lastDemo));
   $('#btn-finish').addEventListener('pointerdown', () => {
     renderHome();
     show('screen-home');
