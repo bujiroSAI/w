@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>知床、実測の大地。 — laneB realDEM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#182229; --mist:#e9eef1; --sea:#274c58; --accent:#c8552c;
+    --serif:"Shippori Mincho","Hiragino Mincho ProN",serif;
+    --sans:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--mist);color:var(--ink);font-family:var(--sans)}
+  #gl{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+  #track{height:640svh;position:relative;z-index:1;pointer-events:none}
+  /* 粒状フィルム（SVG data URI・語彙帳S4のCSS版） */
+  #grain{position:fixed;inset:0;z-index:4;pointer-events:none;opacity:.07;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='0.9'/></svg>")}
+  .overlay{position:fixed;inset:0;z-index:2;pointer-events:none}
+  .chapter{position:absolute;opacity:0;will-change:opacity,transform}
+  .chapter .kicker{font-size:12px;letter-spacing:.34em;color:var(--sea);margin-bottom:14px}
+  .chapter h2{font-family:var(--serif);font-weight:700;line-height:1.3;letter-spacing:.06em;
+    font-size:clamp(30px,4.6vw,62px);text-shadow:0 1px 24px rgba(233,238,241,.6)}
+  .chapter p{margin-top:18px;font-size:clamp(13px,1.05vw,15px);line-height:2.1;letter-spacing:.12em;max-width:27em}
+  #ch-hero{left:6vw;bottom:13svh}
+  #ch-hero h2{font-size:clamp(40px,7vw,100px)}
+  #ch-hero .hint{margin-top:24px;font-size:11px;letter-spacing:.3em;color:var(--sea)}
+  #ch-hero .hint::after{content:"";display:block;width:1px;height:44px;background:var(--ink);margin-top:10px;
+    animation:drop 1.8s ease-in-out infinite}
+  @keyframes drop{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}
+    56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+  #ch-sea{left:6vw;top:15svh}
+  #ch-ridge{right:6vw;top:16svh;text-align:right}
+  #ch-ridge p{margin-left:auto}
+  #ch-forest{right:6vw;bottom:15svh;text-align:right}
+  #ch-forest p{margin-left:auto}
+  #ch-close{left:0;right:0;top:34svh;text-align:center}
+  #ch-close p{margin:18px auto 0}
+  #ch-close .note{margin-top:30px;font-size:10px;letter-spacing:.18em;color:#5b6d76;line-height:2}
+  /* 実座標ラベル（DOMオーバーレイ追従・Lewa式） */
+  .pin{position:fixed;z-index:2;pointer-events:none;opacity:0;transform:translate(-50%,-100%);
+    text-align:center;transition:opacity .5s;will-change:left,top}
+  .pin .nm{font-family:var(--serif);font-size:14px;letter-spacing:.14em;font-weight:700;white-space:nowrap}
+  .pin .el{font-size:10px;letter-spacing:.22em;color:#3c515c}
+  .pin::after{content:"";display:block;width:1px;height:38px;background:var(--ink);margin:6px auto 0}
+  .pin i{display:block;width:5px;height:5px;border-radius:99px;background:var(--accent);margin:2px auto 0}
+  /* HUD 計器 */
+  #hud{position:fixed;right:20px;bottom:20px;z-index:3;text-align:right;font-size:10px;
+    letter-spacing:.22em;color:var(--ink);pointer-events:none}
+  #hud .alt{font-family:var(--serif);font-size:22px;letter-spacing:.08em}
+  #hud .alt em{font-style:normal;font-size:10px;letter-spacing:.22em;margin-left:4px}
+  #hud .geo{font-family:ui-monospace,Menlo,monospace;font-size:10px;letter-spacing:.12em;color:#41565f;margin-top:4px}
+  #hud .bar{width:120px;height:1px;background:#9fb2ba;margin:10px 0 6px auto;position:relative}
+  #hud .bar i{position:absolute;left:0;top:0;height:100%;background:var(--accent);width:0}
+  /* WALKモード */
+  #mode-btn{position:fixed;top:18px;right:20px;z-index:6;pointer-events:auto;cursor:pointer;
+    font-family:var(--sans);font-size:11px;letter-spacing:.24em;padding:9px 18px;border-radius:99px;
+    border:1px solid rgba(24,34,41,.45);background:rgba(233,238,241,.75);color:var(--ink);
+    backdrop-filter:blur(4px)}
+  #mode-btn:hover{background:var(--ink);color:#fff}
+  #walk-hint{position:fixed;left:0;right:0;bottom:16px;z-index:5;text-align:center;font-size:10px;
+    letter-spacing:.26em;color:#3c515c;opacity:0;pointer-events:none;transition:opacity .5s}
+  body.walking #walk-hint{opacity:1}
+  body.walking .chapter{opacity:0 !important}
+  #walk-fwd{position:fixed;left:50%;bottom:54px;transform:translateX(-50%);z-index:6;display:none;
+    pointer-events:auto;width:74px;height:74px;border-radius:99px;border:1px solid rgba(24,34,41,.4);
+    background:rgba(233,238,241,.65);font-size:10px;letter-spacing:.2em;color:var(--ink)}
+  @media (hover:none){ body.walking #walk-fwd{display:block} }
+  html.static #mode-btn{display:none}
+  #brand{position:fixed;left:20px;top:18px;z-index:3;font-family:var(--serif);font-weight:700;
+    letter-spacing:.18em;font-size:13px;pointer-events:none}
+  #brand small{display:block;font-family:var(--sans);font-weight:400;font-size:9px;letter-spacing:.3em;color:#5b6d76;margin-top:4px}
+  #loader{position:fixed;inset:0;z-index:5;background:var(--mist);display:flex;align-items:center;justify-content:center;
+    font-size:11px;letter-spacing:.3em;color:var(--sea);transition:opacity .8s}
+  #loader.done{opacity:0;pointer-events:none}
+  @media (max-width:768px){
+    .chapter p{max-width:88vw}
+    #ch-ridge{right:6vw;left:6vw}
+    #hud .bar{width:72px}
+    .pin .nm{font-size:12px}
+  }
+  @media (prefers-reduced-motion: reduce){ #ch-hero .hint::after{animation:none} }
+  html.static #ch-hero .hint::after{animation:none}
+  html.static #loader{display:none}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div id="track" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
+<div id="loader">SHIRETOKO — LOADING TERRAIN</div>
+
+<div class="overlay">
+  <section class="chapter" id="ch-hero" data-chapter="0">
+    <p class="kicker">SHIRETOKO — REAL TERRAIN DATA</p>
+    <h2>知床、<br>実測の大地。</h2>
+    <p>国土地理院の標高データで、半島をまるごと飛ぶ。</p>
+    <p class="hint">SCROLL</p>
+  </section>
+  <section class="chapter" id="ch-sea" data-chapter="1">
+    <p class="kicker">01 — 海から</p>
+    <h2>オホーツクの<br>海面から。</h2>
+    <p>ウトロの沖。霧の向こうに、半島の背骨が実在の起伏のまま見えてくる。</p>
+  </section>
+  <section class="chapter" id="ch-ridge" data-chapter="2">
+    <p class="kicker">02 — 連山</p>
+    <h2>羅臼岳、<br>一六六一メートル。</h2>
+    <p>知床連山の最高峰。この稜線の起伏は、実測の標高データそのままの形。</p>
+  </section>
+  <section class="chapter" id="ch-forest" data-chapter="3">
+    <p class="kicker">03 — 硫黄山へ</p>
+    <h2>森は海を育て、<br>海は森を育てる。</h2>
+    <p>山の栄養は川を下り、海へ渡る。めぐりの中に、この土地の暮らしがある。</p>
+  </section>
+  <section class="chapter" id="ch-close" data-chapter="4">
+    <p class="kicker">04 — 知床岬</p>
+    <h2>ここは、ひと続きの大地。</h2>
+    <p>海から山まで、境目はない。</p>
+    <p class="note">web_factory レーンB実験（実データ版）<br>
+    地形: 国土地理院 標高タイル／空中写真: 国土地理院 全国最新写真（シームレス）</p>
+  </section>
+</div>
+
+<div class="pin" id="pin-rausu"><span class="nm">羅臼岳</span><span class="el">1,661 M</span><i></i></div>
+<div class="pin" id="pin-io"><span class="nm">硫黄山</span><span class="el">1,562 M</span><i></i></div>
+<div class="pin" id="pin-cape"><span class="nm">知床岬</span><span class="el">CAPE</span><i></i></div>
+
+<button id="mode-btn" type="button">歩く — WALK</button>
+<div id="walk-hint">W A S D / 矢印キーで移動 ・ ドラッグで見回す ・ 実測の地形の上を歩いている</div>
+<button id="walk-fwd" type="button">前へ</button>
+<div id="brand">知床<small>REAL DEM FLIGHT</small></div>
+<div id="hud">
+  <div class="alt"><span id="alt-num">0</span><em>M ALT</em></div>
+  <div class="geo" id="geo-num">N44°00′ E145°00′</div>
+  <div class="bar"><i id="prog-bar"></i></div>
+  <div id="ch-num">CH 0 / 4</div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
+<script src="assets/dem_data.js"></script>
+<script src="assets/tex_data.js"></script>
+<script>
+/* ===== 共通フック（契約B準拠） ===== */
+const Q = new URLSearchParams(location.search);
+const PROG_PARAM = Q.get('progress');
+const SELFTEST = Q.has('selftest');
+const STATIC_MODE = PROG_PARAM !== null || SELFTEST;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches || STATIC_MODE;
+if (STATIC_MODE) document.documentElement.classList.add('static');
+window.__errors = [];
+addEventListener('error', e => window.__errors.push(String((e && e.message) || e.type)));
+const _ce = console.error;
+console.error = (...a) => { window.__errors.push('console:' + a.map(String).join(' ').slice(0, 200)); _ce(...a); };
+</script>
+<script>
+/* ===== 実データの展開 ===== */
+/* 座標系: 1 unit = 100m・北 = -Z・標高は誇張 EX 倍（HUD表示は実値に戻す） */
+const EX = 1.75;
+const D = window.__DEM;
+const cLon = (D.lonW + D.lonE) / 2, cLat = (D.latS + D.latN) / 2;
+const KLON = 1113.2 * Math.cos(cLat * Math.PI / 180);   // units/deg（1unit=100m）
+const KLAT = 1110.0;
+const geoX = lon => (lon - cLon) * KLON;
+const geoZ = lat => (cLat - lat) * KLAT;
+const TW = (D.lonE - D.lonW) * KLON;                     // 地形の幅（x）
+const TD = (D.latN - D.latS) * KLAT;                     // 地形の奥行（z）
+
+/* base64 → Uint16（標高m×10） */
+const demRaw = atob(D.b64);
+const dem = new Uint16Array(D.w * D.h);
+for (let i = 0; i < dem.length; i++) {
+  dem[i] = demRaw.charCodeAt(i * 2) | (demRaw.charCodeAt(i * 2 + 1) << 8);
+}
+let peakM = 0;
+for (let i = 0; i < dem.length; i++) if (dem[i] > peakM) peakM = dem[i];
+peakM = peakM / 10;
+
+/* バイリニア標高サンプル（引数は割合 u:西→東 v:北→南、返値はm） */
+function sampleM(u, v) {
+  const x = Math.min(D.w - 1.001, Math.max(0, u * (D.w - 1)));
+  const y = Math.min(D.h - 1.001, Math.max(0, v * (D.h - 1)));
+  const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0;
+  const i = y0 * D.w + x0;
+  const a = dem[i], b = dem[i + 1], c = dem[i + D.w], d = dem[i + D.w + 1];
+  return ((a * (1 - fx) + b * fx) * (1 - fy) + (c * (1 - fx) + d * fx) * fy) / 10;
+}
+function heightAt(lon, lat) {   // 実標高m → シーンy
+  const u = (lon - D.lonW) / (D.lonE - D.lonW);
+  const v = (D.latN - lat) / (D.latN - D.latS);
+  return sampleM(u, v) / 100 * EX;
+}
+
+/* ===== 世界の構築 ===== */
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const MISTC = 0xe4ebee;
+renderer.setClearColor(MISTC);
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(MISTC, 100, 1400);
+const camera = new THREE.PerspectiveCamera(54, 1, 0.5, 6000);
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  const s = Math.min(1, 1100 / h);
+  renderer.setSize(Math.round(w * s), Math.round(h * s), false);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize); resize();
+
+/* --- 地形（実DEM・512x512セグメント・実写真テクスチャ） --- */
+const SEG = 512;
+const tGeo = new THREE.PlaneGeometry(TW, TD, SEG, SEG);
+tGeo.rotateX(-Math.PI / 2);
+{
+  const pos = tGeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const u = (pos.getX(i) + TW / 2) / TW;
+    const v = (pos.getZ(i) + TD / 2) / TD;      // z=-TD/2（北）→ v=0
+    const m = sampleM(u, v);
+    pos.setY(i, m < 2 ? -0.7 : m / 100 * EX);   // 海は水面下へ沈める
+  }
+  tGeo.computeVertexNormals();
+}
+const texImg = new Image();
+const terrainMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.96, metalness: 0 });
+texImg.onload = () => {
+  const t = new THREE.Texture(texImg);
+  if ('colorSpace' in t) t.colorSpace = THREE.SRGBColorSpace || t.colorSpace;
+  else if ('encoding' in t && THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding;
+  t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  t.needsUpdate = true;
+  terrainMat.map = t; terrainMat.color.set(0xffffff); terrainMat.needsUpdate = true;
+  document.getElementById('loader').classList.add('done');
+};
+texImg.onerror = () => window.__errors.push('tex-load-failed');
+texImg.src = window.__TEX;
+const terrain = new THREE.Mesh(tGeo, terrainMat);
+scene.add(terrain);
+
+/* --- 海（語彙帳S1・霧に溶ける） --- */
+const seaUniforms = { uTime: { value: 0 }, uFog: { value: new THREE.Color(MISTC) } };
+const sea = new THREE.Mesh(
+  new THREE.PlaneGeometry(9000, 9000, 1, 1).rotateX(-Math.PI / 2),
+  new THREE.ShaderMaterial({
+    uniforms: seaUniforms, fog: false,
+    vertexShader: `varying vec3 vW; void main(){ vW=(modelMatrix*vec4(position,1.)).xyz;
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `varying vec3 vW; uniform float uTime; uniform vec3 uFog;
+      void main(){
+        float w = sin(vW.x*0.11+uTime*0.5)*sin(vW.z*0.09-uTime*0.33)
+                + 0.5*sin(vW.x*0.031+uTime*0.21)*sin(vW.z*0.027+uTime*0.15);
+        vec3 deep = vec3(0.14,0.27,0.32), lite = vec3(0.21,0.36,0.40);
+        vec3 col = mix(deep, lite, 0.5+0.3*w);
+        float d = length(vW.xz)/1500.0;
+        col = mix(col, uFog, clamp(d,0.0,1.0));
+        gl_FragColor = vec4(col,1.0);
+      }`
+  })
+);
+sea.position.y = 0.04;
+scene.add(sea);
+
+/* --- 空（語彙帳S7・太陽ハロつきドーム）＋光 --- */
+const skyUniforms = { uSun: { value: new THREE.Vector3(-0.5, 0.5, 0.5).normalize() } };
+const sky = new THREE.Mesh(
+  new THREE.SphereGeometry(4200, 28, 18),
+  new THREE.ShaderMaterial({
+    side: THREE.BackSide, depthWrite: false, fog: false,
+    uniforms: skyUniforms,
+    vertexShader: `varying vec3 vD; void main(){ vD=normalize(position);
+      gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `varying vec3 vD; uniform vec3 uSun;
+      void main(){
+        float t = clamp(vD.y*1.6, 0.0, 1.0);
+        vec3 hor = vec3(0.90,0.92,0.93), top = vec3(0.52,0.66,0.77);
+        vec3 col = mix(hor, top, pow(t,0.75));
+        float m = pow(clamp(dot(vD,uSun),0.0,1.0), 5.0);
+        float disk = pow(clamp(dot(vD,uSun),0.0,1.0), 250.0);
+        col += m*0.30*vec3(1.0,0.88,0.66) + disk*vec3(1.1,1.0,0.85);
+        gl_FragColor = vec4(col, 1.0);
+      }`
+  })
+);
+scene.add(sky);
+scene.add(new THREE.HemisphereLight(0xe3ebee, 0x55604e, 1.05));
+const sun = new THREE.DirectionalLight(0xfff2dc, 1.7);
+sun.position.set(-1200, 1300, 1000);   // 南西の高い位置から進行方向の斜面を照らす
+scene.add(sun);
+
+/* ===== 進行度エンジン（実座標のカメラ軌道） ===== */
+const altY = m => m / 100 * EX;
+const P = (lon, lat, m) => new THREE.Vector3(geoX(lon), altY(m), geoZ(lat));
+const camCurve = new THREE.CatmullRomCurve3([
+  P(144.800, 43.960, 500),
+  P(144.950, 44.020, 800),
+  P(145.055, 44.055, 1500),
+  P(145.118, 44.095, 2350),
+  P(145.200, 44.160, 1750),
+  P(145.285, 44.270, 1100),
+  P(145.475, 44.360, 2100)
+]);
+const lookCurve = new THREE.CatmullRomCurve3([
+  P(145.050, 44.080, 800),
+  P(145.100, 44.070, 1200),
+  P(145.122, 44.075, 1500),
+  P(145.165, 44.131, 1300),
+  P(145.260, 44.240, 400),
+  P(145.340, 44.350, 100),
+  P(145.140, 44.090, 900)
+]);
+
+let target = 0, progress = 0;
+if (STATIC_MODE) { progress = target = Math.min(100, Math.max(0, Number(PROG_PARAM || 0))) / 100; }
+let lenis = null;
+if (!STATIC_MODE && matchMedia('(hover:hover)').matches && window.Lenis) {
+  lenis = new Lenis({ lerp: 0.09 });
+}
+function readScroll() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  target = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+}
+
+/* --- 章・実座標ラベル・HUD --- */
+const CH = [
+  { el: document.getElementById('ch-hero'),   a: 0.000, b: 0.105 },
+  { el: document.getElementById('ch-sea'),    a: 0.155, b: 0.345 },
+  { el: document.getElementById('ch-ridge'),  a: 0.400, b: 0.585 },
+  { el: document.getElementById('ch-forest'), a: 0.635, b: 0.805 },
+  { el: document.getElementById('ch-close'),  a: 0.865, b: 1.001 }
+];
+const PINS = [
+  { el: document.getElementById('pin-rausu'), pos: P(145.1223, 44.0754, 1661), a: 0.24, b: 0.62 },
+  { el: document.getElementById('pin-io'),    pos: P(145.1650, 44.1310, 1562), a: 0.46, b: 0.78 },
+  { el: document.getElementById('pin-cape'),  pos: P(145.3350, 44.3450, 40),   a: 0.74, b: 0.985 }
+];
+const altNum = document.getElementById('alt-num');
+const geoNum = document.getElementById('geo-num');
+const progBar = document.getElementById('prog-bar');
+const chNum = document.getElementById('ch-num');
+const smooth = (e0, e1, x) => { const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
+const fmtMin = v => {
+  const d = Math.floor(v), m = Math.floor((v - d) * 60);
+  return d + '°' + String(m).padStart(2, '0') + '′';
+};
+const prj = new THREE.Vector3();
+function updateDOM(p) {
+  let cur = 0;
+  for (let i = 0; i < CH.length; i++) {
+    const c = CH[i], m = 0.045;
+    const oin = (i === 0) ? 1 : smooth(c.a, c.a + m, p);
+    const oout = (i === CH.length - 1) ? 0 : smooth(c.b - m, c.b, p);
+    const o = oin * (1 - oout);
+    c.el.style.opacity = o.toFixed(3);
+    c.el.style.transform = 'translateY(' + ((1 - o) * 14).toFixed(1) + 'px)';
+    if (p >= c.a) cur = i;
+  }
+  for (const pin of PINS) {
+    let vis = walking ? true : (p >= pin.a && p <= pin.b);
+    if (vis) {
+      prj.copy(pin.pos).project(camera);
+      if (prj.z < 1 && Math.abs(prj.x) < 0.92 && Math.abs(prj.y) < 0.85) {
+        pin.el.style.left = ((prj.x * 0.5 + 0.5) * innerWidth).toFixed(0) + 'px';
+        pin.el.style.top = ((-prj.y * 0.5 + 0.5) * innerHeight).toFixed(0) + 'px';
+      } else vis = false;
+    }
+    pin.el.style.opacity = vis ? 1 : 0;
+  }
+  const lat = cLat - camera.position.z / KLAT;
+  const lon = cLon + camera.position.x / KLON;
+  altNum.textContent = Math.max(0, Math.round(camera.position.y / EX * 100 / 10) * 10);
+  geoNum.textContent = 'N' + fmtMin(lat) + ' E' + fmtMin(lon);
+  progBar.style.width = (p * 100).toFixed(1) + '%';
+  chNum.textContent = 'CH ' + cur + ' / 4';
+}
+
+/* ===== WALKモード（実測地形の上を歩く） ===== */
+let walking = false, yaw = 0, pitch = -0.08;
+const EYE = 0.45;                       // 目線高（シーン単位・約26m相当。55m解像度DEMに合わせた縮尺）
+const keys = {};
+const walkDir = new THREE.Vector3();
+function groundY(x, z) {
+  const u = (x + TW / 2) / TW, v = (z + TD / 2) / TD;
+  if (u < 0 || u > 1 || v < 0 || v > 1) return 0.1;
+  const m = sampleM(u, v);
+  return Math.max(0.1, m / 100 * EX);
+}
+const modeBtn = document.getElementById('mode-btn');
+function enterWalk() {
+  walking = true;
+  document.body.classList.add('walking');
+  document.documentElement.style.overflow = 'hidden';
+  if (lenis && lenis.stop) lenis.stop();
+  const d = new THREE.Vector3().subVectors(lookPos, camPos).normalize();
+  yaw = Math.atan2(d.x, d.z);
+  pitch = Math.max(-1.2, Math.min(0.6, Math.asin(d.y)));
+  camera.position.y = Math.max(camera.position.y, groundY(camera.position.x, camera.position.z) + EYE);
+  modeBtn.textContent = '飛行に戻る — FLIGHT';
+}
+function exitWalk() {
+  walking = false;
+  document.body.classList.remove('walking');
+  document.documentElement.style.overflow = '';
+  if (lenis && lenis.start) lenis.start();
+  modeBtn.textContent = '歩く — WALK';
+}
+modeBtn.addEventListener('click', () => walking ? exitWalk() : enterWalk());
+addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+let dragOn = false, lastX = 0, lastY = 0;
+addEventListener('pointerdown', e => {
+  if (!walking || e.target.closest('#mode-btn,#walk-fwd')) return;
+  dragOn = true; lastX = e.clientX; lastY = e.clientY;
+});
+addEventListener('pointermove', e => {
+  if (!walking || !dragOn) return;
+  yaw -= (e.clientX - lastX) * 0.0032;
+  pitch = Math.max(-1.2, Math.min(0.6, pitch - (e.clientY - lastY) * 0.0024));
+  lastX = e.clientX; lastY = e.clientY;
+});
+addEventListener('pointerup', () => { dragOn = false; });
+const fwdBtn = document.getElementById('walk-fwd');
+fwdBtn.addEventListener('pointerdown', e => { e.preventDefault(); keys.__fwd = true; });
+fwdBtn.addEventListener('pointerup', () => { keys.__fwd = false; });
+fwdBtn.addEventListener('pointercancel', () => { keys.__fwd = false; });
+function walkFrame(dt) {
+  const fwd = (keys.w || keys.arrowup || keys.__fwd ? 1 : 0) - (keys.s || keys.arrowdown ? 1 : 0);
+  const strafe = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
+  const speed = (keys.shift ? 2.6 : 0.85);
+  walkDir.set(Math.sin(yaw), 0, Math.cos(yaw));
+  camera.position.x += (walkDir.x * fwd - Math.cos(yaw) * strafe) * speed * dt;
+  camera.position.z += (walkDir.z * fwd + Math.sin(yaw) * strafe) * speed * dt;
+  camera.position.x = Math.max(-TW / 2, Math.min(TW / 2, camera.position.x));
+  camera.position.z = Math.max(-TD / 2, Math.min(TD / 2, camera.position.z));
+  const ty = groundY(camera.position.x, camera.position.z) + EYE;
+  camera.position.y += (ty - camera.position.y) * Math.min(1, dt * 7);
+  lookPos.set(
+    camera.position.x + Math.sin(yaw) * Math.cos(pitch),
+    camera.position.y + Math.sin(pitch),
+    camera.position.z + Math.cos(yaw) * Math.cos(pitch)
+  );
+  camera.lookAt(lookPos);
+}
+
+/* ===== レンダループ（常時再描画契約） ===== */
+const camPos = new THREE.Vector3(), lookPos = new THREE.Vector3();
+let t0 = performance.now();
+function frame(now) {
+  window.__canvasLoop = true;
+  const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
+  if (lenis && !walking) lenis.raf(now);
+  const p = Math.min(1, Math.max(0, progress));
+  if (walking) {
+    walkFrame(dt);
+  } else {
+    if (!STATIC_MODE) { readScroll(); progress += (target - progress) * 0.085; }
+    camCurve.getPointAt(p, camPos);
+    lookCurve.getPointAt(p, lookPos);
+    camera.position.copy(camPos);
+    camera.lookAt(lookPos);
+  }
+  sky.position.copy(camera.position);
+  if (!REDUCED) seaUniforms.uTime.value += dt;
+  updateDOM(p);
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ===== selftest（契約B＋実データ検証） ===== */
+function selftest() {
+  const res = {
+    title: document.title,
+    chapters: document.querySelectorAll('[data-chapter]').length,
+    progressEngine: true,
+    progressParam: PROG_PARAM,
+    dem: { w: D.w, h: D.h, peakM: Math.round(peakM) },
+    texLoaded: !!terrainMat.map,
+    pins: PINS.length,
+    walkMode: !!document.getElementById('mode-btn'),
+    camY: Math.round(camera.position.y * 10) / 10,
+    canvasLoop: !!window.__canvasLoop,
+    pageH: Math.round(document.documentElement.scrollHeight),
+    errors: window.__errors
+  };
+  const pre = document.createElement('pre');
+  pre.id = 'selftest-result'; pre.textContent = JSON.stringify(res);
+  pre.style.cssText = 'position:fixed;left:-9999px;top:0';
+  document.body.appendChild(pre);
+  document.title = 'SELFTEST_DONE';
+}
+addEventListener('load', () => {
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => {
+    if (SELFTEST) setTimeout(selftest, 1600);
+  });
+});
+</script>
+</body>
+</html>
