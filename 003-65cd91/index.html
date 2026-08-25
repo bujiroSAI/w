@@ -1,0 +1,385 @@
+<title>GENIAC-PRIZE キャラバン再起動</title>
+<style>
+  :root{
+    --navy:#123a6b;
+    --blue:#1e6fd9;
+    --sky:#e8f4fd;
+    --sky2:#d3e9fa;
+    --sand:#fffdf5;
+    --ink:#111;
+    --accent:#ff9f1c;
+    --red:#b3261e;
+    --font-body:"Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic Medium",Meiryo,sans-serif;
+    --font-head:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Yu Gothic UI",Meiryo,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.85;
+    font-feature-settings:"palt" 1;
+    background-color:var(--sky);
+    background-image:
+      linear-gradient(rgba(30,111,217,.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30,111,217,.07) 1px, transparent 1px);
+    background-size:24px 24px;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:40px 20px 90px;}
+
+  header{
+    background:var(--sand);
+    border:3px solid var(--navy);
+    border-radius:18px;
+    padding:28px 30px 24px;
+    margin-bottom:34px;
+    box-shadow:6px 6px 0 rgba(18,58,107,.25);
+    position:relative;
+  }
+  header h1{
+    font-family:var(--font-head);
+    font-size:30px;line-height:1.45;margin:0 0 14px;letter-spacing:.005em;
+    color:var(--ink);font-weight:900;text-wrap:balance;
+  }
+  header .meta{font-size:13px;color:#444;margin:0;line-height:1.9;}
+  .sticker{
+    display:inline-block;
+    background:var(--accent);color:#fff;font-weight:700;
+    border:2px solid var(--navy);border-radius:999px;
+    padding:3px 14px;font-size:12.5px;letter-spacing:.1em;
+    margin-bottom:14px;transform:rotate(-2deg);
+    box-shadow:2px 2px 0 rgba(18,58,107,.3);
+  }
+  .zukan{position:absolute;top:18px;right:22px;font-size:34px;line-height:1;transform:rotate(8deg);}
+
+  section{
+    background:#fff;
+    border:3px solid var(--navy);
+    border-radius:16px;
+    padding:24px 26px 20px;
+    margin:0 0 30px;
+    box-shadow:5px 5px 0 rgba(18,58,107,.18);
+  }
+  h2{
+    font-family:var(--font-head);
+    font-size:20.5px;line-height:1.55;margin:-24px -26px 20px;
+    padding:14px 20px;
+    background:var(--sky2);color:var(--ink);
+    border-radius:12px 12px 0 0;
+    letter-spacing:.01em;font-weight:900;
+    border-bottom:3px solid var(--navy);text-wrap:balance;
+  }
+  h2 .num{
+    display:inline-block;background:var(--navy);color:#fff;
+    border-radius:8px;padding:1px 9px;margin-right:11px;
+    font-size:14px;letter-spacing:.1em;font-weight:900;
+  }
+  h2 .bug{margin-left:8px;}
+  h3{
+    font-family:var(--font-head);
+    font-size:16.5px;font-weight:900;margin:26px 0 10px;line-height:1.6;
+    padding-left:11px;border-left:5px solid var(--blue);
+  }
+  p{margin:0 0 15px;}
+  strong{font-weight:800;color:#111;}
+  ul,ol{margin:0 0 16px;padding-left:1.5em;}
+  li{margin-bottom:8px;}
+  ul li::marker{content:"▸ ";color:var(--blue);font-weight:800;}
+  ol li::marker{color:var(--blue);font-weight:800;}
+  a{color:var(--blue);}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--sky);padding:1px 5px;border-radius:4px;}
+
+  .conc{
+    border:3px dashed var(--blue);
+    background:var(--sky);
+    border-radius:14px;
+    padding:20px 22px;margin:0 0 10px;
+  }
+  .conc ul{margin-bottom:0;}
+
+  .tw{overflow-x:auto;margin:0 0 20px;border:2px solid var(--navy);border-radius:12px;}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.7;background:#fff;}
+  th,td{border-bottom:2px solid var(--sky2);padding:11px 13px;text-align:left;vertical-align:top;}
+  thead th{
+    background:var(--sky2);color:var(--ink);font-weight:800;white-space:nowrap;
+    border-bottom:2px solid var(--navy);
+  }
+  tbody tr:nth-child(even){background:var(--sky);}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+  .trail{
+    text-align:center;font-size:18px;letter-spacing:14px;
+    color:var(--blue);margin:0 0 30px;user-select:none;
+  }
+  .warn{
+    font-size:13.5px;color:#5a4a00;background:#fff6e0;
+    border:2px dashed var(--accent);border-radius:10px;
+    padding:10px 14px;margin:0 0 16px;
+  }
+  .note{font-size:13.5px;color:#444;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:0 0 18px;}
+  .card{border:2px solid var(--navy);border-radius:12px;padding:14px 16px;background:var(--sand);}
+  .card .lbl{font-family:var(--font-head);font-weight:900;font-size:13px;letter-spacing:.08em;color:var(--navy);display:block;margin-bottom:4px;}
+  .card .val{font-family:var(--font-head);font-weight:900;font-size:22px;line-height:1.3;font-variant-numeric:tabular-nums;}
+  .card .sub{font-size:12.5px;color:#444;line-height:1.7;display:block;margin-top:4px;}
+
+  .ask{border:2px solid var(--navy);border-radius:12px;padding:0;margin:0 0 16px;overflow:hidden;background:#fff;}
+  .ask > .head{display:flex;gap:10px;align-items:baseline;background:var(--sky2);padding:10px 14px;border-bottom:2px solid var(--navy);}
+  .ask > .head .no{font-family:var(--font-head);font-weight:900;background:var(--navy);color:#fff;border-radius:7px;padding:0 8px;font-size:13px;}
+  .ask > .head .ttl{font-family:var(--font-head);font-weight:900;font-size:15.5px;line-height:1.5;}
+  .ask > .body{padding:12px 16px 4px;}
+  .ask .due{display:inline-block;border:2px solid var(--accent);background:#fff6e0;border-radius:999px;padding:0 10px;font-size:12.5px;font-weight:800;margin-left:auto;white-space:nowrap;}
+
+  .vs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:0 0 16px;}
+  .vs > div{border:2px solid var(--navy);border-radius:12px;overflow:hidden;background:#fff;}
+  .vs h4{font-family:var(--font-head);font-weight:900;font-size:15px;margin:0;padding:9px 14px;background:var(--sky2);border-bottom:2px solid var(--navy);}
+  .vs .in{padding:12px 14px 2px;font-size:14.5px;}
+  .vs dt{font-family:var(--font-head);font-weight:900;font-size:12.5px;letter-spacing:.06em;color:var(--navy);}
+  .vs dd{margin:2px 0 12px;}
+  .vs dl{margin:0;}
+
+  @media (max-width:600px){
+    .wrap{padding:28px 14px 70px;}
+    header{padding:22px 20px 18px;}
+    header h1{font-size:23px;}
+    .zukan{font-size:26px;top:14px;right:16px;}
+    section{padding:20px 18px 16px;}
+    h2{font-size:17.5px;margin:-20px -18px 18px;padding:12px 15px;}
+    body{font-size:15.5px;}
+    .ask > .head{flex-wrap:wrap;}
+    .ask .due{margin-left:0;}
+  }
+  @media print{
+    body{background:#fff;}
+    .wrap{padding:0;max-width:none;}
+    section,header{box-shadow:none;page-break-inside:avoid;}
+    .trail{display:none;}
+  }
+</style>
+
+<div class="wrap">
+
+<header>
+<meta name="robots" content="noindex,nofollow">
+  <span class="sticker">🔒 社内限定</span>
+  <span class="zukan">🗾</span>
+  <h1>GENIAC-PRIZE キャラバン再起動<br>— 添野 → サトシ 引き継ぎ</h1>
+  <p class="meta">スタジオサイタマ合同会社（社内ノート）／ 2026-08-25<br>
+  対象: GENIAC-PRIZE 東京アワード（表彰式）＋4都市キャラバン（東京・大阪・名古屋・博多）<br>
+  正本: <code>11_BCG/11_PRIZE/README.md</code>／会場リサーチ: <code>11_PRIZE/3_deliverables/イベント企画運営/会場リサーチ_4都市キャラバン_FY27/</code></p>
+</header>
+
+<section>
+  <h2><span class="num">00</span>結論<span class="bug">🚩</span></h2>
+  <div class="conc">
+    <ul>
+      <li><strong>決まっているのは東京のアワードだけ。</strong>2027-03-29（月）・TODA HALL &amp; CONFERENCE TOKYO（ホールA＋Room401/402）。使用契約は 2026-07-16 に締結済み。</li>
+      <li><strong>キャラバンは4都市とも会場が決まっていない。</strong>7/14 の東京TFTホール空き回答を最後に6週間動いていない。仮押さえも1件もない。</li>
+      <li><strong>東京と大阪は「候補まで」、名古屋と博多は「開催そのものから」決まっていない。</strong>止まり方が2種類あるので、打ち手も分かれる。</li>
+      <li><strong>会場は自力では決められない。</strong>東京はイベントの仕様（発表と展示をどう置くか）が決まらないとホールの選びようがなく、大阪は候補2つのどちらを取るかがクライアント判断になる。<strong>どちらもBCGと決める話。</strong></li>
+      <li><strong>9月の一手はBCGとの相談を開くこと。</strong>日程・東京の仕様・大阪の二択・名古屋と博多の開催可否を、1回の打合せで並べて片づける。</li>
+    </ul>
+  </div>
+</section>
+
+<p class="trail">🚄🚄🚄</p>
+
+<section>
+  <h2><span class="num">01</span>決まっていること — 東京アワードは会場契約まで終わっている<span class="bug">🏛</span></h2>
+
+  <div class="grid">
+    <div class="card"><span class="lbl">開催日</span><span class="val">2027-03-29</span><span class="sub">月曜</span></div>
+    <div class="card"><span class="lbl">会場</span><span class="val" style="font-size:17px">TODA HALL</span><span class="sub">&amp; CONFERENCE TOKYO<br>ホールA＋Room401/402・東京駅7分</span></div>
+    <div class="card"><span class="lbl">状態</span><span class="val" style="font-size:17px">使用契約 締結済</span><span class="sub">2026-07-16 クラウドサイン<br>予約金は支払済</span></div>
+  </div>
+
+  <p>品川インターシティホール・大手町三井ホールとの3択だったが、<strong>審査委員会をパラレルで走らせる会議室（Room401/402）が同時に取れる</strong>点が決め手になって TODA に決着した。会場側の宿題はない。</p>
+
+  <h3>アワードでこれから決めるもの</h3>
+  <ul>
+    <li>台本・進行・受付オペレーションは未着手。前年度（2026年3月）の議事録が <code>2_meetings/</code> に一式残っているので、その型を下敷きにできる。</li>
+    <li>装飾・飲食、運営スタッフ（フルスイング）、配信（kusuguru）はいずれも金額未確定のまま台帳に置いてある。</li>
+    <li>テーマ1（社会課題事業）の<strong>応募締切は 2026-09-30 昼12:00</strong>。周知の短尺動画は 8/17 に一般公開済み（<code>https://youtu.be/CR6pNFhmSZk</code>）。審査は10月〜3月で、表彰式はその出口にあたる。</li>
+  </ul>
+</section>
+
+<p class="trail">🚄🚄🚄</p>
+
+<section>
+  <h2><span class="num">02</span>キャラバンは4都市とも会場が決まっていない<span class="bug">📍</span></h2>
+
+  <p>開催想定は <strong>2027年4月中旬〜5月末・半日・展示併設</strong>、東京300名／地方各150名。ただし 7/7 の社内検討で必要面積の前提が変わった——<strong>出展30社×1ブース約10人分＝実質300人規模</strong>で、地方も400㎡以上が最低ラインになる。受賞社は約850社に増え、受賞の有無を問わず全社がブースを出せる設計が求められている（出展希望は70社前後の見込み）。</p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>都市</th><th>いまの状態</th><th>候補</th><th>最後に動いた日</th></tr></thead>
+    <tbody>
+      <tr><td><strong>東京</strong><br>300名</td><td>候補は1つに絞れている。<strong>空き回答は来たが仮押さえに進めていない</strong></td><td>TFTホール1000<br><span class="note">有明・ホール900㎡＋ホワイエ400㎡。300／500との2室同時利用案もある</span></td><td>2026-07-14</td></tr>
+      <tr><td><strong>大阪</strong><br>150名</td><td><strong>候補が2つのまま。どちらも押さえられていない</strong></td><td>QUINTBRIDGE ／ Blooming Camp<br><span class="note">どちらも無料枠での利用が前提</span></td><td>2026-07-16</td></tr>
+      <tr><td><strong>名古屋</strong><br>150名</td><td><strong>開催そのものが未確定。</strong>候補は挙がっているが会場へ接触していない</td><td>STATION Ai ／ ナゴヤイノベーターズガレージ</td><td>2026-07-07</td></tr>
+      <tr><td><strong>博多</strong><br>150名</td><td><strong>開催そのものが未確定。</strong>7/7 に本命を決めたきり接触していない</td><td>西鉄ホール（天神直結・フラット500㎡）</td><td>2026-07-07</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="warn">名古屋と博多は、7/7 の2本の議事録と会場リサーチ資料で本命が食い違っている（→ <strong>05 未確認事項</strong>）。動く前にどちらを正とするか決める。</div>
+</section>
+
+<p class="trail">🚄🚄🚄</p>
+
+<section>
+  <h2><span class="num">03</span>BCGと決めないと進まないこと<span class="bug">🤝</span></h2>
+
+  <p>会場を押さえられないのは、こちらの手が止まっているからではない。<strong>決めるのがクライアント側の判断にあたる論点が4つ残っている。</strong>窓口は土屋様（中村様が代打）、チャンネルは Slack <code>ex-bcg-studiosaitama_prize</code>。</p>
+
+  <div class="ask">
+    <div class="head"><span class="no">1</span><span class="ttl">日程 — 会場優先か、委員スケジュール優先か</span><span class="due">最優先</span></div>
+    <div class="body">
+      <p>7/7 の会場検討MTGで、土屋様がクライアントに判断させる方向で持ち帰ったまま返ってきていない。<strong>これが全部の親</strong>で、日程がないと仮押さえも申請も見積も動かせない。4都市の確定日でなくてよく、週単位のレンジで足りる。</p>
+      <p class="note">会場側からリードが入れば日程を失うという事実は、7/7 に土屋様自身が認識している。そこを再提示して判断を促す。</p>
+    </div>
+  </div>
+
+  <div class="ask">
+    <div class="head"><span class="no">2</span><span class="ttl">東京 — TFTホールの使い方（仕様）が決まらないと、借りる会場が決まらない</span><span class="due">最優先</span></div>
+    <div class="body">
+      <p>TFTホールは 1000／500／300 の複数ホールがあり、<strong>どう使うかで借りる部屋が変わる。</strong>ホール1000に発表と展示を同居させるのか、ホール300を発表・ホール500を展示として2室同時に取るのか——この選択がイベントの仕様そのもので、会場選定より先にある。</p>
+      <p>仕様が決まらない原因は、必要面積が確定しないことにある。決めるべきは次の3つ。</p>
+      <ul>
+        <li><strong>展示社数</strong>（昨年30社に対し、今年は受賞850社・出展希望70社前後の見込み）</li>
+        <li><strong>発表と展示を分離するか、同室で回すか</strong>（7/7 では「プレゼンと展示の重複を避けたい」という理由で2室案が出ている）</li>
+        <li><strong>半日の時間帯</strong>（午前／午後）と、そこに設営・撤去が収まるか</li>
+      </ul>
+      <p>この3つはそのまま、<strong>地方3都市の必要面積の前提にもなる</strong>。東京の仕様を先に固めれば、地方の会場選定も同時に動き出す。</p>
+    </div>
+  </div>
+
+  <div class="ask">
+    <div class="head"><span class="no">3</span><span class="ttl">大阪 — QUINTBRIDGE か Blooming Camp か、想定のままでよいか</span><span class="due">最優先</span></div>
+    <div class="body">
+      <p>どちらも昨年◎の実績があり、無料枠での利用が前提。<strong>ただし両方にデメリットがあり、どちらを取るかの判断が要る。</strong></p>
+
+      <div class="vs">
+        <div>
+          <h4>QUINTBRIDGE（NTT西・京橋）</h4>
+          <div class="in"><dl>
+            <dt>強み</dt>
+            <dd>無料。NTT西の共創ネットワークがそのまま告知エンジンになる。昨年1階の貸切実績あり。</dd>
+            <dt>デメリット</dt>
+            <dd><strong>会場レイアウトに難がある。</strong>1Fの共創空間で、来場150名＋展示30社＋ミニステージ＋受付通路を同時に置くと上限ぎりぎり。机も備わっていないため持込前提で、カフェゾーンまで机を出してブース化する案になっている。</dd>
+            <dt>いまの状態</dt>
+            <dd>7/16 に「開催が4月以降で年度をまたぐため現時点で可否は回答できない。希望なら改めて申請を」との回答。<strong>再申請できる時期が未定。</strong></dd>
+          </dl></div>
+        </div>
+        <div>
+          <h4>Blooming Camp（グラングリーン大阪 北館3F）</h4>
+          <div class="in"><dl>
+            <dt>強み</dt>
+            <dd>無料。大阪駅直結で立地は候補中最強。</dd>
+            <dt>デメリット</dt>
+            <dd><strong>予約の受付開始が遅い</strong>（開始時期は要確認）。加えてプレゼンスクエア383㎡＋コネクトエリア277㎡の2フロア構成で、フロアが分断され実質の利用面積が狭くなる。公称120名で、150名＋展示には容量が足りない。</dd>
+            <dt>いまの状態</dt>
+            <dd><strong>交渉は未着手。</strong>7/7 時点では「QUINTBRIDGE → だめなら Blooming Camp」の順で置いている。</dd>
+          </dl></div>
+        </div>
+      </div>
+
+      <p>無料前提を外す場合の対抗は<strong>ハービスホール小</strong>（大阪駅直結・262㎡＋ホワイエ約500㎡・展示35万／8h）と<strong>ナレッジシアター</strong>（大阪駅直結・429㎡＋ホワイエ381㎡・50万）。どちらも展示動線には QUINTBRIDGE より素直で、レイアウトの問題は消える。<strong>「無料を守る」か「レイアウトを取る」かの選択としてBCGに出す。</strong></p>
+    </div>
+  </div>
+
+  <div class="ask">
+    <div class="head"><span class="no">4</span><span class="ttl">名古屋・博多 — そもそも開催するのか</span><span class="due">9月前半</span></div>
+    <div class="body">
+      <p>この2都市は会場が未定なのではなく、<strong>開催すること自体が固まっていない</strong>（台帳上も「構想」の扱い）。7/7 で候補を決めたところで止まり、会場への接触もしていない。</p>
+      <p>開催するなら、会場側の事情でそれぞれ前提工程が挟まる。</p>
+      <ul>
+        <li><strong>名古屋</strong>：ナゴヤイノベーターズガレージは一般貸出をしていないため、<strong>経産省からフロア全体（4F・約660㎡）の貸出を直接打診してもらう必要がある</strong>。STATION Ai なら通常の貸出で取れるが、半日枠に設営〜撤去・原状回復が収まるかが論点。</li>
+        <li><strong>博多</strong>：西鉄ホールは通常の貸出で取れる。並行して<strong>福岡グロースネクスト（FGN）の無償化を経産省つながりで打診</strong>する案が7/7に出ている。</li>
+      </ul>
+      <p>どちらも<strong>経産省への依頼が前提になる打ち手</strong>なので、BCG経由でしか動かせない。</p>
+    </div>
+  </div>
+
+  <h3>あわせて返してもらう3点</h3>
+  <p>会場リサーチの段階からBCGに投げたまま、回収できていない。上の1〜4を決めるための材料でもある。</p>
+  <ul>
+    <li>東京の想定展示社数（昨年30社 → 今年いくつか）</li>
+    <li>各都市の予算上限</li>
+    <li>半日の時間帯（午前／午後）</li>
+  </ul>
+</section>
+
+<p class="trail">🚄🚄🚄</p>
+
+<section>
+  <h2><span class="num">04</span>いまの費用の見立て<span class="bug">💴</span></h2>
+
+  <p>会場・装飾・運営の想定額。<strong>いずれも会場が確定していないための仮置き</strong>で、確定値ではない。</p>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>都市</th><th>候補</th><th class="num">会場費</th><th class="num">装飾</th><th class="num">運営（フルスイング）</th></tr></thead>
+    <tbody>
+      <tr><td>東京 300名</td><td>TFTホール</td><td class="num">¥2,500,000</td><td class="num">¥300,000</td><td class="num">¥1,500,000</td></tr>
+      <tr><td>大阪 150名</td><td>QUINTBRIDGE ／ Blooming Camp</td><td class="num">¥500,000</td><td class="num">—</td><td class="num">未定</td></tr>
+      <tr><td>名古屋 150名</td><td>STATION Ai ／ ガレージ</td><td class="num">¥300,000</td><td class="num">—</td><td class="num">¥1,500,000</td></tr>
+      <tr><td>博多 150名</td><td>西鉄ホール</td><td class="num">¥500,000</td><td class="num">—</td><td class="num">¥1,500,000</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p class="note">無料枠（QUINTBRIDGE・Blooming Camp・STATION Ai・FGN）が成立するかで会場費は大きく振れる。有料に切り替わった場合の相場は、大阪ハービス ¥350,000／ナレッジシアター ¥500,000、名古屋ウインクあいち ¥65,800／中日ホール ¥600,000、博多西鉄ホール ¥300,000（平日）／福岡トヨタホール ¥450,000。</p>
+
+  <div class="warn">予算枠との突合せは <code>11_BCG/01_コスト管理</code> 側が正本。本メモでは扱わない。</div>
+</section>
+
+<p class="trail">🚄🚄🚄</p>
+
+<section>
+  <h2><span class="num">05</span>未確認事項<span class="bug">🔍</span></h2>
+
+  <div class="tw">
+  <table>
+    <thead><tr><th>事項</th><th>確認先</th><th>判明すると何が変わるか</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Blooming Camp の予約受付がいつ始まるか</strong></td><td>先方へ問合せ</td><td>QUINTBRIDGE と並走できるかが決まる。遅いなら、待つあいだに有料会場を仮押さえしておく判断が要る</td></tr>
+      <tr><td><strong>QUINTBRIDGE の再申請時期</strong><br><span class="note">7/16「年度またぎで現時点は回答不可」</span></td><td>先方へ電話・メール</td><td>共創審査に約2週かかる前提の逆算ができる。受付が遅いなら大阪は有料会場との並走に切り替える</td></tr>
+      <tr><td><strong>東京TFTの仮押さえがどこで止まっているか</strong></td><td>フルスイング</td><td>こちらの照会が止まっているだけなら今週で解ける。ビッグサイト側の回答待ちなら代替（TODA A・品川）の並走を始める</td></tr>
+      <tr><td><strong>名古屋・博多の本命が資料間で食い違う</strong><br><span class="note">地方会場検討会＝名古屋ガレージ／福岡トヨタ、BCG同席MTG＝名古屋STATION Ai／博多西鉄ホール、会場リサーチ＝博多大名カンファレンス</span></td><td>添野に確認</td><td>接触先が変わる。ガレージを取るなら経産省経由の打診が前提工程として増える</td></tr>
+      <tr><td><strong>7月に手配した印刷物が着いたか</strong><br><span class="note">A1概要パネル×5枚／チラシ200枚／省庁ユースケース資料4種×各100部／立掛けラック</span></td><td>アクセア・GENIAC事務局（経産省AI産業戦略室 佐藤様宛・目黒）</td><td>未着なら再手配。キャラバンの周知物なので、開催が動き出す前に揃える</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<p class="trail">🚄🚄🚄</p>
+
+<section>
+  <h2><span class="num">06</span>手を動かす順番<span class="bug">📋</span></h2>
+
+  <ol>
+    <li><strong>BCGに打合せを立てる。</strong>03 の1〜4を1回の卓に並べる。日程・東京の仕様・大阪の二択・名古屋と博多の開催可否は、どれも単独では決まらず互いに前提になっている。</li>
+    <li><strong>並行して、外部の回答待ちを先に起こす。</strong>TFTの仮押さえ督促（フルスイング）、QUINTBRIDGEの再申請時期、Blooming Campの予約開始時期——この3つは相手の返答に日数がかかるので、打合せを待たずに投げる。</li>
+    <li><strong>ブース収容数の試算を出す。</strong>7/7 のアクションアイテムで未提出。TFT500（500㎡）で長机を並べれば50ブース超という粗い見立てまではある。<strong>この数字が東京の仕様（02）を決める材料そのもの</strong>なので、打合せの前に出しておくと卓が早く回る。</li>
+    <li><strong>会場が決まったら、電話確認項目を潰す。</strong>控室20名規模・搬入口の寸法と対応車格・天井高・ホワイエの内訳・展示30社の同時レイアウト可否・ケータリング持込料。項目は会場リサーチ資料に一覧がある。</li>
+  </ol>
+</section>
+
+<p class="trail">🚄🚄🚄</p>
+
+<section>
+  <h2><span class="num">07</span>参照<span class="bug">📚</span></h2>
+  <ul>
+    <li><code>11_BCG/11_PRIZE/README.md</code> — カルテ（現在地・記録）。事実の正本</li>
+    <li><code>11_BCG/11_PRIZE/2_meetings/20260707_PRIZE会場検討MTG.md</code> — BCG同席。東京TFT・ブース設計・大阪の二択</li>
+    <li><code>11_BCG/11_PRIZE/2_meetings/20260707_地方会場検討会.md</code> — 社内。地方3都市の候補整理・必要面積の前提変更</li>
+    <li><code>11_BCG/11_PRIZE/3_deliverables/イベント企画運営/会場リサーチ_4都市キャラバン_FY27/</code> — スコア付きショートリスト・足切りログ・電話確認項目・スライド用の会場基本情報</li>
+  </ul>
+</section>
+
+</div>
