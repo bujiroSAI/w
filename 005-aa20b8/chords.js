@@ -58,6 +58,15 @@ const INTRO_TRIALS = 4;
 // 新和音の出題重み（定着するまで多めに出す）
 const NEW_CHORD_BOOST = { untilAccuracy: 0.85, window: 12, probability: 0.4 };
 
+// 「きくじかん」＝受動的曝露ブロック。
+// Little, Cheng & Wright (2019): 同じ試行数でも、答えさせる練習だけでは学習が起きず（+9.8pt・有意差なし）、
+// 練習と受動的曝露を交互に挟むと劇的に学習した（+19.3pt・全員が学習）。未訓練音色・未訓練課題にも般化。
+// 2歳児にとっては休憩にもなる。
+const LISTEN_BLOCK = {
+  everyNTrials: 5,  // 何問ごとに挟むか
+  chords: 3,        // 1回に聴かせる和音の数
+};
+
 const DEFAULT_SETTINGS = {
   pitchA: 440,          // 基準ピッチ。家のピアノが442Hz調律なら設定で変更
   trialsPerSession: 20, // 1セッションの試行数（原法は1回20〜30試行・2〜3分）
@@ -68,5 +77,6 @@ const DEFAULT_SETTINGS = {
   parentPaced: false,   // true: おとながことりをタッチして次の問題へ（親子共同プレイ）
   marks: false,         // 旗に「しるし」を出す（色覚多様性への冗長コード）
   cudPalette: false,    // 色覚配慮パレットに切り替える
+  listenBlocks: true,   // 「きくじかん」を挟む（Little 2019・練習だけでは学習しない）
   dailyTarget: 4,       // 1日の推奨セッション数（原法は1日4〜5回）
 };

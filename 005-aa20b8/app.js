@@ -229,6 +229,8 @@
       lastPicks: [],
       autoReplays: 0,
       waitTimer: null,
+      listening: false,
+      lastListenAt: -1,
     };
     $('#demo-badge').classList.toggle('hidden', !S.demo);
     keepAwake(true);
@@ -238,7 +240,10 @@
   }
 
   function stopSession() {
-    if (S && S.waitTimer) clearTimeout(S.waitTimer);
+    if (S) {
+      if (S.waitTimer) clearTimeout(S.waitTimer);
+      S.listening = false; // きくじかんのループを止める
+    }
     S = null;
     keepAwake(false);
   }
@@ -341,10 +346,63 @@
     }
   }
 
+  // ============ きくじかん（受動的曝露ブロック） ============
+  // 答えさせずに「和音→その旗が光る→色名を読み上げ」を数回。Little 2019 の交互配置の実装。
+  function runListenBlock(done) {
+    if (!S) return;
+    S.locked = true;
+    S.listening = true;
+    renderFlags();
+    $('#flags').classList.add('lock');
+    speech('きくじかん');
+    Voice.speak('きくじかん');
+
+    // 同じ和音が連続すると曝露の多様性が落ちるので、直前と同じものは引き直す
+    const pool = S.pool.slice();
+    const picks = [];
+    for (let i = 0; i < LISTEN_BLOCK.chords; i++) {
+      let pick = pool[Math.floor(Math.random() * pool.length)];
+      for (let t = 0; t < 5 && pool.length > 1 && pick === picks[picks.length - 1]; t++) {
+        pick = pool[Math.floor(Math.random() * pool.length)];
+      }
+      picks.push(pick);
+    }
+
+    let i = 0;
+    const step = () => {
+      if (!S || !S.listening) return;
+      if (i >= picks.length) {
+        S.listening = false;
+        setTimeout(() => { if (S) done(); }, 500);
+        return;
+      }
+      const id = picks[i++];
+      const c = CHORD_BY_ID[id];
+      $$('#flags .flag').forEach(f => f.classList.remove('glow', 'fade'));
+      playChord(id);
+      const el = flagEl(id);
+      if (el) {
+        el.classList.add('glow');
+        $$('#flags .flag').forEach(f => { if (f !== el) f.classList.add('fade'); });
+      }
+      speech(c.label);
+      setTimeout(() => Voice.speak(c.label), 700);
+      setTimeout(step, 2600);
+    };
+    setTimeout(step, 900);
+  }
+
   function nextTrial() {
     if (!S) return;
     S.pendingNext = false;
     if (S.idx >= S.total) { endSession(); return; }
+    // きくじかんを挟む（intro中は単独提示そのものが曝露なので挟まない）
+    if (Store.data.settings.listenBlocks && S.mode !== 'intro' && S.pool.length >= 2 &&
+        S.idx > 0 && S.idx % LISTEN_BLOCK.everyNTrials === 0 && S.lastListenAt !== S.idx) {
+      S.lastListenAt = S.idx;
+      runListenBlock(nextTrial);
+      return;
+    }
     S.corrective = false;
     S.autoReplays = 0;
     S.locked = true;
@@ -671,6 +729,8 @@
         <span class="stepper">
           <button type="button" id="set-tri-minus">−</button><b id="set-tri-val">${st.trialsPerSession}</b><button type="button" id="set-tri-plus">＋</button>
         </span></div>
+      <div class="p-set-row"><span class="p-set-label">きくじかんを はさむ<small>${LISTEN_BLOCK.everyNTrials}問ごとに、答えずに聴くだけの時間を挟む。研究では、同じ問題数でも答えさせる練習だけだと学習が起きず、聴くだけの時間を交互に挟むと大きく伸びた</small></span>
+        <button type="button" class="switch ${st.listenBlocks ? 'on' : ''}" id="set-listen" aria-label="きくじかん"></button></div>
       <div class="p-set-row"><span class="p-set-label">はたに しるしをつける<small>色が見分けにくいお子さま向け（日本人男性の約5%）。色に加えて形でも区別できる</small></span>
         <button type="button" class="switch ${st.marks ? 'on' : ''}" id="set-marks" aria-label="しるし"></button></div>
       <div class="p-set-row"><span class="p-set-label">色覚配慮パレット<small>Okabe-Ito配色に切替。市販の旗教材と色が変わる点に注意</small></span>
@@ -721,6 +781,7 @@
         $(id).classList.toggle('on', st[key]);
       });
     };
+    toggle('#set-listen', 'listenBlocks');
     toggle('#set-voice', 'voice');
     toggle('#set-sfx', 'sfx');
     toggle('#set-suggest', 'autoSuggest');
@@ -762,6 +823,7 @@
         <li><b>間違えても教え直すだけ。</b>アプリは正解の旗を光らせて同じ和音をもう一度鳴らす。叱る・がっかりした顔を見せない。</li>
         <li><b>習得中にやらないこと（原法の禁止事項）:</b> 単音あてクイズ／ドレミで歌わせる（階名唱）／和音をバラして弾く（分散）／移調あそび。どれも「響きを丸ごと覚える」プロセスを壊す。単音・相対音感は全部の旗が終わってからの段階。</li>
         <li><b>本物のピアノとの併用は最良。</b>同じ和音を弾いて旗あそびをするのが原法そのもの（このアプリはその持ち歩き版・補助輪）。</li>
+        <li><b>「きくじかん」は飛ばさない。</b>${LISTEN_BLOCK.everyNTrials}問ごとに、答えずにただ聴くだけの時間が入る。海外の研究で、<b>同じ問題数でも答えさせる練習だけでは学習が起きず、聴くだけの時間を交互に挟んだ群だけが大きく伸びた</b>（未習の音色にも効果が広がった）。子どもにとっては休憩にもなる。</li>
         <li><b>色が見分けにくいお子さまへ。</b>男性の約5%（日本）は赤と緑の区別が難しい。2歳児は「見分けられない」と言えないため、うまくいかないと「向いていない」と誤解されやすい。設定の<b>「はたに しるしをつける」</b>を入れると、色に加えて形（丸・星・三角…）でも旗を区別できる。訓練上の効果は変わらない——旗は音につける名札であって、名札が色でも形でも音の学習は同じように進む。</li>
         <li><b>iPadは「ホーム画面に追加」で使う。</b>Safariのままだと7日間使わないと記録が消えることがある（iOSの仕様）。共有ボタン→「ホーム画面に追加」。誤操作防止にはiOSの「アクセスガイド」（設定→アクセシビリティ）が便利。</li>
       </ol>
