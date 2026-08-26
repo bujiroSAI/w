@@ -19,23 +19,25 @@ const NOTE_MIDI = (() => {
 // 導入順に並べる。unlock順 = この配列の先頭からn個。
 // ink: 旗ラベル文字色（旗布の明度に応じて）
 // group: 同じ構成音グループ（響き）。グループ内の混同=クロマ依存エラー=前進のサイン（榊原1999）
+// mark: 旗の「しるし」。色覚多様性への冗長コード（WCAG 1.4.1・日本人男性の約5%）。
+// cud: 色覚配慮パレット（Okabe-Ito 8色を骨格に、明度差で14本を分離）。
 const CHORDS = [
   // ---- 白鍵9和音（導入順は榊原1999/2004 Figure 1 で確認済み） ----
-  { id: 'aka',      label: 'あか',     color: '#E8382F', ink: '#FFFFFF', notes: ['C4', 'E4', 'G4'],  yomi: 'ドミソ',   group: 'C' },
-  { id: 'kiiro',    label: 'きいろ',   color: '#F5C518', ink: '#4A3B2E', notes: ['C4', 'F4', 'A4'],  yomi: 'ドファラ', group: 'F' },
-  { id: 'ao',       label: 'あお',     color: '#2A6BD4', ink: '#FFFFFF', notes: ['B3', 'D4', 'G4'],  yomi: 'シレソ',   group: 'G' },
-  { id: 'kuro',     label: 'くろ',     color: '#38332F', ink: '#FFFFFF', notes: ['A3', 'C4', 'F4'],  yomi: 'ラドファ', group: 'F' },
-  { id: 'midori',   label: 'みどり',   color: '#2E9E4F', ink: '#FFFFFF', notes: ['D4', 'G4', 'B4'],  yomi: 'レソシ',   group: 'G' },
-  { id: 'daidai',   label: 'だいだい', color: '#EE7B23', ink: '#FFFFFF', notes: ['E4', 'G4', 'C5'],  yomi: 'ミソド',   group: 'C' },
-  { id: 'murasaki', label: 'むらさき', color: '#8B4FB8', ink: '#FFFFFF', notes: ['F4', 'A4', 'C5'],  yomi: 'ファラド', group: 'F' },
-  { id: 'momoiro',  label: 'ももいろ', color: '#F08CB0', ink: '#4A3B2E', notes: ['G3', 'B3', 'D4'],  yomi: 'ソシレ',   group: 'G' },
-  { id: 'chairo',   label: 'ちゃいろ', color: '#8D6238', ink: '#FFFFFF', notes: ['G3', 'C4', 'E4'],  yomi: 'ソドミ',   group: 'C' },
+  { id: 'aka',      label: 'あか',     color: '#E8382F', ink: '#FFFFFF', notes: ['C4', 'E4', 'G4'],  yomi: 'ドミソ',   group: 'C',  mark: 'dot',    cud: '#D55E00' },
+  { id: 'kiiro',    label: 'きいろ',   color: '#F5C518', ink: '#4A3B2E', notes: ['C4', 'F4', 'A4'],  yomi: 'ドファラ', group: 'F',  mark: 'star',   cud: '#F0E442' },
+  { id: 'ao',       label: 'あお',     color: '#2A6BD4', ink: '#FFFFFF', notes: ['B3', 'D4', 'G4'],  yomi: 'シレソ',   group: 'G',  mark: 'tri',    cud: '#0072B2' },
+  { id: 'kuro',     label: 'くろ',     color: '#38332F', ink: '#FFFFFF', notes: ['A3', 'C4', 'F4'],  yomi: 'ラドファ', group: 'F',  mark: 'sq',     cud: '#1A1A1A' },
+  { id: 'midori',   label: 'みどり',   color: '#2E9E4F', ink: '#FFFFFF', notes: ['D4', 'G4', 'B4'],  yomi: 'レソシ',   group: 'G',  mark: 'heart',  cud: '#009E73' },
+  { id: 'daidai',   label: 'だいだい', color: '#EE7B23', ink: '#FFFFFF', notes: ['E4', 'G4', 'C5'],  yomi: 'ミソド',   group: 'C',  mark: 'dia',    cud: '#E69F00' },
+  { id: 'murasaki', label: 'むらさき', color: '#8B4FB8', ink: '#FFFFFF', notes: ['F4', 'A4', 'C5'],  yomi: 'ファラド', group: 'F',  mark: 'cross',  cud: '#8E4FA8' },
+  { id: 'momoiro',  label: 'ももいろ', color: '#F08CB0', ink: '#4A3B2E', notes: ['G3', 'B3', 'D4'],  yomi: 'ソシレ',   group: 'G',  mark: 'flower', cud: '#F7B6D2' },
+  { id: 'chairo',   label: 'ちゃいろ', color: '#8D6238', ink: '#FFFFFF', notes: ['G3', 'C4', 'E4'],  yomi: 'ソドミ',   group: 'C',  mark: 'pent',   cud: '#6E4B1F' },
   // ---- 黒鍵和音5個（構成音は実践記録2本が独立に一致・導入順のみ未確定） ----
-  { id: 'kimidori', label: 'きみどり', color: '#9DB92C', ink: '#4A3B2E', notes: ['A3', 'C#4', 'E4'],  yomi: 'ラ ド#ミ',  group: 'A' },
-  { id: 'usudaidai',label: 'うすだいだい', color: '#F3C193', ink: '#4A3B2E', notes: ['D4', 'F#4', 'A4'], yomi: 'レ ファ#ラ', group: 'D' },
-  { id: 'fujiiro',  label: 'ふじいろ', color: '#A58FC9', ink: '#4A3B2E', notes: ['E4', 'G#4', 'B4'],  yomi: 'ミ ソ#シ',  group: 'E' },
-  { id: 'haiiro',   label: 'はいいろ', color: '#9A948C', ink: '#FFFFFF', notes: ['Bb3', 'D4', 'F4'],  yomi: 'シ♭レファ', group: 'Bb' },
-  { id: 'mizuiro',  label: 'みずいろ', color: '#6FC3E0', ink: '#4A3B2E', notes: ['Eb4', 'G4', 'Bb4'], yomi: 'ミ♭ソシ♭', group: 'Eb' },
+  { id: 'kimidori', label: 'きみどり', color: '#9DB92C', ink: '#4A3B2E', notes: ['A3', 'C#4', 'E4'],  yomi: 'ラ ド#ミ',  group: 'A',  mark: 'hex',  cud: '#C7E020' },
+  { id: 'usudaidai',label: 'うすだいだい', color: '#F3C193', ink: '#4A3B2E', notes: ['D4', 'F#4', 'A4'], yomi: 'レ ファ#ラ', group: 'D', mark: 'moon', cud: '#F7C59F' },
+  { id: 'fujiiro',  label: 'ふじいろ', color: '#A58FC9', ink: '#4A3B2E', notes: ['E4', 'G#4', 'B4'],  yomi: 'ミ ソ#シ',  group: 'E',  mark: 'ring', cud: '#B3A6E8' },
+  { id: 'haiiro',   label: 'はいいろ', color: '#9A948C', ink: '#FFFFFF', notes: ['Bb3', 'D4', 'F4'],  yomi: 'シ♭レファ', group: 'Bb', mark: 'bar',  cud: '#8C8C8C' },
+  { id: 'mizuiro',  label: 'みずいろ', color: '#6FC3E0', ink: '#4A3B2E', notes: ['Eb4', 'G4', 'Bb4'], yomi: 'ミ♭ソシ♭', group: 'Eb', mark: 'up',   cud: '#56B4E9' },
 ];
 
 const CHORD_BY_ID = Object.fromEntries(CHORDS.map(c => [c.id, c]));
@@ -64,5 +66,7 @@ const DEFAULT_SETTINGS = {
   sfx: true,
   autoSuggest: true,    // 進級提案を出す
   parentPaced: false,   // true: おとながことりをタッチして次の問題へ（親子共同プレイ）
+  marks: false,         // 旗に「しるし」を出す（色覚多様性への冗長コード）
+  cudPalette: false,    // 色覚配慮パレットに切り替える
   dailyTarget: 4,       // 1日の推奨セッション数（原法は1日4〜5回）
 };

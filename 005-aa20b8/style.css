@@ -275,22 +275,26 @@ button:focus-visible { outline: 3px solid var(--wood); outline-offset: 3px; bord
   align-items: flex-end;
   align-content: flex-end;
   justify-content: center;
-  gap: clamp(10px, 3vw, 40px);
+  gap: clamp(8px, 1.6vw, 30px);
   padding: 0 24px calc(46px + env(safe-area-inset-bottom));
 }
+/* --fw = 旗の幅。枚数に応じて renderFlags が設定する（14本でも画面に収める） */
 .flag {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 0 1 clamp(150px, 24vw, 300px);
+  flex: 0 0 var(--fw, 260px);
+  min-width: 0; /* 長いラベルで旗が横に伸びるのを防ぐ */
   max-height: 100%;
   transition: opacity 0.25s, transform 0.25s, filter 0.25s;
 }
 .flag-cloth {
   position: relative;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   aspect-ratio: 8 / 5.4;
   background:
@@ -308,17 +312,27 @@ button:focus-visible { outline: 3px solid var(--wood); outline-offset: 3px; bord
 .flag:nth-child(3) .flag-cloth { animation-delay: -2.2s; }
 .flag:nth-child(4) .flag-cloth { animation-delay: -0.6s; }
 .flag:nth-child(5) .flag-cloth { animation-delay: -1.7s; }
+.flag-mark {
+  width: calc(var(--fw, 260px) * 0.2);
+  height: calc(var(--fw, 260px) * 0.2);
+  color: var(--ink2, #fff);
+  opacity: 0.92;
+  margin-bottom: 1px;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.12));
+}
 .flag-label {
-  font-size: clamp(30px, 4.6vw, 54px);
+  font-size: calc(var(--fw, 260px) * 0.185 * var(--labscale, 1));
   font-weight: 900;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
   color: var(--ink2, #fff);
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.14);
+  white-space: nowrap;
 }
 .flag-pole {
   position: relative;
-  width: 12px;
-  height: clamp(56px, 10vh, 110px);
+  width: clamp(7px, calc(var(--fw, 260px) * 0.046), 12px);
+  height: clamp(28px, calc(var(--fw, 260px) * 0.34), 96px);
   background: linear-gradient(90deg, var(--wood), var(--wood-deep));
   border-radius: 0 0 6px 6px;
   margin-top: -4px;
@@ -328,7 +342,8 @@ button:focus-visible { outline: 3px solid var(--wood); outline-offset: 3px; bord
   position: absolute;
   top: -9px; left: 50%;
   transform: translateX(-50%);
-  width: 20px; height: 20px;
+  width: clamp(12px, calc(var(--fw, 260px) * 0.077), 20px);
+  aspect-ratio: 1;
   border-radius: 50%;
   background: var(--kraft-deep);
 }
@@ -349,7 +364,6 @@ button:focus-visible { outline: 3px solid var(--wood); outline-offset: 3px; bord
     0 8px 0 rgba(74, 59, 46, 0.14);
 }
 .flag.shake { animation: flag-shake 0.4s ease; }
-.flag.intro { flex-basis: clamp(220px, 38vw, 420px); }
 
 /* ============ ごほうび ============ */
 .reward-inner {
@@ -612,9 +626,7 @@ input[type='range'] { width: 150px; accent-color: var(--wood-deep); }
 
 /* 縦持ち・狭幅 */
 @media (max-width: 700px) {
-  .flags { flex-wrap: wrap; align-content: flex-end; gap: 12px; }
-  .flag { flex-basis: clamp(130px, 42vw, 220px); }
-  .flag-pole { height: 44px; }
+  .flags { gap: 10px; }
   .stage-area { height: clamp(150px, 24vh, 210px); }
   .p-chord-row { grid-template-columns: 32px 70px 1fr 60px; }
   .p-chord-yomi { display: none; }

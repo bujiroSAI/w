@@ -49,6 +49,30 @@
     <path d="M96 92 Q100 96 104 92" fill="none" stroke="#4A3B2E" stroke-width="3" stroke-linecap="round"/>
   </svg>`;
 
+  // ============ 旗のしるし（色覚多様性への冗長コード・WCAG 1.4.1） ============
+  // 色が見分けられなくても旗を同定できるようにする。2歳児は「見分けられない」と言えないため、
+  // 気づかれないまま「才能がない」と誤解される事故を防ぐのが目的。
+  const MARKS = {
+    dot:    '<circle cx="12" cy="12" r="8"/>',
+    star:   '<path d="M12 3l2.6 6.1 6.6.5-5 4.3 1.5 6.4L12 17l-5.7 3.3 1.5-6.4-5-4.3 6.6-.5z"/>',
+    tri:    '<path d="M12 3.5l8.5 15h-17z"/>',
+    sq:     '<rect x="4.5" y="4.5" width="15" height="15" rx="2"/>',
+    heart:  '<path d="M12 20.5S3.5 15 3.5 9.4A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 8.5 1.8c0 5.6-8.5 11.1-8.5 11.1z"/>',
+    dia:    '<path d="M12 2.5l9.5 9.5L12 21.5 2.5 12z"/>',
+    cross:  '<path d="M9.4 3h5.2v6.4H21v5.2h-6.4V21H9.4v-6.4H3V9.4h6.4z"/>',
+    flower: '<g><circle cx="12" cy="5.6" r="3.6"/><circle cx="12" cy="18.4" r="3.6"/><circle cx="5.6" cy="12" r="3.6"/><circle cx="18.4" cy="12" r="3.6"/></g>',
+    pent:   '<path d="M12 2.5l9.5 6.9-3.6 11.1H6.1L2.5 9.4z"/>',
+    hex:    '<path d="M12 2.5l8.2 4.75v9.5L12 21.5l-8.2-4.75v-9.5z"/>',
+    moon:   '<path d="M16.5 3a9.5 9.5 0 1 0 0 18 11 11 0 0 1 0-18z"/>',
+    ring:   '<path d="M12 2.5A9.5 9.5 0 1 0 12 21.5 9.5 9.5 0 0 0 12 2.5zm0 5.2a4.3 4.3 0 1 1 0 8.6 4.3 4.3 0 0 1 0-8.6z"/>',
+    bar:    '<rect x="2.5" y="9" width="19" height="6" rx="2"/>',
+    up:     '<path d="M12 2.5l8.5 9h-5v10h-7v-10h-5z"/>',
+  };
+  const markSvg = (id) =>
+    `<svg class="flag-mark" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">${MARKS[id] || MARKS.dot}</svg>`;
+
+  const chordColor = (c) => (Store.data.settings.cudPalette && c.cud) ? c.cud : c.color;
+
   // ============ こえ（読み上げ） ============
   const Voice = (() => {
     let ja = null;
@@ -239,14 +263,22 @@
   function renderFlags() {
     const box = $('#flags');
     box.innerHTML = '';
-    for (const c of visibleChords()) {
+    const list = visibleChords();
+    // 旗の幅を枚数から決める。14本（最終形）でも1画面に収める。
+    // 2歳児のタップ精度（平均4.5mmずれ）を考慮し、下限は実寸2cm角を割らない値に置く。
+    const n = list.length;
+    const fw = n <= 1 ? 380 : n <= 3 ? 270 : n <= 6 ? 205 : n <= 9 ? 152 : 118;
+    box.style.setProperty('--fw', `min(${fw}px, ${Math.floor(88 / Math.min(n, 5))}vw)`);
+    for (const c of list) {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'flag' + (S.mode === 'intro' ? ' intro' : '');
       b.dataset.chord = c.id;
       b.setAttribute('aria-label', c.label);
-      b.style.setProperty('--flag', c.color);
-      b.innerHTML = `<span class="flag-cloth" style="--ink2:${c.ink}"><span class="flag-label">${c.label}</span></span><span class="flag-pole"></span>`;
+      b.style.setProperty('--flag', chordColor(c));
+      b.style.setProperty('--labscale', String(Math.min(1, 3.6 / c.label.length)));
+      const mark = Store.data.settings.marks ? markSvg(c.mark) : '';
+      b.innerHTML = `<span class="flag-cloth" style="--ink2:${c.ink}">${mark}<span class="flag-label">${c.label}</span></span><span class="flag-pole"></span>`;
       b.addEventListener('pointerdown', () => onFlag(c.id, b));
       box.appendChild(b);
     }
@@ -361,7 +393,7 @@
       });
       if (!small) {
         const r = el.getBoundingClientRect();
-        Confetti.burst(c.color, r.left + r.width / 2, r.top + r.height * 0.3, 70);
+        Confetti.burst(chordColor(c), r.left + r.width / 2, r.top + r.height * 0.3, 70);
       }
     }
     const char = $('#char-btn');
@@ -545,7 +577,7 @@
       const unlocked = i < d.unlocked.length;
       if (!unlocked) {
         return `<div class="p-chord-row locked">
-          <span class="p-chip" style="background:${c.color}"></span>
+          <span class="p-chip" style="background:${chordColor(c)}"></span>
           <span class="p-chord-name">${c.label}</span>
           <span class="p-chord-yomi">${c.yomi}</span>
           <span class="p-bar"><i style="width:0"></i></span>
@@ -555,7 +587,7 @@
       const w = acc === null ? 0 : Math.round(acc * 100);
       const good = acc !== null && acc >= ADVANCE_RULE.minAccuracy;
       return `<div class="p-chord-row">
-        <span class="p-chip" style="background:${c.color}"></span>
+        <span class="p-chip" style="background:${chordColor(c)}"></span>
         <span class="p-chord-name">${c.label}</span>
         <span class="p-chord-yomi">${c.yomi}</span>
         <span class="p-bar${good ? ' good' : ''}"><i style="width:${w}%"></i></span>
@@ -639,6 +671,10 @@
         <span class="stepper">
           <button type="button" id="set-tri-minus">−</button><b id="set-tri-val">${st.trialsPerSession}</b><button type="button" id="set-tri-plus">＋</button>
         </span></div>
+      <div class="p-set-row"><span class="p-set-label">はたに しるしをつける<small>色が見分けにくいお子さま向け（日本人男性の約5%）。色に加えて形でも区別できる</small></span>
+        <button type="button" class="switch ${st.marks ? 'on' : ''}" id="set-marks" aria-label="しるし"></button></div>
+      <div class="p-set-row"><span class="p-set-label">色覚配慮パレット<small>Okabe-Ito配色に切替。市販の旗教材と色が変わる点に注意</small></span>
+        <button type="button" class="switch ${st.cudPalette ? 'on' : ''}" id="set-cud" aria-label="色覚配慮パレット"></button></div>
       <div class="p-set-row"><span class="p-set-label">こえ（色名の読み上げ）</span>
         <button type="button" class="switch ${st.voice ? 'on' : ''}" id="set-voice" aria-label="こえ"></button></div>
       <div class="p-set-row"><span class="p-set-label">効果音</span>
@@ -688,6 +724,15 @@
     toggle('#set-voice', 'voice');
     toggle('#set-sfx', 'sfx');
     toggle('#set-suggest', 'autoSuggest');
+    ['#set-marks:marks', '#set-cud:cudPalette'].forEach(pair => {
+      const [sel, key] = pair.split(':');
+      $(sel).addEventListener('click', () => {
+        st[key] = !st[key];
+        Store.save();
+        $(sel).classList.toggle('on', st[key]);
+        renderParent(); // 一覧の色見本も即反映
+      });
+    });
     $('#set-vol').addEventListener('input', (e) => {
       st.volume = parseFloat(e.target.value);
       Store.save();
@@ -717,6 +762,7 @@
         <li><b>間違えても教え直すだけ。</b>アプリは正解の旗を光らせて同じ和音をもう一度鳴らす。叱る・がっかりした顔を見せない。</li>
         <li><b>習得中にやらないこと（原法の禁止事項）:</b> 単音あてクイズ／ドレミで歌わせる（階名唱）／和音をバラして弾く（分散）／移調あそび。どれも「響きを丸ごと覚える」プロセスを壊す。単音・相対音感は全部の旗が終わってからの段階。</li>
         <li><b>本物のピアノとの併用は最良。</b>同じ和音を弾いて旗あそびをするのが原法そのもの（このアプリはその持ち歩き版・補助輪）。</li>
+        <li><b>色が見分けにくいお子さまへ。</b>男性の約5%（日本）は赤と緑の区別が難しい。2歳児は「見分けられない」と言えないため、うまくいかないと「向いていない」と誤解されやすい。設定の<b>「はたに しるしをつける」</b>を入れると、色に加えて形（丸・星・三角…）でも旗を区別できる。訓練上の効果は変わらない——旗は音につける名札であって、名札が色でも形でも音の学習は同じように進む。</li>
         <li><b>iPadは「ホーム画面に追加」で使う。</b>Safariのままだと7日間使わないと記録が消えることがある（iOSの仕様）。共有ボタン→「ホーム画面に追加」。誤操作防止にはiOSの「アクセスガイド」（設定→アクセシビリティ）が便利。</li>
       </ol>
       <p class="p-warn">⚠️ 開始年齢がすべて: 縦断研究で習得が確認されているのは2〜6歳開始（Sakakibara 2014・継続22人全員が習得）。7歳以降の開始は急に難しくなる。<br>
