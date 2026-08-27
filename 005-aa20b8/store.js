@@ -90,6 +90,34 @@ const Store = (() => {
   }
 
   // 進級条件を満たしているか
+  // 進級までの残り（親向け進捗表示に使う）
+  function advanceStatus() {
+    if (data.unlocked.length >= CHORDS.length) return null;
+    const st = stageTrials();
+    const days = stageDays();
+    let weakest = null;
+    let accOk = true;
+    for (const id of data.unlocked) {
+      const { acc, n } = chordAccuracy(id, ADVANCE_RULE.perChordWindow);
+      const ok = n >= Math.min(ADVANCE_RULE.perChordWindow, 12) && acc !== null && acc >= ADVANCE_RULE.minAccuracy;
+      if (!ok) {
+        accOk = false;
+        if (!weakest || (acc || 0) < (weakest.acc || 0)) weakest = { id, acc, n };
+      }
+    }
+    return {
+      daysDone: days,
+      daysNeed: ADVANCE_RULE.minDaysOnStage,
+      daysLeft: Math.max(0, ADVANCE_RULE.minDaysOnStage - days),
+      trialsDone: st.length,
+      trialsNeed: ADVANCE_RULE.minTrialsOnStage,
+      accOk,
+      weakest,
+      ready: advanceReady(),
+      next: CHORDS[data.unlocked.length] || null,
+    };
+  }
+
   function advanceReady() {
     if (data.unlocked.length >= CHORDS.length) return false;
     const st = stageTrials();
@@ -128,7 +156,7 @@ const Store = (() => {
   }
 
   return { load, save, reset, addTrial, addSession, addSticker, unlockNext, clearIntro,
-           chordAccuracy, stageTrials, stageDays, advanceReady, todaySessions, calendar,
+           chordAccuracy, stageTrials, stageDays, advanceReady, advanceStatus, todaySessions, calendar,
            exportJSON, dayKey,
            get data() { return data; } };
 })();

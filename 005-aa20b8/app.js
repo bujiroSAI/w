@@ -120,22 +120,37 @@
     window.addEventListener('resize', size);
     size();
 
+    function mk(x, y, vx, vy, color) {
+      const kind = Math.random();
+      return {
+        x, y, vx, vy,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.5,
+        w: 7 + Math.random() * 9,
+        h: 5 + Math.random() * 7,
+        c: Math.random() < 0.28 ? '#FFFDF6' : color,
+        shape: kind < 0.55 ? 'rect' : kind < 0.8 ? 'dot' : 'flag', // 紙片・丸・小旗
+        sw: Math.random() * Math.PI * 2,   // ひらひらの位相
+        swf: 0.08 + Math.random() * 0.1,   // ひらひらの速さ
+        t: 0,
+        life: 1,
+      };
+    }
     function burst(color, x, y, n) {
       if (reduced) return;
       for (let i = 0; i < (n || 60); i++) {
         const a = Math.random() * Math.PI * 2;
-        const sp = 4 + Math.random() * 8;
-        parts.push({
-          x, y,
-          vx: Math.cos(a) * sp,
-          vy: Math.sin(a) * sp - 6,
-          rot: Math.random() * Math.PI,
-          vr: (Math.random() - 0.5) * 0.4,
-          w: 7 + Math.random() * 8,
-          h: 5 + Math.random() * 6,
-          c: Math.random() < 0.28 ? '#FFFDF6' : color,
-          life: 1,
-        });
+        const sp = 5 + Math.random() * 10;
+        parts.push(mk(x, y, Math.cos(a) * sp, Math.sin(a) * sp - 7, color));
+      }
+      if (!raf) tick();
+    }
+    // 画面上部からその色の紙吹雪を降らせる（big演出用）
+    function rain(color, n) {
+      if (reduced) return;
+      for (let i = 0; i < (n || 50); i++) {
+        parts.push(mk(Math.random() * innerWidth, -20 - Math.random() * 120,
+                      (Math.random() - 0.5) * 2, 1 + Math.random() * 3, color));
       }
       if (!raf) tick();
     }
@@ -145,22 +160,33 @@
       parts = parts.filter(p => p.life > 0);
       if (parts.length === 0) { cancelAnimationFrame(raf); raf = null; return; }
       for (const p of parts) {
-        p.vy += 0.35;
+        p.t++;
+        p.vy += p.vy < 2.6 ? 0.32 : 0.06; // 終端速度でひらひら落ちる
         p.vx *= 0.985;
-        p.x += p.vx;
+        p.x += p.vx + Math.sin(p.t * p.swf + p.sw) * 1.1;
         p.y += p.vy;
         p.rot += p.vr;
-        p.life -= 0.011;
+        p.life -= 0.0085;
         cx.save();
         cx.translate(p.x, p.y);
         cx.rotate(p.rot);
         cx.globalAlpha = Math.max(0, Math.min(1, p.life * 1.6));
         cx.fillStyle = p.c;
-        cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        // ひらひら感: 位相で片軸を潰す（紙が翻る見え方）
+        cx.scale(1, 0.35 + 0.65 * Math.abs(Math.sin(p.t * p.swf * 1.6 + p.sw)));
+        if (p.shape === 'dot') {
+          cx.beginPath(); cx.arc(0, 0, p.w * 0.42, 0, Math.PI * 2); cx.fill();
+        } else if (p.shape === 'flag') {
+          cx.beginPath();
+          cx.moveTo(-p.w / 2, -p.h / 2); cx.lineTo(p.w / 2, 0); cx.lineTo(-p.w / 2, p.h / 2);
+          cx.closePath(); cx.fill();
+        } else {
+          cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        }
         cx.restore();
       }
     }
-    return { burst };
+    return { burst, rain };
   })();
 
   // ============ 画面切替 ============
@@ -188,6 +214,25 @@
     }
     $('#parent-badge').classList.toggle('hidden',
       !(st.autoSuggest && Store.advanceReady()));
+
+    // つぎの旗までの見通し（見えない待機を見える階段に）
+    const info = $('#next-flag-info');
+    const a = Store.advanceStatus();
+    if (!a) {
+      info.textContent = 'ぜんぶの はたが そろったよ！';
+      info.classList.remove('hidden');
+    } else if (a.ready) {
+      info.innerHTML = 'あたらしい はたが <b>もうすぐ</b>！（おうちのかたへ）';
+      info.classList.remove('hidden');
+    } else if (a.daysLeft > 0 && Store.data.trials.length > 0) {
+      info.innerHTML = 'あたらしい はたまで あと <b>' + a.daysLeft + 'にち</b>くらい';
+      info.classList.remove('hidden');
+    } else if (!a.accOk && a.daysLeft === 0) {
+      info.textContent = 'あたらしい はた、 れんしゅうちゅう！';
+      info.classList.remove('hidden');
+    } else {
+      info.classList.add('hidden');
+    }
   }
 
   // ============ セッション（試行の状態機械） ============
@@ -231,6 +276,10 @@
       waitTimer: null,
       listening: false,
       lastListenAt: -1,
+      currentShift: 0,
+      promptAt: null,
+      manualReplays: 0,
+      streak: 0,
     };
     $('#demo-badge').classList.toggle('hidden', !S.demo);
     keepAwake(true);
@@ -312,9 +361,27 @@
     return ids[Math.floor(Math.random() * ids.length)];
   }
 
-  function playChord(chordId) {
+  // 和音ごとに許されるオクターブシフト（音域クランプ）
+  function allowedShifts(c) {
+    const ms = c.notes.map(NOTE_MIDI);
+    const lo = Math.min(...ms), hi = Math.max(...ms);
+    return OCTAVE_PLAY.shifts.filter(sh =>
+      lo + 12 * sh >= OCTAVE_PLAY.lowestMidi && hi + 12 * sh <= OCTAVE_PLAY.highestMidi);
+  }
+
+  // 出題シフトの抽選。基準形をpZeroで出し、残りを他シフトで等分。
+  function pickShift(chordId) {
+    if (!Store.data.settings.octaveRange) return 0;
+    const pool = allowedShifts(CHORD_BY_ID[chordId]);
+    const others = pool.filter(sh => sh !== 0);
+    if (others.length === 0) return 0;
+    if (Math.random() < OCTAVE_PLAY.pZero) return 0;
+    return others[Math.floor(Math.random() * others.length)];
+  }
+
+  function playChord(chordId, shift) {
     const c = CHORD_BY_ID[chordId];
-    const midis = c.notes.map(NOTE_MIDI);
+    const midis = c.notes.map(n => NOTE_MIDI(n) + 12 * (shift || 0));
     const char = $('#char-btn');
     char.classList.remove('sing', 'bounce');
     void char.offsetWidth; // アニメ再発火
@@ -328,7 +395,7 @@
       if (!S || S.locked) return;
       if (S.autoReplays < 2) {
         S.autoReplays++;
-        playChord(S.current);
+        playChord(S.current, S.currentShift);
         armWaitTimer();
       }
     }, 9000);
@@ -379,7 +446,7 @@
       const id = picks[i++];
       const c = CHORD_BY_ID[id];
       $$('#flags .flag').forEach(f => f.classList.remove('glow', 'fade'));
-      playChord(id);
+      playChord(id, pickShift(id)); // 曝露も高さ違いで（chroma汎化）
       const el = flagEl(id);
       if (el) {
         el.classList.add('glow');
@@ -405,6 +472,7 @@
     }
     S.corrective = false;
     S.autoReplays = 0;
+    S.manualReplays = 0;
     S.locked = true;
 
     if (S.mode === 'intro' && S.introLeft <= 0) {
@@ -412,6 +480,8 @@
       Store.clearIntro();
     }
     S.current = S.mode === 'intro' ? S.introChord : pickChord();
+    // intro（導入）は基準形で固定。混合出題からは高さ違いを混ぜる（chords.js OCTAVE_PLAY）
+    S.currentShift = S.mode === 'intro' ? 0 : pickShift(S.current);
     S.lastPicks.push(S.current);
 
     renderFlags();
@@ -422,7 +492,7 @@
 
     setTimeout(() => {
       if (!S) return;
-      playChord(S.current);
+      playChord(S.current, S.currentShift);
       if (S.mode === 'intro') {
         const c = CHORD_BY_ID[S.current];
         setTimeout(() => Voice.speak('これは ' + c.label), 900);
@@ -430,6 +500,7 @@
       setTimeout(() => {
         if (!S) return;
         S.locked = false;
+        S.promptAt = Date.now(); // 反応時間の起点（ロック解除時）
         box.classList.remove('lock');
         if (S.mode !== 'intro') speech('どの はた かな？');
         armWaitTimer();
@@ -441,27 +512,40 @@
     return $(`#flags .flag[data-chord="${chordId}"]`);
   }
 
+  // 演出レベル: small(訂正成功) < normal < big(3連続ごと・セッション最終問)
   function celebrate(chordId, small) {
     const c = CHORD_BY_ID[chordId];
     const el = flagEl(chordId);
+    const finale = S.idx + 1 >= S.total;
+    const big = !small && (finale || (S.streak > 0 && S.streak % 3 === 0));
     if (el) {
       el.classList.add('win');
+      if (big) el.classList.add('win-big');
       $$('#flags .flag').forEach(f => {
         if (f !== el) f.classList.add('fade');
       });
-      if (!small) {
-        const r = el.getBoundingClientRect();
-        Confetti.burst(chordColor(c), r.left + r.width / 2, r.top + r.height * 0.3, 70);
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height * 0.3;
+      if (small) {
+        Confetti.burst(chordColor(c), cx, cy, 26);
+      } else if (big) {
+        Confetti.burst(chordColor(c), cx, cy, 110);
+        Confetti.rain(chordColor(c), 60);
+        setTimeout(() => { if (S) Confetti.burst(chordColor(c), cx, cy - 60, 60); }, 240);
+      } else {
+        Confetti.burst(chordColor(c), cx, cy, 80);
       }
     }
     const char = $('#char-btn');
-    char.classList.remove('cheer');
+    char.classList.remove('cheer', 'jump');
     void char.offsetWidth;
-    char.classList.add('cheer');
-    if (Store.data.settings.sfx) Piano.sfxCorrect();
-    const praise = ['せいかい！', 'すごい！', 'やったね！', 'いいね！'];
+    char.classList.add(big ? 'jump' : 'cheer');
+    if (Store.data.settings.sfx) { if (big) Piano.sfxFanfare(); else Piano.sfxCorrect(); }
+    const praise = big
+      ? ['すごーい！', 'めちゃくちゃ すごい！', 'かんぺき！']
+      : ['せいかい！', 'すごい！', 'やったね！', 'いいね！'];
     Voice.speak(c.label + '。' + praise[Math.floor(Math.random() * praise.length)]);
-    speech('せいかい！ ' + c.label);
+    speech((big ? '🎉 ' : '') + 'せいかい！ ' + c.label);
   }
 
   function logTrial(ok, corr, tapped) {
@@ -474,12 +558,19 @@
       corr: !!corr || S.mode === 'intro', // 導入試行は正答率統計から除外
       stage: Store.data.unlocked.length,
       sess: S.id,
+      oct: S.currentShift || 0,                       // 提示オクターブ（chroma分析の要）
+      rt: S.promptAt ? Date.now() - S.promptAt : null, // 反応時間ms（方略転換の計器）
+      rep: (S.autoReplays || 0) + (S.manualReplays || 0), // この試行での再聴回数
     });
   }
 
   function onFlag(chordId, el) {
     if (!S || S.locked) return;
     if (S.waitTimer) clearTimeout(S.waitTimer);
+    // 押した瞬間の手応え（正誤の前に必ず返す——「押すと反応する」の学習）
+    el.classList.remove('tapped');
+    void el.offsetWidth;
+    el.classList.add('tapped');
 
     if (S.corrective) {
       // 訂正モード: 光っている正解旗を探してもらう
@@ -506,6 +597,7 @@
       S.locked = true;
       logTrial(true, false, chordId);
       S.correct++;
+      S.streak++;
       celebrate(chordId, false);
       S.idx++;
       if (S.mode === 'intro') S.introLeft--;
@@ -513,6 +605,7 @@
     } else {
       // まちがい: 叱らない・考えさせない。すぐ正解旗を光らせ、同じ和音をもう一度聞いてタッチしてもらう。
       logTrial(false, false, chordId);
+      S.streak = 0; // 演出レベルが下がるだけ。何も言わない（罰にしない）
       S.corrective = true;
       S.locked = true;
       if (Store.data.settings.sfx) Piano.sfxSoft();
@@ -524,10 +617,11 @@
       Voice.speak('これは ' + c.label);
       setTimeout(() => {
         if (!S) return;
-        playChord(S.current);
+        playChord(S.current, S.currentShift);
         setTimeout(() => {
           if (!S) return;
           S.locked = false;
+          S.promptAt = Date.now();
           armWaitTimer();
         }, 350);
       }, 1100);
@@ -676,6 +770,21 @@
     }
     $('#p-chords').innerHTML = rows + eq;
 
+    // 進級ステータスカード（常設・「いつ終わるのか」を親に見せる）
+    const stat = Store.advanceStatus();
+    const statBox = $('#p-advance-status');
+    if (stat && !stat.ready) {
+      const parts = [];
+      parts.push('日数 ' + Math.min(stat.daysDone, stat.daysNeed) + '/' + stat.daysNeed + '日');
+      parts.push('練習 ' + Math.min(stat.trialsDone, stat.trialsNeed) + '/' + stat.trialsNeed + '回');
+      parts.push(stat.accOk ? '正答率 ✔' : ('正答率 ' + (stat.weakest && stat.weakest.acc !== null ? Math.round(stat.weakest.acc*100)+'%' : '記録中') + '（' + (stat.weakest ? CHORD_BY_ID[stat.weakest.id].label : '') + '）'));
+      statBox.innerHTML = '<b>つぎの旗「' + (stat.next ? stat.next.label : '') + '」まで</b>: ' + parts.join(' ／ ') +
+        '<small>基準: 全部の旗が直近' + ADVANCE_RULE.perChordWindow + '回で' + Math.round(ADVANCE_RULE.minAccuracy*100) + '%以上 × ' + ADVANCE_RULE.minDaysOnStage + '日 × ' + ADVANCE_RULE.minTrialsOnStage + '回（原法の「誤りが生じない範囲で最速2週間ごと」の機械化）。お子さまの様子で早めたい場合は下の設定「旗を手動で追加」から。</small>';
+      statBox.classList.remove('hidden');
+    } else {
+      statBox.classList.add('hidden');
+    }
+
     // 進級バナー
     const banner = $('#advance-banner');
     const next = CHORDS[d.unlocked.length];
@@ -729,6 +838,8 @@
         <span class="stepper">
           <button type="button" id="set-tri-minus">−</button><b id="set-tri-val">${st.trialsPerSession}</b><button type="button" id="set-tri-plus">＋</button>
         </span></div>
+      <div class="p-set-row"><span class="p-set-label">おとの たかさを かえて だす<small>同じ和音を高いオクターブ・低いオクターブでも鳴らす。1つの高さだけで練習すると「音の高さ」で丸暗記してしまい、高さが変わると当てられなくなることが研究で示されている。響きそのものを覚えるために推奨オン</small></span>
+        <button type="button" class="switch ${st.octaveRange ? 'on' : ''}" id="set-oct" aria-label="おとのたかさ"></button></div>
       <div class="p-set-row"><span class="p-set-label">きくじかんを はさむ<small>${LISTEN_BLOCK.everyNTrials}問ごとに、答えずに聴くだけの時間を挟む。研究では、同じ問題数でも答えさせる練習だけだと学習が起きず、聴くだけの時間を交互に挟むと大きく伸びた</small></span>
         <button type="button" class="switch ${st.listenBlocks ? 'on' : ''}" id="set-listen" aria-label="きくじかん"></button></div>
       <div class="p-set-row"><span class="p-set-label">はたに しるしをつける<small>色が見分けにくいお子さま向け（日本人男性の約5%）。色に加えて形でも区別できる</small></span>
@@ -781,6 +892,7 @@
         $(id).classList.toggle('on', st[key]);
       });
     };
+    toggle('#set-oct', 'octaveRange');
     toggle('#set-listen', 'listenBlocks');
     toggle('#set-voice', 'voice');
     toggle('#set-sfx', 'sfx');
@@ -823,6 +935,7 @@
         <li><b>間違えても教え直すだけ。</b>アプリは正解の旗を光らせて同じ和音をもう一度鳴らす。叱る・がっかりした顔を見せない。</li>
         <li><b>習得中にやらないこと（原法の禁止事項）:</b> 単音あてクイズ／ドレミで歌わせる（階名唱）／和音をバラして弾く（分散）／移調あそび。どれも「響きを丸ごと覚える」プロセスを壊す。単音・相対音感は全部の旗が終わってからの段階。</li>
         <li><b>本物のピアノとの併用は最良。</b>同じ和音を弾いて旗あそびをするのが原法そのもの（このアプリはその持ち歩き版・補助輪）。</li>
+        <li><b>同じ和音が高くなったり低くなったりするのは仕様。</b>1つの高さだけで練習すると「音の高さ」で丸暗記してしまい、オクターブが変わっただけで当てられなくなることが研究で確認されている（響きを覚えていない証拠）。高さを変えても同じ旗——それが「響きで聴けている」ということ。なお別の和音への移調は絶対に混ぜない（学習を壊すため。設定にも存在しない）。</li>
         <li><b>「きくじかん」は飛ばさない。</b>${LISTEN_BLOCK.everyNTrials}問ごとに、答えずにただ聴くだけの時間が入る。海外の研究で、<b>同じ問題数でも答えさせる練習だけでは学習が起きず、聴くだけの時間を交互に挟んだ群だけが大きく伸びた</b>（未習の音色にも効果が広がった）。子どもにとっては休憩にもなる。</li>
         <li><b>色が見分けにくいお子さまへ。</b>男性の約5%（日本）は赤と緑の区別が難しい。2歳児は「見分けられない」と言えないため、うまくいかないと「向いていない」と誤解されやすい。設定の<b>「はたに しるしをつける」</b>を入れると、色に加えて形（丸・星・三角…）でも旗を区別できる。訓練上の効果は変わらない——旗は音につける名札であって、名札が色でも形でも音の学習は同じように進む。</li>
         <li><b>iPadは「ホーム画面に追加」で使う。</b>Safariのままだと7日間使わないと記録が消えることがある（iOSの仕様）。共有ボタン→「ホーム画面に追加」。誤操作防止にはiOSの「アクセスガイド」（設定→アクセシビリティ）が便利。</li>
@@ -916,10 +1029,17 @@
     renderHome();
     show('screen-home');
   }));
+  $('#home-char').addEventListener('pointerdown', () => {
+    const hc = $('#home-char');
+    hc.classList.remove('bounce', 'sing');
+    void hc.offsetWidth;
+    hc.classList.add('bounce', 'sing');
+    if (Store.data.settings.sfx) Piano.sfxTap();
+  });
   $('#char-btn').addEventListener('pointerdown', () => {
     if (!S) return;
     if (S.pendingNext) { nextTrial(); return; }
-    if (S.current) playChord(S.current);
+    if (S.current) { S.manualReplays = (S.manualReplays || 0) + 1; playChord(S.current, S.currentShift); }
   });
 
   // 最初のタッチでオーディオをアンロック（iOS）
