@@ -6,45 +6,49 @@
     --shu:#D9481C; --ai:#1B4B8F; --wash:#F7F5F1; --gold:#8C6D2F; --ok:#2E7D4F;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--paper);color:var(--ink);font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",sans-serif;font-size:15px;line-height:1.9;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN",sans-serif;font-size:15px;line-height:1.9;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 20px}
   .disp{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif}
   .num{font-family:"Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums}
+  a{color:var(--ai)}
 
-  header{border-bottom:2px solid var(--ink);padding:56px 0 30px}
-  .eyebrow{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.18em;color:var(--sub)}
-  .eyebrow::before{content:"";width:10px;height:10px;background:var(--ai)}
-  h1{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(38px,6vw,58px);line-height:1.25;margin:16px 0 8px;letter-spacing:.02em}
-  .ver{font-size:12px;color:var(--sub);letter-spacing:.08em;margin-bottom:10px}
-  .lead{max-width:700px;font-size:14.5px}
+  header{border-bottom:2px solid var(--ink);padding:44px 0 26px}
+  .eyebrow{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--sub)}
+  .eyebrow::before{content:"";width:10px;height:10px;background:var(--ai);flex:0 0 auto}
+  h1{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(34px,8vw,58px);line-height:1.25;margin:14px 0 6px;letter-spacing:.02em}
+  .ver{font-size:11.5px;color:var(--sub);letter-spacing:.06em;margin-bottom:10px}
+  .lead{max-width:700px;font-size:14px}
   .lead b{font-weight:900}
 
-  .toc{margin-top:24px;display:grid;gap:10px}
-  .toc-part{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-  .toc-part .pt{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:13px;letter-spacing:.1em;min-width:9em;color:var(--ink)}
-  .toc a{font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink);text-decoration:none;border:1.5px solid var(--ink);padding:4px 10px;border-radius:2px}
+  .toc{margin-top:22px;display:grid;gap:12px}
+  .toc-part .pt{display:block;font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:12.5px;letter-spacing:.12em;color:var(--ink);margin-bottom:7px}
+  .toc-links{display:flex;flex-wrap:wrap;gap:7px}
+  .toc a{font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--ink);text-decoration:none;border:1.5px solid var(--ink);padding:6px 11px;border-radius:2px;line-height:1.3}
   .toc a:hover,.toc a:focus{background:var(--ink);color:#fff;outline:none}
   .toc a .n{color:var(--shu);margin-right:5px;font-family:"Barlow Condensed",sans-serif}
 
-  .part{margin-top:56px;border-bottom:2px solid var(--ink);padding-bottom:8px}
+  .part{margin-top:52px;border-bottom:2px solid var(--ink);padding-bottom:8px}
   .part .pno{font-family:"Barlow Condensed",sans-serif;font-weight:700;color:var(--shu);font-size:15px;letter-spacing:.1em}
-  .part h2{font-family:"Shippori Mincho B1",serif;font-size:27px;font-weight:800}
-  .part p{font-size:13px;color:var(--sub);max-width:680px;margin-top:4px}
+  .part h2{font-family:"Shippori Mincho B1",serif;font-size:clamp(21px,5vw,27px);font-weight:800}
+  .part p{font-size:12.5px;color:var(--sub);max-width:680px;margin-top:4px}
 
-  section{padding:40px 0 6px}
-  .sec-head{border-bottom:1.5px solid var(--ink);padding-bottom:9px;margin-bottom:8px;display:flex;align-items:baseline;gap:14px}
-  .sec-no{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;color:var(--shu)}
-  h3.sec-title{font-size:21px;font-weight:900;letter-spacing:.03em}
-  .sec-intro{max-width:700px;color:var(--sub);font-size:13.5px;margin:8px 0 18px}
+  section{padding:36px 0 4px}
+  .sec-head{border-bottom:1.5px solid var(--ink);padding-bottom:8px;margin-bottom:8px;display:flex;align-items:baseline;gap:12px}
+  .sec-no{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;color:var(--shu);flex:0 0 auto}
+  h3.sec-title{font-size:clamp(17px,4.6vw,21px);font-weight:900;letter-spacing:.02em}
+  .sec-intro{max-width:700px;color:var(--sub);font-size:13px;margin:8px 0 16px}
   .sec-intro b{color:var(--ink)}
+  .note{font-size:12px;color:var(--sub);margin:4px 0 0}
 
-  .entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
-  .entry{border:1px solid var(--line);border-top:3px solid var(--ai);background:#fff;padding:15px 17px 13px}
+  /* entry cards（文化エントリ） */
+  .entries{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:13px}
+  .entry{border:1px solid var(--line);border-top:3px solid var(--ai);background:#fff;padding:14px 16px 12px}
   .entry.shu{border-top-color:var(--shu)}
   .entry.gold{border-top-color:var(--gold)}
   .entry.grn{border-top-color:var(--ok)}
-  .e-name{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:18px}
-  .e-sub{display:block;font-size:11.5px;color:var(--sub);font-weight:700;letter-spacing:.05em;margin:2px 0 7px}
+  .e-name{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:17.5px}
+  .e-sub{display:block;font-size:11px;color:var(--sub);font-weight:700;letter-spacing:.04em;margin:2px 0 7px}
   .entry p{font-size:12.5px;line-height:1.8}
   .entry p b{font-weight:900}
   .chips{margin-top:9px;display:flex;flex-wrap:wrap;gap:6px}
@@ -53,57 +57,100 @@
   .chip.warn{border-color:var(--shu);color:var(--shu);background:#fff}
   .chip.season{border-color:var(--ok);color:var(--ok);background:#fff}
 
-  .tbl-wrap{overflow-x:auto;margin:10px 0 20px}
-  table{border-collapse:collapse;width:100%;min-width:740px;font-size:12.5px}
-  th{font-size:11px;letter-spacing:.1em;color:var(--sub);font-weight:700;text-align:left;border-bottom:1.5px solid var(--ink);padding:6px 10px;white-space:nowrap;background:#fff}
-  td{border-bottom:1px solid var(--line);padding:9px 10px;vertical-align:top;line-height:1.75}
-  td b{font-weight:900}
-  td.tel{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;white-space:nowrap}
-  .mark{display:inline-block;width:2.2em;text-align:center;font-weight:900;border-radius:2px;padding:0 2px}
+  /* row cards（データ型エントリ: 水系・調理の型） */
+  .rowcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:13px}
+  .rc{border:1px solid var(--line);border-left:3px solid var(--ai);background:#fff;padding:13px 15px 11px}
+  .rc .rc-name{font-weight:900;font-size:15.5px}
+  .rc .rc-name .disp{font-size:16px}
+  .rc .rc-area{font-size:11px;color:var(--sub);font-weight:700;margin-left:6px}
+  .field{display:flex;gap:8px;font-size:12.5px;line-height:1.7;margin-top:6px}
+  .field .k{flex:0 0 4.2em;font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--sub);padding-top:3px}
+  .field .v b{font-weight:900}
+
+  /* 暦リスト */
+  .cal{border-top:1.5px solid var(--ink)}
+  .cal-row{display:flex;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line);align-items:flex-start}
+  .mark{flex:0 0 3.4em;text-align:center;font-weight:900;font-size:12px;border-radius:2px;padding:2px 0;margin-top:2px}
   .mark.now{background:var(--ok);color:#fff}
   .mark.ok{border:1.5px solid var(--ok);color:var(--ok)}
   .mark.proc{border:1.5px solid var(--gold);color:var(--gold)}
   .mark.off{border:1.5px solid var(--line);color:var(--sub)}
+  .cal-body{font-size:13px;line-height:1.75}
+  .cal-body b{font-weight:900}
+  .cal-body .where{display:inline-block;font-size:10.5px;font-weight:700;color:var(--ai);border:1px solid var(--ai);border-radius:2px;padding:0 6px;margin-left:6px;vertical-align:1px}
+  .cal-body .memo{display:block;font-size:11.5px;color:var(--sub)}
 
-  .callout{border-left:4px solid var(--ai);background:var(--wash);padding:13px 18px;margin:14px 0;font-size:13px;max-width:780px}
-  .lines{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0}
-  .lineb{padding:13px 15px;border:1.5px solid var(--ink);font-size:12.5px;line-height:1.7}
-  .lineb h4{font-size:12.5px;font-weight:900;margin-bottom:3px;letter-spacing:.06em}
+  /* 仕入先グループ */
+  .supgroup{border:1px solid var(--line);border-top:3px solid var(--ink);margin:0 0 14px;background:#fff}
+  .supgroup>h4{font-size:13px;font-weight:900;letter-spacing:.06em;padding:10px 15px;border-bottom:1px solid var(--line);background:var(--wash)}
+  .sup{padding:11px 15px;border-bottom:1px solid var(--line)}
+  .sup:last-child{border-bottom:none}
+  .sup .s-name{font-weight:900;font-size:13.5px}
+  .sup .s-tel{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:700;margin:1px 0}
+  .sup .s-tel a{text-decoration:none;border-bottom:1.5px solid var(--ai)}
+  .sup .s-what{font-size:12px;color:var(--sub);line-height:1.7}
+  .sup .s-what b{color:var(--ink);font-weight:900}
+
+  .callout{border-left:4px solid var(--ai);background:var(--wash);padding:12px 16px;margin:14px 0;font-size:12.5px;max-width:780px;line-height:1.85}
+  .lines{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:11px;margin:14px 0}
+  .lineb{padding:12px 14px;border:1.5px solid var(--ink);font-size:12px;line-height:1.7}
+  .lineb h4{font-size:12px;font-weight:900;margin-bottom:3px;letter-spacing:.05em}
   .lineb.grey{background:var(--wash)}
   .lineb.black{background:var(--ink);color:#fff}
   .lineb.black h4{color:#fff}
 
-  footer{margin-top:64px;border-top:2px solid var(--ink);padding:22px 0 70px;font-size:12px;color:var(--sub);line-height:2}
-  a{color:var(--ai)}
+  footer{margin-top:56px;border-top:2px solid var(--ink);padding:20px 0 84px;font-size:11.5px;color:var(--sub);line-height:2}
+
+  .totop{position:fixed;right:14px;bottom:14px;width:44px;height:44px;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;text-decoration:none;font-size:15px;box-shadow:0 2px 8px rgba(27,23,20,.12);z-index:9}
+  .totop:hover{background:var(--ink);color:#fff}
+
+  @media (max-width:640px){
+    body{font-size:14px}
+    .wrap{padding:0 16px}
+    header{padding:34px 0 22px}
+    .lead{font-size:13px}
+    section{padding:30px 0 2px}
+    .entry p{font-size:12px}
+    .field{font-size:12px}
+    .cal-row{gap:9px}
+    .cal-body{font-size:12.5px}
+    .toc a{padding:7px 12px}
+  }
 </style>
 
-<div class="wrap">
+<div class="wrap" id="top">
 
 <header>
 <meta name="robots" content="noindex,nofollow">
   <div class="eyebrow">MASHI'S KITCHEN リサーチ資料 — 釣りフェス2027（2027.1.22–24 パシフィコ横浜）</div>
   <h1>ニッポン魚食大全</h1>
-  <div class="ver">v2 統合版 — 文化 × 旬 × 仕入れ（旧「食材の選択肢カタログ」を吸収・2026-08-28）</div>
-  <p class="lead">伝統魚食・ローカル魚食・マニアックな魚と、その仕入れ筋の統合資料。<b>推奨には丸めていない。</b>第一部は「どの海・湖から引くか」（素材と旬と仕入先）、第二部は「どう料理してきたか」（古い調理の辞典）、第三部は「1月の魚暦と実務」。会場ルールは<b>電気調理のみ・全品事前申請・生食は出さない前提</b>。</p>
+  <div class="ver">v2.1 統合版・スマホ最適化（2026-08-28）</div>
+  <p class="lead">伝統魚食・ローカル魚食・マニアックな魚と、その仕入れ筋の統合資料。<b>推奨には丸めていない。</b>第一部は「どの海・湖から引くか」、第二部は「どう料理してきたか」、第三部は「1月の魚暦と実務」。会場ルールは<b>電気調理のみ・全品事前申請・生食は出さない前提</b>。</p>
   <nav class="toc">
-    <div class="toc-part"><span class="pt">第一部　素材</span>
-      <a href="#s1"><span class="n">01</span>海の未利用魚</a>
-      <a href="#s2"><span class="n">02</span>冬の三陸</a>
-      <a href="#s3"><span class="n">03</span>鮭</a>
-      <a href="#s4"><span class="n">04</span>南の海・石垣</a>
-      <a href="#s5"><span class="n">05</span>湖と川</a>
-      <a href="#s6"><span class="n">06</span>竹とメンマ</a>
+    <div class="toc-part"><span class="pt">第一部　素材 — どの海・湖から引くか</span>
+      <div class="toc-links">
+        <a href="#s1"><span class="n">01</span>海の未利用魚</a>
+        <a href="#s2"><span class="n">02</span>冬の三陸</a>
+        <a href="#s3"><span class="n">03</span>鮭</a>
+        <a href="#s4"><span class="n">04</span>南の海・石垣</a>
+        <a href="#s5"><span class="n">05</span>湖と川</a>
+        <a href="#s6"><span class="n">06</span>竹とメンマ</a>
+      </div>
     </div>
-    <div class="toc-part"><span class="pt">第二部　技法</span>
-      <a href="#s7"><span class="n">07</span>発酵と熟成</a>
-      <a href="#s8"><span class="n">08</span>干す・焼く・出汁</a>
-      <a href="#s9"><span class="n">09</span>会場で作れる型</a>
-      <a href="#s10"><span class="n">10</span>海のない土地</a>
+    <div class="toc-part"><span class="pt">第二部　技法 — 古い調理の辞典</span>
+      <div class="toc-links">
+        <a href="#s7"><span class="n">07</span>発酵と熟成</a>
+        <a href="#s8"><span class="n">08</span>干す・焼く・出汁</a>
+        <a href="#s9"><span class="n">09</span>会場で作れる型</a>
+        <a href="#s10"><span class="n">10</span>海のない土地</a>
+      </div>
     </div>
     <div class="toc-part"><span class="pt">第三部　暦と実務</span>
-      <a href="#s11"><span class="n">11</span>1月の魚暦</a>
-      <a href="#s12"><span class="n">12</span>仕入れ先総覧</a>
-      <a href="#s13"><span class="n">13</span>選ぶときの観点</a>
+      <div class="toc-links">
+        <a href="#s11"><span class="n">11</span>1月の魚暦</a>
+        <a href="#s12"><span class="n">12</span>仕入れ先総覧</a>
+        <a href="#s13"><span class="n">13</span>選ぶときの観点</a>
+      </div>
     </div>
   </nav>
 </header>
@@ -117,27 +164,27 @@
     <div class="entry shu">
       <span class="e-name">ネンブツダイ</span><span class="e-sub">別名20以上「金魚」ほか｜全国の磯・通年</span>
       <p>外道の王にして本企画の主役候補。高知西部で「<b>はりめ</b>」、徳島県南で「<b>赤じゃこ</b>」と呼ばれ、煮干しにして素麺・ところてんの出汁にする文化が現存。甘くコクのある上等な出汁。定置網の混獲で通年おり、業務用「念仏鯛煮干し」（長崎産）も実在。</p>
-      <div class="chips"><span class="chip season">通年（混獲）</span><span class="chip buy">仕入: §12の産地筋（電話番号つき）</span></div>
+      <div class="chips"><span class="chip season">通年（混獲）</span><span class="chip buy">仕入: §12の産地筋</span></div>
     </div>
     <div class="entry shu">
       <span class="e-name">ゲンゲ</span><span class="e-sub">幻魚｜富山湾〜新潟・深海</span>
-      <p>漁師に「<b>下の下（げのげ）</b>」と呼ばれ浜に捨てられていた深海魚が、いまや「幻魚」。ゼラチン質の白身で、冬の底引きで揚がる。げんげ汁・干物が絶品で、通販流通も厚い。未利用魚サクセスの完成形。</p>
-      <div class="chips"><span class="chip season">冬の底引きが本場</span><span class="chip buy">仕入: 浜浦水産（魚津）・うみてらす名立（上越）</span></div>
+      <p>漁師に「<b>下の下（げのげ）</b>」と呼ばれ浜に捨てられていた深海魚が、いまや「幻魚」。ゼラチン質の白身で、冬の底引きで揚がる。げんげ汁・干物が絶品で通販流通も厚い。未利用魚サクセスの完成形。</p>
+      <div class="chips"><span class="chip season">冬の底引き</span><span class="chip buy">浜浦水産（魚津）ほか</span></div>
     </div>
     <div class="entry shu">
       <span class="e-name">メヒカリ</span><span class="e-sub">アオメエソ｜いわき・宮崎</span>
       <p>底引きの邪魔者だった雑魚が、漁協女性部の料理教室から評判になり<b>2001年にいわき市の魚</b>へ。唐揚げは大手居酒屋の定番になった。「雑魚→市の魚」の出世頭。</p>
-      <div class="chips"><span class="chip season">通年（底引き期）</span><span class="chip buy">仕入: いわき常磐もの（公式通販）</span></div>
+      <div class="chips"><span class="chip season">通年（底引き期）</span><span class="chip buy">いわき常磐もの</span></div>
     </div>
     <div class="entry shu">
       <span class="e-name">ホタルジャコ（じゃこ天）</span><span class="e-sub">ハランボ｜愛媛・宇和島</span>
       <p>江戸後期1800年頃から続く<b>雑魚すり身文化の完成形</b>。商品にならない小魚を骨と皮ごとすり潰して揚げる。農水省「うちの郷土料理」登録。「骨ごと食べる」の大先輩。</p>
-      <div class="chips"><span class="chip buy">仕入: 安岡蒲鉾・野中かまぼこ店（宇和島）</span></div>
+      <div class="chips"><span class="chip buy">安岡蒲鉾・野中かまぼこ店</span></div>
     </div>
     <div class="entry shu">
       <span class="e-name">ボラ</span><span class="e-sub">ハク→イナ→ボラ→トド｜全国</span>
       <p>高度経済成長期の水質悪化で「臭い」の烙印を押されたが、きれいな海の<b>寒ボラは真鯛級の白身</b>。卵巣は日本三大珍味カラスミ、幽門は「へそ」という珍味。最終名「トド」は「とどのつまり」の語源。日本一誤解されている魚。</p>
-      <div class="chips"><span class="chip season">冬（寒ボラ）が旬</span></div>
+      <div class="chips"><span class="chip season">冬（寒ボラ）</span></div>
     </div>
     <div class="entry shu">
       <span class="e-name">コノシロ</span><span class="e-sub">シンコ→コハダ→コノシロ｜江戸前</span>
@@ -148,7 +195,7 @@
       <p>見た目は海のギャング、身は上品なゼラチン白身。高知のタタキ、紀州の干物と黒潮の土地では堂々の郷土食。<b>捌ける人が少ないから流通しない</b>「技術の壁」型未利用魚。冬は鍋も良い。</p>
     </div>
     <div class="entry shu">
-      <span class="e-name">カジカ・ギンポ・エイ</span><span class="e-sub">鍋こわし／江戸前天ぷらの通／かすべ</span>
+      <span class="e-name">カジカ・ギンポ・エイ</span><span class="e-sub">鍋こわし／江戸前天ぷら／かすべ</span>
       <p>カジカは鍋が旨すぎて「<b>鍋こわし</b>」（北海道・冬）。ギンポは天ぷら職人が「最上」と呼ぶ通のネタ。エイ（かすべ）は煮こごりで食べ継がれる北国の惣菜魚。見た目と味のギャップ番付常連組。</p>
       <div class="chips"><span class="chip season">カジカ・かすべは冬</span></div>
     </div>
@@ -186,7 +233,7 @@
     <div class="entry shu">
       <span class="e-name">ナメタガレイ</span><span class="e-sub">ババガレイ｜三陸沿岸〜仙台湾</span>
       <p>宮城の<b>年越し魚</b>。冬に産卵期を迎える子持ちを煮付けて大晦日に食べる（子孫繁栄）。年末は1匹5〜6千円に跳ね上がる。農水省「うちの郷土料理」登録。</p>
-      <div class="chips"><span class="chip season">◎ 冬・正月文化</span><span class="chip warn">年末は高騰→年明け仕入れが狙い目</span></div>
+      <div class="chips"><span class="chip season">◎ 冬・正月文化</span><span class="chip warn">年末高騰→年明け仕入れが狙い目</span></div>
     </div>
     <div class="entry shu">
       <span class="e-name">アンコウ</span><span class="e-sub">常磐〜三陸｜冬の底引き</span>
@@ -271,31 +318,82 @@
 <section id="s5">
   <div class="sec-head"><span class="sec-no">05</span><h3 class="sec-title">湖と川 — 内水面の五百年</h3></div>
   <p class="sec-intro">湖の魚食は佃煮・甘露煮・煮干しの<b>加工品文化が厚く、伝票も工程も堅い</b>。冬が漁期の水系は1月開催と噛み合う。</p>
-  <div class="tbl-wrap"><table>
-    <tr><th>水系</th><th>魚種</th><th>文化・料理</th><th>1月</th><th>仕入れ先候補</th><th>会場での形</th></tr>
-    <tr><td><b>八郎湖</b>（秋田・tsuda筋）</td><td>ワカサギ・シラウオ</td><td><b>氷下漁1794年〜</b>（諏訪湖から技術導入）・500年の漁の佃煮文化</td><td><span class="mark now">旬</span> 冬が漁期</td><td><a href="https://www.chida.co.jp/product/wakasagi.html">千田佐市商店</a>ほか老舗</td><td>佃煮／唐揚げ</td></tr>
-    <tr><td><b>諏訪湖</b>（長野）</td><td>ワカサギ</td><td><b>氷下漁の源流</b>（八郎潟へ渡した側）・空揚/甘露煮</td><td><span class="mark now">旬</span> 冬が釣期</td><td><a href="https://www.suwakogyokyou.com/">諏訪湖漁協</a>（直販）・<a href="https://www.city.suwa.lg.jp/site/enjoy/4774.html">えびす屋</a></td><td>唐揚げ／甘露煮</td></tr>
-    <tr><td><b>琵琶湖</b>（滋賀）</td><td>ホンモロコ・小鮎・ゴリ・イサザ・スジエビ</td><td><b>湖魚文化の本丸</b>——佃煮・飴炊き・えび豆・鮒寿司</td><td><span class="mark now">旬</span> モロコは冬〜早春／小鮎・ゴリは時期外→佃煮で</td><td><a href="https://uoju.jp/">魚重産業</a>・<a href="https://tomitaya.net/">沖島冨田屋</a>（漁師直）・<a href="https://www.biwa-oumi.com/SHOP/uo-c-moroko1000.html">琵琶近江商店</a>（<b>生モロコ1kg</b>）</td><td>モロコ素焼き／佃煮</td></tr>
-    <tr><td><b>霞ヶ浦</b>（茨城）</td><td>ワカサギ・シラウオ・川エビ</td><td>帆引き網・佃煮/甘露煮/煮干しの一大産地</td><td><span class="mark proc">加工</span> 漁は夏〜年末中心→加工品・冷凍が確実</td><td><a href="http://www.onumasuisan.co.jp/item/index.html">小沼水産</a>（淡水魚卸）・<a href="http://www.tokiwanotsukudani.jp/">常磐商店</a>・<a href="https://www.chuuzaburou.com/">貝塚忠三郎商店</a>（1910年〜）</td><td>佃煮／煮干し出汁／川エビ唐揚げ</td></tr>
-    <tr><td><b>利根川水系</b>（古河・佐原）</td><td>フナ・マハゼ</td><td><b>鮒甘露煮</b>（百年フード・10時間炊き）・<b>いかだ焼</b></td><td><span class="mark now">旬</span> 寒鮒が冬の旬・加工品通年</td><td><a href="https://www.koga-kanroni.com/">野村甘露煮店</a>・<a href="https://koga-tamuraya.com/">田村屋</a>・<a href="https://www.47club.jp/pages/89003491534">正上</a>（1800年〜）</td><td>そのまま／炙り直し</td></tr>
-    <tr><td><b>外来魚・霞ヶ浦</b></td><td>アメリカナマズ</td><td>行方市「なめパックン」で名物化</td><td><span class="mark ok">通年</span> 養殖・加工品</td><td><a href="https://www.e-consul.info/iba/nmg/namazu/">なまず屋</a>（<b>養殖・加工品販売</b>）・<a href="https://www.namegata-koikoi.com/special/burger.html">こいこい</a></td><td>フライ／バーガー<br><span class="chip">特定外来生物＝加工品/フィレなら適法</span></td></tr>
-    <tr><td><b>外来魚・琵琶湖</b></td><td>オオクチバス</td><td><a href="https://www.biwahaku.jp/2023/01/_5kg.html">琵琶湖博物館の天丼が月1,000食</a>・県駆除事業</td><td><span class="mark ok">通年</span></td><td>駆除協力の湖魚業者ルート（要照会）</td><td>天ぷら／フライ</td></tr>
-    <tr><td><b>どじょう</b>（江戸）</td><td>ドジョウ（養殖）</td><td>柳川鍋・どぜう汁（<a href="https://www.maff.go.jp/j/keikaku/syokubunka/k_ryouri/search_menu/menu/34_4_tokyo.html">農水省郷土料理・東京</a>・駒形どぜう1801年〜の系譜）</td><td><span class="mark ok">通年</span> 養殖</td><td>業務用川魚問屋へ照会（未特定）</td><td>柳川仕立て（IH/グリドル）</td></tr>
-    <tr><td><b>ヤツメウナギ</b></td><td>カワヤツメ</td><td>新潟・山形のかば焼き文化。無顎類＝<b>生物学的に別次元</b>・「目の薬」</td><td><span class="mark now">旬</span> 冬〜春</td><td>流通僅少（マニアック最高格・話のネタ枠）</td><td>—</td></tr>
-  </table></div>
+  <div class="rowcards">
+    <div class="rc">
+      <div class="rc-name"><span class="disp">八郎湖</span><span class="rc-area">秋田・tsuda筋｜ワカサギ・シラウオ</span></div>
+      <div class="field"><span class="k">文化</span><span class="v"><b>氷下漁1794年〜</b>（諏訪湖から技術導入）・500年の漁の佃煮文化</span></div>
+      <div class="field"><span class="k">1月</span><span class="v"><b>冬が漁期そのもの</b></span></div>
+      <div class="field"><span class="k">仕入</span><span class="v"><a href="https://www.chida.co.jp/product/wakasagi.html">千田佐市商店</a>ほか老舗</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">佃煮／唐揚げ</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">諏訪湖</span><span class="rc-area">長野｜ワカサギ</span></div>
+      <div class="field"><span class="k">文化</span><span class="v"><b>氷下漁の源流</b>（八郎潟へ渡した側）・空揚/甘露煮</span></div>
+      <div class="field"><span class="k">1月</span><span class="v"><b>冬が釣期</b></span></div>
+      <div class="field"><span class="k">仕入</span><span class="v"><a href="https://www.suwakogyokyou.com/">諏訪湖漁協</a>（直販）・<a href="https://www.city.suwa.lg.jp/site/enjoy/4774.html">えびす屋</a></span></div>
+      <div class="field"><span class="k">会場</span><span class="v">唐揚げ／甘露煮</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">琵琶湖</span><span class="rc-area">滋賀｜モロコ・小鮎・ゴリ・イサザ・スジエビ</span></div>
+      <div class="field"><span class="k">文化</span><span class="v"><b>湖魚文化の本丸</b>——佃煮・飴炊き・えび豆・鮒寿司</span></div>
+      <div class="field"><span class="k">1月</span><span class="v"><b>ホンモロコは冬〜早春が旬</b>。小鮎・ゴリは時期外→佃煮で</span></div>
+      <div class="field"><span class="k">仕入</span><span class="v"><a href="https://uoju.jp/">魚重産業</a>・<a href="https://tomitaya.net/">沖島冨田屋</a>（漁師直）・<a href="https://www.biwa-oumi.com/SHOP/uo-c-moroko1000.html">琵琶近江商店</a>（<b>生モロコ1kg</b>）</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">モロコ素焼き／小鮎天ぷら／佃煮</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">霞ヶ浦</span><span class="rc-area">茨城｜ワカサギ・シラウオ・川エビ</span></div>
+      <div class="field"><span class="k">文化</span><span class="v">帆引き網・佃煮/甘露煮/煮干しの一大産地</span></div>
+      <div class="field"><span class="k">1月</span><span class="v">漁は夏〜年末中心→<b>加工品・冷凍が確実</b></span></div>
+      <div class="field"><span class="k">仕入</span><span class="v"><a href="http://www.onumasuisan.co.jp/item/index.html">小沼水産</a>（淡水魚卸）・<a href="http://www.tokiwanotsukudani.jp/">常磐商店</a>・<a href="https://www.chuuzaburou.com/">貝塚忠三郎商店</a>（1910年〜）</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">佃煮／煮干し出汁／川エビ唐揚げ</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">利根川水系</span><span class="rc-area">古河・佐原｜フナ・マハゼ</span></div>
+      <div class="field"><span class="k">文化</span><span class="v"><b>鮒甘露煮</b>（百年フード・10時間炊き）・<b>いかだ焼</b></span></div>
+      <div class="field"><span class="k">1月</span><span class="v"><b>寒鮒が冬の旬</b>・加工品通年</span></div>
+      <div class="field"><span class="k">仕入</span><span class="v"><a href="https://www.koga-kanroni.com/">野村甘露煮店</a>・<a href="https://koga-tamuraya.com/">田村屋</a>・<a href="https://www.47club.jp/pages/89003491534">正上</a>（1800年〜）</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">そのまま／炙り直し</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">外来魚・霞ヶ浦</span><span class="rc-area">アメリカナマズ</span></div>
+      <div class="field"><span class="k">文化</span><span class="v">行方市「なめパックン」で名物化</span></div>
+      <div class="field"><span class="k">1月</span><span class="v">通年（養殖・加工品）</span></div>
+      <div class="field"><span class="k">仕入</span><span class="v"><a href="https://www.e-consul.info/iba/nmg/namazu/">なまず屋</a>（<b>養殖・加工品販売</b>）・<a href="https://www.namegata-koikoi.com/special/burger.html">こいこい</a></span></div>
+      <div class="field"><span class="k">会場</span><span class="v">フライ／バーガー——<b>特定外来生物＝加工品/フィレ仕入れなら適法</b></span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">外来魚・琵琶湖</span><span class="rc-area">オオクチバス</span></div>
+      <div class="field"><span class="k">文化</span><span class="v"><a href="https://www.biwahaku.jp/2023/01/_5kg.html">琵琶湖博物館の天丼が月1,000食</a>・県駆除事業</span></div>
+      <div class="field"><span class="k">1月</span><span class="v">通年</span></div>
+      <div class="field"><span class="k">仕入</span><span class="v">駆除協力の湖魚業者ルート（要照会）</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">天ぷら／フライ</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">どじょう</span><span class="rc-area">江戸｜ドジョウ（養殖）</span></div>
+      <div class="field"><span class="k">文化</span><span class="v">柳川鍋・どぜう汁（<a href="https://www.maff.go.jp/j/keikaku/syokubunka/k_ryouri/search_menu/menu/34_4_tokyo.html">農水省郷土料理・東京</a>・駒形どぜう1801年〜の系譜）</span></div>
+      <div class="field"><span class="k">1月</span><span class="v">通年（養殖）</span></div>
+      <div class="field"><span class="k">仕入</span><span class="v">業務用川魚問屋へ照会（未特定）</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">柳川仕立て（IH/グリドル）</span></div>
+    </div>
+    <div class="rc">
+      <div class="rc-name"><span class="disp">ヤツメウナギ</span><span class="rc-area">新潟・山形</span></div>
+      <div class="field"><span class="k">文化</span><span class="v">かば焼き文化。無顎類＝<b>生物学的に別次元</b>・「目の薬」</span></div>
+      <div class="field"><span class="k">1月</span><span class="v">冬〜春が漁期</span></div>
+      <div class="field"><span class="k">仕入</span><span class="v">流通僅少——マニアック最高格・話のネタ枠</span></div>
+    </div>
+  </div>
 </section>
 
 <section id="s6">
   <div class="sec-head"><span class="sec-no">06</span><h3 class="sec-title">竹とメンマ — 和竿つながりの箸休め</h3></div>
   <p class="sec-intro">放置竹林→国産メンマ化の全国運動（<a href="https://www.japan-menma.com/">純国産メンマプロジェクト</a>）が実在。<b>「使われない竹」は「使われない魚」と同じ構図</b>。原料の幼竹は5〜6月採取＝<b>今回は仕入れ一択</b>（布袋竹・矢竹の自家仕込みは来春の宿題）。</p>
-  <div class="tbl-wrap"><table>
-    <tr><th>竹種</th><th>和竿との関係</th><th>食用</th></tr>
-    <tr><td><b>布袋竹</b></td><td><b>和竿の主材</b></td><td>タケノコは「甘味と歯ごたえがあって美味しい」と明記あり。メンマ商品は未確認</td></tr>
-    <tr><td><b>真竹</b></td><td>和竿材</td><td>日本古来のたけのこ・メンマ実績あり</td></tr>
-    <tr><td><b>淡竹</b></td><td>和竿材</td><td>アク少なめ・メンマ実績あり</td></tr>
-    <tr><td>孟宗竹</td><td>（竿には使わない）</td><td>国産メンマの主流・業務用も入手可</td></tr>
-    <tr><td>矢竹</td><td>和竿の穂持ち</td><td>細すぎて食用実績ほぼ無し——<b>「矢竹だけは竿に専念」</b></td></tr>
-  </table></div>
+  <div class="rowcards">
+    <div class="rc"><div class="rc-name"><span class="disp">布袋竹</span><span class="rc-area">和竿の主材</span></div><div class="field"><span class="k">食用</span><span class="v">タケノコは「<b>甘味と歯ごたえがあって美味しい</b>」と明記あり。メンマ商品は未確認</span></div></div>
+    <div class="rc"><div class="rc-name"><span class="disp">真竹</span><span class="rc-area">和竿材</span></div><div class="field"><span class="k">食用</span><span class="v">日本古来のたけのこ・メンマ実績あり</span></div></div>
+    <div class="rc"><div class="rc-name"><span class="disp">淡竹</span><span class="rc-area">和竿材</span></div><div class="field"><span class="k">食用</span><span class="v">アク少なめ・メンマ実績あり</span></div></div>
+    <div class="rc"><div class="rc-name"><span class="disp">孟宗竹</span><span class="rc-area">竿には使わない</span></div><div class="field"><span class="k">食用</span><span class="v">国産メンマの主流・業務用も入手可</span></div></div>
+    <div class="rc"><div class="rc-name"><span class="disp">矢竹</span><span class="rc-area">和竿の穂持ち</span></div><div class="field"><span class="k">食用</span><span class="v">細すぎて食用実績ほぼ無し——<b>「矢竹だけは竿に専念」</b></span></div></div>
+  </div>
   <p class="note">仕入れ先: <a href="https://www.yokamon.jp/ichiba/c200756/76">タケマン（糸島・純国産）</a>／<a href="https://menma-omenma.stores.jp/">国産メンマ専門店</a>／<a href="https://www.marumatsu-mb.jp/list.php?c_id=75">丸松物産（業務用）</a>／竹種明記品はプロジェクト窓口へ「和竿の竹種のメンマを探している」と照会。</p>
 </section>
 
@@ -331,19 +429,48 @@
 <section id="s9">
   <div class="sec-head"><span class="sec-no">09</span><h3 class="sec-title">会場で作れる型 — 電気加熱 × 古い料理</h3></div>
   <p class="sec-intro">申込書の「調理方法」欄に落ちる形。<b>会場では「下処理済みを加熱と盛付だけ」が安全形</b>。</p>
-  <div class="tbl-wrap"><table>
-    <tr><th>型</th><th>文化背景</th><th>合う魚</th><th>会場での形（電気）</th><th>仕込み/仕入れ</th></tr>
-    <tr><td><b>丸ごと唐揚げ</b></td><td>雑魚食の王道・骨まで食べる</td><td>ネンブツダイ・小魚全般・ワカサギ・メヒカリ</td><td>電気フライヤーで二度揚げ・匂いで集客</td><td>下処理済み冷凍を産地から</td></tr>
-    <tr><td><b>つみれ・だんご汁</b></td><td>すり身文化（じゃこ天1800年頃〜）</td><td>ネンブツダイ・タラ・アラ</td><td>スープウォーマーで加熱保持・冬の会場に効く</td><td>加工済みすり身</td></tr>
-    <tr><td><b>佃煮・甘露煮</b></td><td><b>語源は江戸・佃島の保存食</b>＝釣り文化と地続き</td><td>ワカサギ・小鮎・モロコ・フナ</td><td>そのまま／飯もの・トッピング</td><td>§05の各業者</td></tr>
-    <tr><td><b>雀焼き・いかだ焼</b></td><td>小魚を串で焼く利根川下流の型</td><td>フナ・ハゼ</td><td>電気グリルで炙り直し</td><td>正上ほか</td></tr>
-    <tr><td><b>柳川仕立て</b></td><td>江戸のどぜう文化</td><td>ドジョウ（雑魚柳川に応用可）</td><td>IH小鍋・グリドル（卵とじ）</td><td>§05どじょう</td></tr>
-    <tr><td><b>マース煮</b></td><td>沖縄の塩と泡盛の煮</td><td>ミーバイ・白身</td><td>IH</td><td>gussan直送</td></tr>
-    <tr><td><b>汁・雑煮</b></td><td>焼き干し出汁の古層（§08）</td><td>焼きハゼ・はりめ・タラのアラ</td><td>スープウォーマー</td><td>煮干し加工品＋アラ</td></tr>
-    <tr><td><b>鯉こく・あら汁</b></td><td>内陸の滋養食（佐久・郡山の養鯉）</td><td>コイ・アラ</td><td>ウォーマー</td><td>養鯉業者へ照会</td></tr>
-    <tr><td><b>田楽・山椒味噌</b></td><td>川魚×味噌の内陸文化</td><td>川魚全般</td><td>電気グリル</td><td>魚は§05</td></tr>
-    <tr><td><b>骨酒</b></td><td>焼き干しに熱燗</td><td>イワナ（養殖）</td><td>電気加熱の燗 <span class="chip">酒類は要項上販売可・提供方法の申請要</span></td><td>養殖イワナ焼き干し（通販流通あり）</td></tr>
-  </table></div>
+  <div class="rowcards">
+    <div class="rc"><div class="rc-name">丸ごと唐揚げ<span class="rc-area">雑魚食の王道・骨まで</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">ネンブツダイ・小魚全般・ワカサギ・メヒカリ</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">電気フライヤーで二度揚げ・匂いで集客</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">下処理済み冷凍を産地から</span></div></div>
+    <div class="rc"><div class="rc-name">つみれ・だんご汁<span class="rc-area">すり身文化（じゃこ天1800年頃〜）</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">ネンブツダイ・タラ・アラ</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">スープウォーマーで加熱保持・冬の会場に効く</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">加工済みすり身</span></div></div>
+    <div class="rc"><div class="rc-name">佃煮・甘露煮<span class="rc-area">語源は江戸・佃島＝釣り文化と地続き</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">ワカサギ・小鮎・モロコ・フナ</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">そのまま／飯もの・トッピング</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">§05の各業者</span></div></div>
+    <div class="rc"><div class="rc-name">雀焼き・いかだ焼<span class="rc-area">小魚を串で焼く利根川下流の型</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">フナ・ハゼ</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">電気グリルで炙り直し</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">正上ほか</span></div></div>
+    <div class="rc"><div class="rc-name">柳川仕立て<span class="rc-area">江戸のどぜう文化</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">ドジョウ（雑魚柳川に応用可）</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">IH小鍋・グリドル（卵とじ）</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">§05どじょう</span></div></div>
+    <div class="rc"><div class="rc-name">マース煮<span class="rc-area">沖縄の塩と泡盛の煮</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">ミーバイ・白身</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">IH</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">gussan直送</span></div></div>
+    <div class="rc"><div class="rc-name">汁・雑煮<span class="rc-area">焼き干し出汁の古層（§08）</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">焼きハゼ・はりめ・タラのアラ</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">スープウォーマー</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">煮干し加工品＋アラ</span></div></div>
+    <div class="rc"><div class="rc-name">鯉こく・あら汁<span class="rc-area">内陸の滋養食（佐久・郡山の養鯉）</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">コイ・アラ</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">ウォーマー</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">養鯉業者へ照会</span></div></div>
+    <div class="rc"><div class="rc-name">田楽・山椒味噌<span class="rc-area">川魚×味噌の内陸文化</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">川魚全般</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">電気グリル</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">魚は§05</span></div></div>
+    <div class="rc"><div class="rc-name">骨酒<span class="rc-area">焼き干しに熱燗</span></div>
+      <div class="field"><span class="k">合う魚</span><span class="v">イワナ（養殖）</span></div>
+      <div class="field"><span class="k">会場</span><span class="v">電気加熱の燗——酒類は要項上販売可・提供方法の申請要</span></div>
+      <div class="field"><span class="k">仕込み</span><span class="v">養殖イワナ焼き干し（通販流通あり）</span></div></div>
+  </div>
 </section>
 
 <section id="s10">
@@ -360,48 +487,60 @@
 
 <section id="s11">
   <div class="sec-head"><span class="sec-no">11</span><h3 class="sec-title">1月の魚暦 — 会期（1/22–24）に何があるか</h3></div>
-  <p class="sec-intro">凡例: <span class="mark now">旬</span>=1月がまさに旬 ／ <span class="mark ok">可</span>=通年・安定 ／ <span class="mark proc">加工</span>=加工品なら季節無関係 ／ <span class="mark off">外</span>=時期外→加工品や冷凍で代替。<b>供給の設計は「冬の旬を軸に、秋〜年末の冷凍ストックで平準化、加工品を保険に」</b>。</p>
-  <div class="tbl-wrap"><table>
-    <tr><th>1月</th><th>素材</th><th>供給圏</th><th>備考</th></tr>
-    <tr><td><span class="mark now">旬</span></td><td><b>マダラ（白子）</b></td><td>三陸 minai</td><td>12〜2月の産卵期が最盛。時化リスクのみ</td></tr>
-    <tr><td><span class="mark now">旬</span></td><td><b>ドンコ</b></td><td>三陸 minai</td><td>11〜3月・冬の肝。どんこ汁</td></tr>
-    <tr><td><span class="mark now">旬</span></td><td><b>ナメタガレイ</b></td><td>三陸〜仙台湾</td><td>正月魚。年末高騰→年明けが狙い目</td></tr>
-    <tr><td><span class="mark now">旬</span></td><td>アンコウ</td><td>常磐〜三陸</td><td>どぶ汁・七つ道具</td></tr>
-    <tr><td><span class="mark now">旬</span></td><td><b>ワカサギ（氷下漁系）</b></td><td>八郎湖・諏訪湖</td><td>冬が漁期そのもの。文化の裏付けつき</td></tr>
-    <tr><td><span class="mark now">旬</span></td><td><b>ホンモロコ</b></td><td>琵琶湖</td><td>冬〜早春が旬。生1kg単位の販売実在</td></tr>
-    <tr><td><span class="mark now">旬</span></td><td>寒鮒・寒ボラ・カジカ・かすべ・ゲンゲ・ヤツメ</td><td>各地</td><td>「寒」の名がつく冬の顔ぶれ</td></tr>
-    <tr><td><span class="mark now">旬</span></td><td>グルクン（脂）</td><td>石垣 gussan</td><td>冬に脂。南の旬枠</td></tr>
-    <tr><td><span class="mark ok">可</span></td><td><b>ネンブツダイ</b></td><td>定置混獲（房総・徳島・高知）</td><td>通年。鮮魚は漁協照会・煮干しは商品仕入れ</td></tr>
-    <tr><td><span class="mark ok">可</span></td><td>ミーバイ・トロピカル勢</td><td>石垣 gussan</td><td>通年。シガテラ選別は産地側</td></tr>
-    <tr><td><span class="mark ok">可</span></td><td>メヒカリ・金華サバ・ミズダコ</td><td>いわき・石巻・三陸</td><td>底引き期・秋冬ブランド・正月ダコ</td></tr>
-    <tr><td><span class="mark ok">可</span></td><td>どじょう・鯉・外来魚（ナマズ/バス）</td><td>養殖・駆除ルート</td><td>季節に依存しない安定枠</td></tr>
-    <tr><td><span class="mark proc">加工</span></td><td>佃煮・甘露煮・煮干し・メンマ・へしこ・塩引き鮭・新巻・とば</td><td>各老舗（§12）</td><td><b>伝票・保存・工程すべて堅い保険レイヤー</b></td></tr>
-    <tr><td><span class="mark proc">加工</span></td><td>焼きハゼ・あご焼き干し</td><td>石巻・平戸ほか</td><td>正月需要ピークは12月→1月分は早押さえ</td></tr>
-    <tr><td><span class="mark off">外</span></td><td>小鮎・ゴリ（夏の湖魚）・アユ</td><td>琵琶湖ほか</td><td>時期外→佃煮・焼き干し・うるかの加工品で出す</td></tr>
-    <tr><td><span class="mark off">外</span></td><td>ハタハタ（生）</td><td>秋田</td><td>接岸ピークは12月。1月は飯寿司・しょっつるで</td></tr>
-  </table></div>
+  <p class="sec-intro">凡例: <span class="mark now" style="display:inline-block">旬</span>=1月がまさに旬 ／ <span class="mark ok" style="display:inline-block">可</span>=通年・安定 ／ <span class="mark proc" style="display:inline-block">加工</span>=加工品なら無季 ／ <span class="mark off" style="display:inline-block">外</span>=時期外→代替。<b>設計は「冬の旬を軸に、秋〜年末の冷凍ストックで平準化、加工品を保険に」</b>。</p>
+  <div class="cal">
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body"><b>マダラ（白子）</b><span class="where">三陸 minai</span><span class="memo">12〜2月の産卵期が最盛。時化リスクのみ</span></div></div>
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body"><b>ドンコ</b><span class="where">三陸 minai</span><span class="memo">11〜3月・冬の肝。どんこ汁</span></div></div>
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body"><b>ナメタガレイ</b><span class="where">三陸〜仙台湾</span><span class="memo">正月魚。年末高騰→年明けが狙い目</span></div></div>
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body">アンコウ<span class="where">常磐〜三陸</span><span class="memo">どぶ汁・七つ道具</span></div></div>
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body"><b>ワカサギ（氷下漁系）</b><span class="where">八郎湖・諏訪湖</span><span class="memo">冬が漁期そのもの。文化の裏付けつき</span></div></div>
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body"><b>ホンモロコ</b><span class="where">琵琶湖</span><span class="memo">冬〜早春が旬。生1kg単位の販売実在</span></div></div>
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body">寒鮒・寒ボラ・カジカ・かすべ・ゲンゲ・ヤツメ<span class="where">各地</span><span class="memo">「寒」の名がつく冬の顔ぶれ</span></div></div>
+    <div class="cal-row"><span class="mark now">旬</span><div class="cal-body">グルクン（脂）<span class="where">石垣 gussan</span><span class="memo">冬に脂。南の旬枠</span></div></div>
+    <div class="cal-row"><span class="mark ok">可</span><div class="cal-body"><b>ネンブツダイ</b><span class="where">房総・徳島・高知</span><span class="memo">通年（定置混獲）。鮮魚は漁協照会・煮干しは商品仕入れ</span></div></div>
+    <div class="cal-row"><span class="mark ok">可</span><div class="cal-body">ミーバイ・トロピカル勢<span class="where">石垣 gussan</span><span class="memo">通年。シガテラ選別は産地側</span></div></div>
+    <div class="cal-row"><span class="mark ok">可</span><div class="cal-body">メヒカリ・金華サバ・ミズダコ<span class="where">いわき・石巻・三陸</span><span class="memo">底引き期・秋冬ブランド・正月ダコ</span></div></div>
+    <div class="cal-row"><span class="mark ok">可</span><div class="cal-body">どじょう・鯉・外来魚（ナマズ/バス）<span class="where">養殖・駆除ルート</span><span class="memo">季節に依存しない安定枠</span></div></div>
+    <div class="cal-row"><span class="mark proc">加工</span><div class="cal-body">佃煮・甘露煮・煮干し・メンマ・へしこ・塩引き鮭・新巻・とば<span class="where">各老舗（§12）</span><span class="memo"><b>伝票・保存・工程すべて堅い保険レイヤー</b></span></div></div>
+    <div class="cal-row"><span class="mark proc">加工</span><div class="cal-body">焼きハゼ・あご焼き干し<span class="where">石巻・平戸ほか</span><span class="memo">正月需要ピークは12月→1月分は早押さえ</span></div></div>
+    <div class="cal-row"><span class="mark off">外</span><div class="cal-body">小鮎・ゴリ（夏の湖魚）・アユ<span class="where">琵琶湖ほか</span><span class="memo">時期外→佃煮・焼き干し・うるかの加工品で出す</span></div></div>
+    <div class="cal-row"><span class="mark off">外</span><div class="cal-body">ハタハタ（生）<span class="where">秋田</span><span class="memo">接岸ピークは12月。1月は飯寿司・しょっつるで</span></div></div>
+  </div>
   <div class="callout"><b>正月直後という追い風</b>——年取り魚（東の鮭・西の鰤、境界は糸魚川静岡構造線）、田作り、雑煮の出汁地図（焼きハゼ・あご・鮎）。来場者が正月に食べたばかりの文化の「答え合わせ」ができる時期に開くのが釣りフェスの1月。</div>
 </section>
 
 <section id="s12">
   <div class="sec-head"><span class="sec-no">12</span><h3 class="sec-title">仕入れ先総覧 — 電話番号と当たり方</h3></div>
-  <p class="sec-intro">聞き方の芯：魚の名前でなく伝票から。<b>「①下処理済み/加工品で出せるか ②送り状・請求書が出るか ③1月末に向けた量と単価」</b>。回答は必ずメールで残す。</p>
-  <div class="tbl-wrap"><table>
-    <tr><th>系統</th><th>当たり先</th><th>連絡先</th><th>何が引けるか</th></tr>
-    <tr><td rowspan="5"><b>ネンブツダイ産地筋</b></td><td>ネット商社ドットコム（業務用卸EC）</td><td class="tel"><a href="https://www.netshousha.com/SHOP/nenbutudainiboshi10kg.html">念仏鯛煮干し 5.5kg ¥4,950</a></td><td><b>商品が実在</b>（長崎産）。在庫切れ→入荷連絡登録＋製造元照会</td></tr>
-    <tr><td><b>鞆浦漁協</b>（徳島・海陽町）</td><td class="tel">0884-73-0011</td><td>徳島最大の大敷網＝赤じゃこ文化の本場。混獲鮮魚と加工者紹介</td></tr>
-    <tr><td>宍喰漁協（同）</td><td class="tel">0884-76-3101</td><td>第二候補</td></tr>
-    <tr><td><b>すくも湾漁協</b>（高知・宿毛）</td><td class="tel">本所 0880-62-3177／市場 0880-62-3950</td><td>「はりめ」文化圏の中核（<a href="http://sukumobay.com/">公式</a>）</td></tr>
-    <tr><td><b>保田漁協「ばんや」</b>（千葉・鋸南町）</td><td class="tel">0470-55-4844</td><td>朝獲れ定置＋直売。関東最近場（<a href="https://banya-grp.jp/">公式</a>）</td></tr>
-    <tr><td rowspan="2"><b>チーム直送</b></td><td>minai（三陸）</td><td class="tel">チーム内</td><td>冬の旬魚＋混獲未利用魚→秋〜年末に冷凍ストック</td></tr>
-    <tr><td>gussan（石垣）</td><td class="tel">チーム内</td><td>南国魚。シガテラ選別は産地側で</td></tr>
-    <tr><td rowspan="3"><b>湖沼の老舗</b></td><td>八郎湖・諏訪湖</td><td class="tel">§05参照</td><td>千田佐市商店／諏訪湖漁協直販</td></tr>
-    <tr><td>霞ヶ浦</td><td class="tel">§05参照</td><td>小沼水産（卸）・常磐商店・貝塚忠三郎商店</td></tr>
-    <tr><td>琵琶湖・利根川</td><td class="tel">§05参照</td><td>魚重産業・沖島冨田屋・琵琶近江商店／野村甘露煮店・田村屋・正上</td></tr>
-    <tr><td><b>EC産直</b></td><td><a href="https://www.tabechoku.com/">食べチョク</a>・ポケットマルシェ</td><td class="tel">EC</td><td>未利用魚セットの業務用相談（出品者の許可確認とセット）</td></tr>
-    <tr><td><b>メンマ</b></td><td>タケマン・専門店・丸松物産・プロジェクト窓口</td><td class="tel">§06参照</td><td>食べ比べ用の竹種違い調達</td></tr>
-    <tr><td><b>発酵・出汁の名品</b></td><td>諸井醸造（しょっつる）・かきや/平松食品（焼きハゼ）・田村長（へしこ）ほか</td><td class="tel">§07–08参照</td><td>調味と出汁のレイヤー</td></tr>
-  </table></div>
+  <p class="sec-intro">聞き方の芯：魚の名前でなく伝票から。<b>「①下処理済み/加工品で出せるか ②送り状・請求書が出るか ③1月末に向けた量と単価」</b>。回答は必ずメールで残す。番号はタップで発信。</p>
+
+  <div class="supgroup">
+    <h4>ネンブツダイ産地筋</h4>
+    <div class="sup"><div class="s-name">ネット商社ドットコム（業務用卸EC）</div><div class="s-tel"><a href="https://www.netshousha.com/SHOP/nenbutudainiboshi10kg.html">念仏鯛煮干し 5.5kg ¥4,950</a></div><div class="s-what"><b>商品が実在</b>（長崎産）。在庫切れ→入荷連絡登録＋製造元照会</div></div>
+    <div class="sup"><div class="s-name">鞆浦漁協（徳島・海陽町）</div><div class="s-tel"><a href="tel:0884730011">0884-73-0011</a></div><div class="s-what"><b>徳島最大の大敷網</b>＝赤じゃこ文化の本場。混獲鮮魚と加工者紹介</div></div>
+    <div class="sup"><div class="s-name">宍喰漁協（徳島・海陽町）</div><div class="s-tel"><a href="tel:0884763101">0884-76-3101</a></div><div class="s-what">第二候補</div></div>
+    <div class="sup"><div class="s-name">すくも湾漁協（高知・宿毛）</div><div class="s-tel"><a href="tel:0880623177">本所 0880-62-3177</a>／<a href="tel:0880623950">市場 0880-62-3950</a></div><div class="s-what">「はりめ」文化圏の中核（<a href="http://sukumobay.com/">公式</a>）</div></div>
+    <div class="sup"><div class="s-name">保田漁協「ばんや」（千葉・鋸南町）</div><div class="s-tel"><a href="tel:0470554844">0470-55-4844</a></div><div class="s-what">朝獲れ定置＋直売。関東最近場（<a href="https://banya-grp.jp/">公式</a>）</div></div>
+  </div>
+
+  <div class="supgroup">
+    <h4>チーム直送</h4>
+    <div class="sup"><div class="s-name">minai（三陸）</div><div class="s-what">冬の旬魚＋混獲未利用魚→<b>秋〜年末に冷凍ストック</b>。送り状（出荷者名・産地・魚種）を毎便つける段取りを合意しておく</div></div>
+    <div class="sup"><div class="s-name">gussan（石垣）</div><div class="s-what">南国魚。シガテラ選別は産地側で</div></div>
+  </div>
+
+  <div class="supgroup">
+    <h4>湖沼の老舗（詳細は§05）</h4>
+    <div class="sup"><div class="s-name">八郎湖・諏訪湖</div><div class="s-what">千田佐市商店／諏訪湖漁協直販</div></div>
+    <div class="sup"><div class="s-name">霞ヶ浦</div><div class="s-what">小沼水産（卸）・常磐商店・貝塚忠三郎商店</div></div>
+    <div class="sup"><div class="s-name">琵琶湖・利根川</div><div class="s-what">魚重産業・沖島冨田屋・琵琶近江商店／野村甘露煮店・田村屋・正上</div></div>
+  </div>
+
+  <div class="supgroup">
+    <h4>EC・加工の名品</h4>
+    <div class="sup"><div class="s-name">産直EC</div><div class="s-what"><a href="https://www.tabechoku.com/">食べチョク</a>・ポケットマルシェ——未利用魚セットの業務用相談（出品者の許可確認とセット）</div></div>
+    <div class="sup"><div class="s-name">メンマ（§06）</div><div class="s-what">タケマン・国産メンマ専門店・丸松物産・プロジェクト窓口</div></div>
+    <div class="sup"><div class="s-name">発酵・出汁の名品（§07–08）</div><div class="s-what">諸井醸造（しょっつる）・かきや/平松食品（焼きハゼ）・田村長（へしこ）ほか</div></div>
+  </div>
 </section>
 
 <section id="s13">
@@ -416,9 +555,10 @@
 </section>
 
 <footer>
-  MASHI's kitchen 企画室｜ニッポン魚食大全 v2 統合版（2026-08-28）——旧「食材の選択肢カタログ」を吸収し、文化×旬×仕入れを一冊に再編<br>
-  正本: soeno_master/20_Projects/_Active/wazao/3_deliverables/270122_釣りフェス出店/魚食大全.html ｜姉妹資料: チームページ MASHI's kitchen（企画・メンバー・メニュー）<br>
+  MASHI's kitchen 企画室｜ニッポン魚食大全 v2.1（2026-08-28・統合版をスマホ最適化）<br>
+  正本: soeno_master/20_Projects/_Active/wazao/3_deliverables/270122_釣りフェス出店/魚食大全.html ｜姉妹資料: チームページ MASHI's kitchen<br>
   主な出典: 農水省「うちの郷土料理」（ナメタガレイ・ワニ料理・柳川鍋ほか）／市場魚貝類図鑑（はりめ・赤じゃこ・ボラ）／プライドフィッシュ／富山の食材（ゲンゲ）／いわき常磐もの／諸井醸造／美川商工会（ふぐの子）／千年鮭きっかわ・村上市（100年フード）／紀文 正月データベース（年取り魚）／琵琶湖博物館・滋賀県（外来魚）／純国産メンマプロジェクト／各仕入先公式=本文リンク（検索確認 2026-08-27〜28）
 </footer>
 
 </div>
+<a class="totop" href="#top" aria-label="ページ上部へ">▲</a>
