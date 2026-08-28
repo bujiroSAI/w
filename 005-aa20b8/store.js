@@ -105,12 +105,13 @@ const Store = (() => {
         if (!weakest || (acc || 0) < (weakest.acc || 0)) weakest = { id, acc, n };
       }
     }
+    const dNeed = advanceDaysNeed(data.unlocked.length);
     return {
       daysDone: days,
-      daysNeed: ADVANCE_RULE.minDaysOnStage,
-      daysLeft: Math.max(0, ADVANCE_RULE.minDaysOnStage - days),
+      daysNeed: dNeed,
+      daysLeft: Math.max(0, dNeed - days),
       trialsDone: st.length,
-      trialsNeed: ADVANCE_RULE.minTrialsOnStage,
+      trialsNeed: advanceTrialsNeed(data.unlocked.length),
       accOk,
       weakest,
       ready: advanceReady(),
@@ -121,8 +122,8 @@ const Store = (() => {
   function advanceReady() {
     if (data.unlocked.length >= CHORDS.length) return false;
     const st = stageTrials();
-    if (st.length < ADVANCE_RULE.minTrialsOnStage) return false;
-    if (stageDays() < ADVANCE_RULE.minDaysOnStage) return false;
+    if (st.length < advanceTrialsNeed(data.unlocked.length)) return false;
+    if (stageDays() < advanceDaysNeed(data.unlocked.length)) return false;
     return data.unlocked.every(id => {
       const { acc, n } = chordAccuracy(id, ADVANCE_RULE.perChordWindow);
       return n >= Math.min(ADVANCE_RULE.perChordWindow, 12) && acc >= ADVANCE_RULE.minAccuracy;

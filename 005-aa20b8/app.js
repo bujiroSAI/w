@@ -9,45 +9,42 @@
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-  // ============ キャラクター（ことりの指揮者・ピアノ台の上） ============
-  const CHAR_SVG = `
-  <svg viewBox="0 0 200 192" xmlns="http://www.w3.org/2000/svg">
-    <!-- ピアノ台 -->
-    <g>
-      <rect x="34" y="128" width="132" height="52" rx="10" fill="#A9805A" stroke="#82603F" stroke-width="3"/>
-      <rect x="42" y="136" width="116" height="18" rx="4" fill="#FFFDF6" stroke="#82603F" stroke-width="2.5"/>
-      <g fill="#4A3B2E">
-        <rect x="52" y="136" width="7" height="11" rx="1.5"/>
-        <rect x="66" y="136" width="7" height="11" rx="1.5"/>
-        <rect x="88" y="136" width="7" height="11" rx="1.5"/>
-        <rect x="102" y="136" width="7" height="11" rx="1.5"/>
-        <rect x="116" y="136" width="7" height="11" rx="1.5"/>
-        <rect x="138" y="136" width="7" height="11" rx="1.5"/>
-      </g>
-      <rect x="42" y="162" width="116" height="6" rx="3" fill="#82603F" opacity="0.5"/>
-    </g>
-    <!-- おんぷ（うたうとき） -->
-    <text class="note-puff" x="34" y="52" font-size="26" fill="#93836D">♪</text>
-    <text class="note-puff" x="150" y="40" font-size="30" fill="#93836D" style="animation-delay:0.18s">♫</text>
-    <!-- ことり -->
-    <g stroke="#4A3B2E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-      <ellipse cx="100" cy="88" rx="41" ry="37" fill="#FFFDF6"/>
-      <path d="M63 92 Q52 100 58 112 Q70 108 74 100" fill="#DCCBA6"/>
-      <path d="M137 92 Q148 100 142 112 Q130 108 126 100" fill="#DCCBA6"/>
-      <path d="M100 66 l-5 -10 l10 0 z" fill="#DCA95B"/>
-      <ellipse cx="100" cy="99" rx="24" ry="18" fill="#F4EBD5" stroke="none"/>
-      <path d="M92 108 l0 12 m-6 0 l6 0 l5 -3 M108 108 l0 12 m-6 0 l6 0 l5 -3" fill="none" stroke="#DCA95B"/>
-    </g>
-    <g fill="#4A3B2E">
-      <circle cx="86" cy="84" r="4.6"/>
-      <circle cx="114" cy="84" r="4.6"/>
-    </g>
-    <g fill="#EAD3B8">
-      <circle cx="78" cy="94" r="6"/>
-      <circle cx="122" cy="94" r="6"/>
-    </g>
-    <path d="M96 92 Q100 96 104 92" fill="none" stroke="#4A3B2E" stroke-width="3" stroke-linecap="round"/>
-  </svg>`;
+  // ============ キャラクター（おどるひつじ・画像ポーズ切替） ============
+  // 性格: 陽気で楽しげ・小刻みなステップワークでよく踊る・オーバーリアクション。
+  // 待機中は常にステップダンス（CSS）。出来事に応じてポーズ画像を差し替える。
+  const Char = (() => {
+    const POSES = ['neutral', 'listen', 'clap', 'joy', 'sing', 'wave', 'sleep'];
+    POSES.forEach(pz => { const i = new Image(); i.src = `char/${pz}.png`; }); // プリロード
+    const timers = new Map();
+    function mount(el) {
+      if (!el || el.querySelector('.char-img')) return;
+      el.innerHTML = `<img class="char-img" src="char/neutral.png" alt="" draggable="false">
+        <span class="char-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
+    }
+    // pose(el, name, holdMs): holdMs後にneutralへ戻る。holdMs省略で戻らない。
+    function pose(el, name, holdMs) {
+      if (!el) return;
+      const img = el.querySelector('.char-img');
+      if (!img) return;
+      img.src = `char/${name}.png`;
+      if (timers.has(el)) { clearTimeout(timers.get(el)); timers.delete(el); }
+      if (holdMs) timers.set(el, setTimeout(() => { img.src = 'char/neutral.png'; el.classList.remove('overreact', 'groove'); }, holdMs));
+    }
+    // オーバーリアクション（2連ぴょんジャンプ+のけぞり）
+    function overreact(el) {
+      if (!el) return;
+      el.classList.remove('overreact');
+      void el.offsetWidth;
+      el.classList.add('overreact');
+    }
+    // 音に乗る（ビート揺れ）
+    function groove(el, ms) {
+      if (!el) return;
+      el.classList.add('groove');
+      setTimeout(() => el.classList.remove('groove'), ms || 1600);
+    }
+    return { mount, pose, overreact, groove };
+  })();
 
   // ============ 旗のしるし（色覚多様性への冗長コード・WCAG 1.4.1） ============
   // 色が見分けられなくても旗を同定できるようにする。2歳児は「見分けられない」と言えないため、
@@ -215,6 +212,18 @@
     $('#parent-badge').classList.toggle('hidden',
       !(st.autoSuggest && Store.advanceReady()));
 
+    // 旅の地図: 14個のボタンのみち。とれた色だけ塗られていく
+    const j = $('#journey');
+    j.innerHTML = '';
+    CHORDS.forEach((c, i) => {
+      const dot = document.createElement('span');
+      const got = i < Store.data.unlocked.length;
+      const now2 = i === Store.data.unlocked.length - 1;
+      dot.className = 'j-dot' + (got ? ' got' : '') + (now2 ? ' now' : '');
+      if (got) dot.style.setProperty('--jc', chordColor(c));
+      j.appendChild(dot);
+    });
+
     // つぎの旗までの見通し（見えない待機を見える階段に）
     const info = $('#next-flag-info');
     const a = Store.advanceStatus();
@@ -332,7 +341,7 @@
       b.style.setProperty('--flag', chordColor(c));
       b.style.setProperty('--labscale', String(Math.min(1, 3.6 / c.label.length)));
       const mark = Store.data.settings.marks ? markSvg(c.mark) : '';
-      b.innerHTML = `<span class="flag-cloth" style="--ink2:${c.ink}">${mark}<span class="flag-label">${c.label}</span></span><span class="flag-pole"></span>`;
+      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}"><span class="mini-flag" style="--flag:${chordColor(c)}" aria-hidden="true"></span>${mark}<span class="flag-label">${c.label}</span></span>`;
       b.addEventListener('pointerdown', () => onFlag(c.id, b));
       box.appendChild(b);
     }
@@ -383,9 +392,10 @@
     const c = CHORD_BY_ID[chordId];
     const midis = c.notes.map(n => NOTE_MIDI(n) + 12 * (shift || 0));
     const char = $('#char-btn');
-    char.classList.remove('sing', 'bounce');
+    char.classList.remove('bounce');
     void char.offsetWidth; // アニメ再発火
-    char.classList.add('sing', 'bounce');
+    char.classList.add('bounce');
+    Char.groove(char, 1400); // 音が鳴っているあいだリズムに乗る
     return Piano.chord(midis, { a4: Store.data.settings.pitchA });
   }
 
@@ -401,12 +411,12 @@
     }, 9000);
   }
 
-  // 次の試行へ。parentPaced（親子共同モード）では、おとなの「ことりタッチ」を待つ。
+  // 次の試行へ。parentPaced（親子共同モード）では、おとなの「キャラタッチ」を待つ。
   function proceed(delay) {
     if (Store.data.settings.parentPaced) {
       S.pendingNext = true;
       setTimeout(() => {
-        if (S && S.pendingNext) speech('ことりを タッチで つぎへ');
+        if (S && S.pendingNext) speech('ひつじを タッチで つぎへ');
       }, delay);
     } else {
       setTimeout(nextTrial, delay);
@@ -421,6 +431,7 @@
     S.listening = true;
     renderFlags();
     $('#flags').classList.add('lock');
+    Char.pose($('#char-btn'), 'sing');
     speech('きくじかん');
     Voice.speak('きくじかん');
 
@@ -488,7 +499,8 @@
     renderDots();
     const box = $('#flags');
     box.classList.add('lock');
-    speech(S.mode === 'intro' ? 'あたらしい はた！' : 'きいてね');
+    Char.pose($('#char-btn'), S.mode === 'intro' ? 'sing' : 'listen');
+    speech(S.mode === 'intro' ? 'あたらしい ボタン！' : 'きいてね');
 
     setTimeout(() => {
       if (!S) return;
@@ -502,7 +514,8 @@
         S.locked = false;
         S.promptAt = Date.now(); // 反応時間の起点（ロック解除時）
         box.classList.remove('lock');
-        if (S.mode !== 'intro') speech('どの はた かな？');
+        Char.pose($('#char-btn'), 'neutral');
+        if (S.mode !== 'intro') speech('どの ボタン かな？');
         armWaitTimer();
       }, 350);
     }, 600);
@@ -537,9 +550,8 @@
       }
     }
     const char = $('#char-btn');
-    char.classList.remove('cheer', 'jump');
-    void char.offsetWidth;
-    char.classList.add(big ? 'jump' : 'cheer');
+    Char.pose(char, big ? 'joy' : 'clap', big ? 2100 : 1500);
+    Char.overreact(char);
     if (Store.data.settings.sfx) { if (big) Piano.sfxFanfare(); else Piano.sfxCorrect(); }
     const praise = big
       ? ['すごーい！', 'めちゃくちゃ すごい！', 'かんぺき！']
@@ -613,7 +625,8 @@
       const c = CHORD_BY_ID[S.current];
       const g = flagEl(S.current);
       if (g) g.classList.add('glow');
-      speech('ひかってる はたを タッチ');
+      Char.pose($('#char-btn'), 'sing', 1400);
+      speech('ひかってる ボタンを タッチ');
       Voice.speak('これは ' + c.label);
       setTimeout(() => {
         if (!S) return;
@@ -625,6 +638,46 @@
           armWaitTimer();
         }, 350);
       }, 1100);
+    }
+  }
+
+  // ============ じぶんで ならす（自由演奏・記録なし） ============
+  // 「押すと楽しいことが起きる」をタップ回数の制約なしで教える遊び場。
+  // 序盤（旗1本の時期）の退屈対策の柱。試行としては一切記録しない。
+  let freeLock = 0;
+  function renderFreeplay() {
+    const box = $('#free-flags');
+    box.innerHTML = '';
+    const list = Store.data.unlocked.map(id => CHORD_BY_ID[id]);
+    const n = list.length;
+    const fw = n <= 1 ? 300 : n <= 3 ? 230 : n <= 6 ? 185 : n <= 9 ? 145 : 112;
+    box.style.setProperty('--fw', `min(${fw}px, ${Math.floor(88 / Math.min(n, 5))}vw)`);
+    for (const c of list) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'flag';
+      b.dataset.chord = c.id;
+      b.setAttribute('aria-label', c.label);
+      b.style.setProperty('--flag', chordColor(c));
+      b.style.setProperty('--labscale', String(Math.min(1, 3.6 / c.label.length)));
+      const mark = Store.data.settings.marks ? markSvg(c.mark) : '';
+      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}"><span class="mini-flag" style="--flag:${chordColor(c)}" aria-hidden="true"></span>${mark}<span class="flag-label">${c.label}</span></span>`;
+      b.addEventListener('pointerdown', () => {
+        const now = Date.now();
+        if (now - freeLock < 350) return; // 連打で音が濁るのを防ぐ
+        freeLock = now;
+        b.classList.remove('tapped'); void b.offsetWidth; b.classList.add('tapped');
+        Piano.ensure();
+        const midis = c.notes.map(x => NOTE_MIDI(x));
+        Piano.chord(midis, { a4: Store.data.settings.pitchA });
+        Voice.speak(c.label);
+        const fc = $('#free-char');
+        Char.pose(fc, 'sing', 1100);
+        Char.groove(fc, 1100);
+        const r = b.getBoundingClientRect();
+        Confetti.burst(chordColor(c), r.left + r.width / 2, r.top + r.height * 0.3, 16);
+      });
+      box.appendChild(b);
     }
   }
 
@@ -654,6 +707,9 @@
     Store.addSession(sess);
     stopSession();
     if (Store.data.settings.sfx) Piano.sfxFanfare();
+    Char.mount($('#reward-char'));
+    Char.pose($('#reward-char'), 'joy');
+    Char.overreact($('#reward-char'));
     Voice.speak('よくできました！');
     $('#reward-title').textContent = 'よくできました！';
     $('.reward-sub').classList.remove('hidden');
@@ -829,7 +885,7 @@
           <button type="button" data-v="440" class="${st.pitchA === 440 ? 'on' : ''}">440</button>
           <button type="button" data-v="442" class="${st.pitchA === 442 ? 'on' : ''}">442</button>
         </span></div>
-      <div class="p-set-row"><span class="p-set-label">すすめかた<small>「おとなと」は、おとなが ことりをタッチして次の問題へ</small></span>
+      <div class="p-set-row"><span class="p-set-label">すすめかた<small>「おとなと」は、おとなが キャラクターをタッチして次の問題へ</small></span>
         <span class="seg" id="set-paced">
           <button type="button" data-v="0" class="${!st.parentPaced ? 'on' : ''}">じどう</button>
           <button type="button" data-v="1" class="${st.parentPaced ? 'on' : ''}">おとなと</button>
@@ -1019,6 +1075,7 @@
   $('#btn-finish').addEventListener('pointerdown', () => {
     renderHome();
     show('screen-home');
+    Char.pose($('#home-char'), 'wave', 2000);
     Voice.speak('また あそぼうね');
   });
   $('#btn-stickers').addEventListener('pointerdown', () => {
@@ -1031,15 +1088,23 @@
   }));
   $('#home-char').addEventListener('pointerdown', () => {
     const hc = $('#home-char');
-    hc.classList.remove('bounce', 'sing');
-    void hc.offsetWidth;
-    hc.classList.add('bounce', 'sing');
+    const pz = ['joy', 'clap', 'wave', 'sing'][Math.floor(Math.random() * 4)];
+    Char.pose(hc, pz, 1400);
+    Char.overreact(hc);
     if (Store.data.settings.sfx) Piano.sfxTap();
   });
   $('#char-btn').addEventListener('pointerdown', () => {
     if (!S) return;
     if (S.pendingNext) { nextTrial(); return; }
     if (S.current) { S.manualReplays = (S.manualReplays || 0) + 1; playChord(S.current, S.currentShift); }
+  });
+
+  $('#btn-freeplay').addEventListener('pointerdown', () => {
+    Piano.unlock();
+    Char.mount($('#free-char'));
+    renderFreeplay();
+    show('screen-freeplay');
+    Char.pose($('#free-char'), 'wave', 1500);
   });
 
   // 最初のタッチでオーディオをアンロック（iOS）
@@ -1059,7 +1124,8 @@
 
   // ============ 起動 ============
   Store.load();
-  $('#home-char').innerHTML = CHAR_SVG;
-  $('#char-btn').innerHTML = CHAR_SVG;
+  Char.mount($('#home-char'));
+  Char.mount($('#char-btn'));
   renderHome();
+  Char.pose($('#home-char'), 'wave', 1800); // ごあいさつして踊りはじめる
 })();

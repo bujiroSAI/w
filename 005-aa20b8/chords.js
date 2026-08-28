@@ -50,7 +50,14 @@ const ADVANCE_RULE = {
   minAccuracy: 0.95,    // 全和音がこの正答率以上
   minDaysOnStage: 14,   // 現ステージで最低2週間（原法どおり）
   minTrialsOnStage: 80, // 現ステージの総試行数
+  // 序盤の特例（2026-08-28 施主裁定）: 旗1本の期間は選択肢が1つで正答率が情報を持たず、
+  // 一律14日は退屈で挫折を生むだけ。原法の「最速2週間」は複数和音の弁別安定の話であって、
+  // 導入初期は短くする。1本目=3日・2本目=7日・以降は原法どおり14日。
+  stageDaysBy: { 1: 3, 2: 7 },
+  stageTrialsBy: { 1: 30, 2: 60 },
 };
+function advanceDaysNeed(stage) { return ADVANCE_RULE.stageDaysBy[stage] || ADVANCE_RULE.minDaysOnStage; }
+function advanceTrialsNeed(stage) { return ADVANCE_RULE.stageTrialsBy[stage] || ADVANCE_RULE.minTrialsOnStage; }
 
 // 新和音の導入モード: 混ぜる前に単独提示で覚えさせる試行数
 const INTRO_TRIALS = 4;

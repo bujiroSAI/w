@@ -33,12 +33,14 @@
       </svg>
       <span>おとはた</span>
     </h1>
-    <p class="tagline">わおんを きいて、はたを あげよう</p>
+    <p class="tagline">わおんを きいて、ボタンを おそう</p>
     <div id="home-char" class="home-char"></div>
     <button id="btn-play" class="big-flag-btn" type="button">
       <span class="big-flag-btn-label">あそぶ</span>
     </button>
+    <button id="btn-freeplay" class="free-btn" type="button">じぶんで ならす</button>
     <div id="today-dots" class="today-dots" title="きょうのセッション"></div>
+    <div id="journey" class="journey" aria-label="はたのみち"></div>
     <div id="next-flag-info" class="next-flag-info hidden"></div>
   </div>
   <button id="btn-stickers" class="corner-btn corner-left" type="button" aria-label="シールちょう">
@@ -76,6 +78,7 @@
 <section id="screen-reward" class="screen">
   <div class="bunting" aria-hidden="true"></div>
   <div class="reward-inner">
+    <div id="reward-char" class="reward-char"></div>
     <h2 id="reward-title" class="reward-title">よくできました！</h2>
     <p class="reward-sub">すきな シールを 1まい えらんでね</p>
     <div id="sticker-choices" class="sticker-choices"></div>
@@ -85,6 +88,24 @@
     </div>
   </div>
   <div class="ground" aria-hidden="true"></div>
+</section>
+
+<!-- ============ じぶんで ならす ============ -->
+<section id="screen-freeplay" class="screen">
+  <div class="bunting" aria-hidden="true"></div>
+  <header class="sub-top">
+    <button class="round-btn js-back-home" type="button" aria-label="もどる">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m14 6-6 6 6 6 1.4-1.4L10.8 12l4.6-4.6L14 6Z"/></svg>
+    </button>
+    <h2 class="sub-title">じぶんで ならす</h2>
+    <div class="play-top-spacer"></div>
+  </header>
+  <div class="stage-area stage-free">
+    <div class="speech">すきな ボタンを おしてみよう</div>
+    <div id="free-char" class="char-btn" aria-hidden="true"></div>
+  </div>
+  <div id="free-flags" class="flags"></div>
+  <div class="ground ground-play" aria-hidden="true"><div class="track-line"></div></div>
 </section>
 
 <!-- ============ シールちょう ============ -->

@@ -1,6 +1,6 @@
 // おとはた — Service Worker（オフライン対応・cache-first）
 // バージョンを上げると次回アクセスで全キャッシュが更新される。
-const VERSION = 'otohata-v1';
+const VERSION = 'otohata-v2';
 const FILES = [
   './',
   './index.html',
@@ -13,6 +13,13 @@ const FILES = [
   './icon.svg',
   './icon-180.png',
   './icon-512.png',
+  './char/neutral.png',
+  './char/listen.png',
+  './char/clap.png',
+  './char/joy.png',
+  './char/sing.png',
+  './char/wave.png',
+  './char/sleep.png',
 ];
 
 self.addEventListener('install', (e) => {
