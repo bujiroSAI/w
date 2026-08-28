@@ -16,19 +16,30 @@
     const POSES = ['neutral', 'listen', 'clap', 'joy', 'sing', 'wave', 'sleep'];
     POSES.forEach(pz => { const i = new Image(); i.src = `char/${pz}.png`; }); // プリロード
     const timers = new Map();
+    const rig = typeof Char3D !== 'undefined' && Char3D.supported; // Live2D風レンダラが使えるか
     function mount(el) {
       if (!el || el.querySelector('.char-img')) return;
-      el.innerHTML = `<img class="char-img" src="char/neutral.png" alt="" draggable="false">
-        <span class="char-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
+      if (rig) {
+        el.innerHTML = `<span class="char-img char-rig"><canvas class="c3-gl"></canvas><canvas class="c3-eyes"></canvas></span>
+          <span class="char-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
+        Char3D.attach(el.querySelector('.char-rig'));
+      } else {
+        el.innerHTML = `<img class="char-img" src="char/neutral.png" alt="" draggable="false">
+          <span class="char-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
+      }
+    }
+    function setImg(el, name) {
+      const w = el.querySelector('.char-rig');
+      if (w) { Char3D.setPose(w, name); return; }
+      const img = el.querySelector('.char-img');
+      if (img) img.src = `char/${name}.png`;
     }
     // pose(el, name, holdMs): holdMs後にneutralへ戻る。holdMs省略で戻らない。
     function pose(el, name, holdMs) {
-      if (!el) return;
-      const img = el.querySelector('.char-img');
-      if (!img) return;
-      img.src = `char/${name}.png`;
+      if (!el || !el.querySelector('.char-img')) return;
+      setImg(el, name);
       if (timers.has(el)) { clearTimeout(timers.get(el)); timers.delete(el); }
-      if (holdMs) timers.set(el, setTimeout(() => { img.src = 'char/neutral.png'; el.classList.remove('overreact', 'groove'); }, holdMs));
+      if (holdMs) timers.set(el, setTimeout(() => { setImg(el, 'neutral'); el.classList.remove('overreact', 'groove'); }, holdMs));
     }
     // オーバーリアクション（2連ぴょんジャンプ+のけぞり）
     function overreact(el) {
