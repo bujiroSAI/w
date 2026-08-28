@@ -14,8 +14,10 @@ const Store = (() => {
       v: 1,
       createdAt: Date.now(),
       settings: Object.assign({}, DEFAULT_SETTINGS),
-      unlocked: ['aka'],        // 解放済み和音（CHORDS順の先頭からの部分列）
-      introPending: 'aka',      // 次セッション冒頭で単独導入する和音id
+      // 2本開始（2026-08-28 施主裁定B）: 1本だけの期間は選択肢がなく弁別が始まらない上に
+      // 退屈で挫折を生む。単独導入は clearIntro の連鎖で1色ずつ丁寧に行う。
+      unlocked: ['aka', 'kiiro'],
+      introPending: 'aka',      // 次セッション冒頭で単独導入する和音id（導入は連鎖する）
       trials: [],               // {t, chord, tapped, ok, corr(訂正試行か), stage, sess}
       sessions: [],             // {id, start, end, total, correct, stage, sticker}
       stickers: [],             // {emoji, t}
@@ -32,6 +34,12 @@ const Store = (() => {
     }
     // 設定の欠損キーを補完
     data.settings = Object.assign({}, DEFAULT_SETTINGS, data.settings || {});
+    // 移行（2026-08-28 裁定B）: 1本だけで始まっている既存データに2本目を足す
+    if (data.unlocked && data.unlocked.length === 1) {
+      data.unlocked.push(CHORDS[1].id);
+      if (!data.introPending) data.introPending = CHORDS[1].id;
+      save();
+    }
     return data;
   }
 
@@ -62,7 +70,12 @@ const Store = (() => {
     return next;
   }
 
-  function clearIntro() { data.introPending = null; save(); }
+  // 導入完了 → unlocked内に未導入の和音が続いていれば、次をそのまま単独導入する（2本開始の連鎖）
+  function clearIntro() {
+    const i = data.unlocked.indexOf(data.introPending);
+    data.introPending = (i >= 0 && i < data.unlocked.length - 1) ? data.unlocked[i + 1] : null;
+    save();
+  }
 
   // ---- 統計 ----
 
