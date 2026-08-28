@@ -224,24 +224,6 @@
       j.appendChild(dot);
     });
 
-    // つぎの旗までの見通し（見えない待機を見える階段に）
-    const info = $('#next-flag-info');
-    const a = Store.advanceStatus();
-    if (!a) {
-      info.textContent = 'ぜんぶの はたが そろったよ！';
-      info.classList.remove('hidden');
-    } else if (a.ready) {
-      info.innerHTML = 'あたらしい はたが <b>もうすぐ</b>！（おうちのかたへ）';
-      info.classList.remove('hidden');
-    } else if (a.daysLeft > 0 && Store.data.trials.length > 0) {
-      info.innerHTML = 'あたらしい はたまで あと <b>' + a.daysLeft + 'にち</b>くらい';
-      info.classList.remove('hidden');
-    } else if (!a.accOk && a.daysLeft === 0) {
-      info.textContent = 'あたらしい はた、 れんしゅうちゅう！';
-      info.classList.remove('hidden');
-    } else {
-      info.classList.add('hidden');
-    }
   }
 
   // ============ セッション（試行の状態機械） ============
@@ -341,7 +323,7 @@
       b.style.setProperty('--flag', chordColor(c));
       b.style.setProperty('--labscale', String(Math.min(1, 3.6 / c.label.length)));
       const mark = Store.data.settings.marks ? markSvg(c.mark) : '';
-      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}"><span class="mini-flag" style="--flag:${chordColor(c)}" aria-hidden="true"></span>${mark}<span class="flag-label">${c.label}</span></span>`;
+      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}">${mark}<span class="flag-label">${c.label}</span></span>`;
       b.addEventListener('pointerdown', () => onFlag(c.id, b));
       box.appendChild(b);
     }
@@ -538,15 +520,18 @@
         if (f !== el) f.classList.add('fade');
       });
       const r = el.getBoundingClientRect();
-      const cx = r.left + r.width / 2, cy = r.top + r.height * 0.3;
+      const cx = r.left + r.width / 2, cy = r.top + r.height * 0.4;
       if (small) {
-        Confetti.burst(chordColor(c), cx, cy, 26);
+        FX.explode(chordColor(c), cx, cy, 0);
+        Confetti.burst(chordColor(c), cx, cy, 22);
       } else if (big) {
-        Confetti.burst(chordColor(c), cx, cy, 110);
+        FX.explode(chordColor(c), cx, cy, 2);
+        Confetti.burst(chordColor(c), cx, cy, 90);
         Confetti.rain(chordColor(c), 60);
-        setTimeout(() => { if (S) Confetti.burst(chordColor(c), cx, cy - 60, 60); }, 240);
+        setTimeout(() => { if (S) Confetti.burst(chordColor(c), cx, cy - 60, 50); }, 240);
       } else {
-        Confetti.burst(chordColor(c), cx, cy, 80);
+        FX.explode(chordColor(c), cx, cy, 1);
+        Confetti.burst(chordColor(c), cx, cy, 60);
       }
     }
     const char = $('#char-btn');
@@ -583,6 +568,10 @@
     el.classList.remove('tapped');
     void el.offsetWidth;
     el.classList.add('tapped');
+    {
+      const r0 = el.getBoundingClientRect();
+      FX.tap(chordColor(CHORD_BY_ID[chordId]), r0.left + r0.width / 2, r0.top + r0.height / 2);
+    }
 
     if (S.corrective) {
       // 訂正モード: 光っている正解旗を探してもらう
@@ -661,7 +650,7 @@
       b.style.setProperty('--flag', chordColor(c));
       b.style.setProperty('--labscale', String(Math.min(1, 3.6 / c.label.length)));
       const mark = Store.data.settings.marks ? markSvg(c.mark) : '';
-      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}"><span class="mini-flag" style="--flag:${chordColor(c)}" aria-hidden="true"></span>${mark}<span class="flag-label">${c.label}</span></span>`;
+      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}">${mark}<span class="flag-label">${c.label}</span></span>`;
       b.addEventListener('pointerdown', () => {
         const now = Date.now();
         if (now - freeLock < 350) return; // 連打で音が濁るのを防ぐ
@@ -675,7 +664,7 @@
         Char.pose(fc, 'sing', 1100);
         Char.groove(fc, 1100);
         const r = b.getBoundingClientRect();
-        Confetti.burst(chordColor(c), r.left + r.width / 2, r.top + r.height * 0.3, 16);
+        FX.explode(chordColor(c), r.left + r.width / 2, r.top + r.height * 0.4, 0);
       });
       box.appendChild(b);
     }
@@ -780,7 +769,7 @@
       <div class="p-stat"><b>${d.stickers.length}</b><span>シール累計</span></div>`;
 
     // すすみぐあい
-    $('#p-stage-label').textContent = `いまの旗: ${d.unlocked.length} / ${CHORDS.length}本`;
+    $('#p-stage-label').textContent = `いまのボタン: ${d.unlocked.length} / ${CHORDS.length}本`;
     const rows = CHORDS.map((c, i) => {
       const unlocked = i < d.unlocked.length;
       if (!unlocked) {
@@ -834,8 +823,8 @@
       parts.push('日数 ' + Math.min(stat.daysDone, stat.daysNeed) + '/' + stat.daysNeed + '日');
       parts.push('練習 ' + Math.min(stat.trialsDone, stat.trialsNeed) + '/' + stat.trialsNeed + '回');
       parts.push(stat.accOk ? '正答率 ✔' : ('正答率 ' + (stat.weakest && stat.weakest.acc !== null ? Math.round(stat.weakest.acc*100)+'%' : '記録中') + '（' + (stat.weakest ? CHORD_BY_ID[stat.weakest.id].label : '') + '）'));
-      statBox.innerHTML = '<b>つぎの旗「' + (stat.next ? stat.next.label : '') + '」まで</b>: ' + parts.join(' ／ ') +
-        '<small>基準: 全部の旗が直近' + ADVANCE_RULE.perChordWindow + '回で' + Math.round(ADVANCE_RULE.minAccuracy*100) + '%以上 × ' + ADVANCE_RULE.minDaysOnStage + '日 × ' + ADVANCE_RULE.minTrialsOnStage + '回（原法の「誤りが生じない範囲で最速2週間ごと」の機械化）。お子さまの様子で早めたい場合は下の設定「旗を手動で追加」から。</small>';
+      statBox.innerHTML = '<b>つぎのボタン「' + (stat.next ? stat.next.label : '') + '」まで</b>: ' + parts.join(' ／ ') +
+        '<small>基準: 全部のボタンが直近' + ADVANCE_RULE.perChordWindow + '回で' + Math.round(ADVANCE_RULE.minAccuracy*100) + '%以上 × ' + ADVANCE_RULE.minDaysOnStage + '日 × ' + ADVANCE_RULE.minTrialsOnStage + '回（原法の「誤りが生じない範囲で最速2週間ごと」の機械化）。お子さまの様子で早めたい場合は下の設定「手動で追加」から。</small>';
       statBox.classList.remove('hidden');
     } else {
       statBox.classList.add('hidden');
@@ -846,7 +835,7 @@
     const next = CHORDS[d.unlocked.length];
     if (Store.advanceReady() && next) {
       banner.classList.remove('hidden');
-      banner.innerHTML = `<span>🚩 すべての旗が安定しました。次の旗「<b>${next.label}</b>（${next.yomi}）」を追加できます。</span>
+      banner.innerHTML = `<span>すべてのボタンが安定しました。次のボタン「<b>${next.label}</b>（${next.yomi}）」を追加できます。</span>
         <button class="pill-btn pill-primary" id="btn-advance" type="button">追加する</button>`;
       $('#btn-advance').addEventListener('click', () => {
         const c = Store.unlockNext();
@@ -898,7 +887,7 @@
         <button type="button" class="switch ${st.octaveRange ? 'on' : ''}" id="set-oct" aria-label="おとのたかさ"></button></div>
       <div class="p-set-row"><span class="p-set-label">きくじかんを はさむ<small>${LISTEN_BLOCK.everyNTrials}問ごとに、答えずに聴くだけの時間を挟む。研究では、同じ問題数でも答えさせる練習だけだと学習が起きず、聴くだけの時間を交互に挟むと大きく伸びた</small></span>
         <button type="button" class="switch ${st.listenBlocks ? 'on' : ''}" id="set-listen" aria-label="きくじかん"></button></div>
-      <div class="p-set-row"><span class="p-set-label">はたに しるしをつける<small>色が見分けにくいお子さま向け（日本人男性の約5%）。色に加えて形でも区別できる</small></span>
+      <div class="p-set-row"><span class="p-set-label">ボタンに しるしをつける<small>色が見分けにくいお子さま向け（日本人男性の約5%）。色に加えて形でも区別できる</small></span>
         <button type="button" class="switch ${st.marks ? 'on' : ''}" id="set-marks" aria-label="しるし"></button></div>
       <div class="p-set-row"><span class="p-set-label">色覚配慮パレット<small>Okabe-Ito配色に切替。市販の旗教材と色が変わる点に注意</small></span>
         <button type="button" class="switch ${st.cudPalette ? 'on' : ''}" id="set-cud" aria-label="色覚配慮パレット"></button></div>

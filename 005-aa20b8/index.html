@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>おとはた — 和音あそび</title>
-<meta name="description" content="2歳からの絶対音感あそび。和音を聞いて色の旗をあげる、和音同定法（公刊の学術研究で検証された訓練法）にもとづくミニゲーム。">
+<meta name="description" content="2歳からの絶対音感あそび。和音を聞いて色のボタンをおす、和音同定法（公刊の学術研究で検証された訓練法）にもとづくミニゲーム。">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,16 +23,8 @@
 
 <!-- ============ ホーム ============ -->
 <section id="screen-home" class="screen active">
-  <div class="bunting" aria-hidden="true"></div>
   <div class="home-inner">
-    <h1 class="logo">
-      <svg class="logo-flag" viewBox="0 0 48 60" aria-hidden="true">
-        <rect x="21" y="4" width="5" height="54" rx="2.5" fill="#8A6544"/>
-        <path class="logo-cloth" d="M26 6 C36 4, 44 8, 45 9 L45 27 C44 26, 36 22, 26 24 Z" fill="#E8382F"/>
-        <circle cx="23.5" cy="4.5" r="4" fill="#B9A57F"/>
-      </svg>
-      <span>おとはた</span>
-    </h1>
+    <h1 class="logo"><span>おとはた</span></h1>
     <p class="tagline">わおんを きいて、ボタンを おそう</p>
     <div id="home-char" class="home-char"></div>
     <button id="btn-play" class="big-flag-btn" type="button">
@@ -40,8 +32,7 @@
     </button>
     <button id="btn-freeplay" class="free-btn" type="button">じぶんで ならす</button>
     <div id="today-dots" class="today-dots" title="きょうのセッション"></div>
-    <div id="journey" class="journey" aria-label="はたのみち"></div>
-    <div id="next-flag-info" class="next-flag-info hidden"></div>
+    <div id="journey" class="journey" aria-label="ボタンのみち"></div>
   </div>
   <button id="btn-stickers" class="corner-btn corner-left" type="button" aria-label="シールちょう">
     <span class="corner-icon">🦁</span><span class="corner-text">シール</span>
@@ -57,7 +48,6 @@
 
 <!-- ============ プレイ ============ -->
 <section id="screen-play" class="screen">
-  <div class="bunting" aria-hidden="true"></div>
   <header class="play-top">
     <button id="btn-home" class="round-btn" type="button" aria-label="ホームへ">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3L12 3Z"/></svg>
@@ -76,7 +66,6 @@
 
 <!-- ============ ごほうび（シール選び） ============ -->
 <section id="screen-reward" class="screen">
-  <div class="bunting" aria-hidden="true"></div>
   <div class="reward-inner">
     <div id="reward-char" class="reward-char"></div>
     <h2 id="reward-title" class="reward-title">よくできました！</h2>
@@ -92,7 +81,6 @@
 
 <!-- ============ じぶんで ならす ============ -->
 <section id="screen-freeplay" class="screen">
-  <div class="bunting" aria-hidden="true"></div>
   <header class="sub-top">
     <button class="round-btn js-back-home" type="button" aria-label="もどる">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m14 6-6 6 6 6 1.4-1.4L10.8 12l4.6-4.6L14 6Z"/></svg>
@@ -139,7 +127,7 @@
     <section class="p-card">
       <h3>すすみぐあい <span id="p-stage-label" class="p-stage-label"></span></h3>
       <div id="p-chords" class="p-chords"></div>
-      <p class="p-note">正答率は各和音の直近20回。すべて95%以上×2週間以上×80回以上で次の旗を提案する（原法「100%正答が2週間つづいたら1つ追加」の機械化）。</p>
+      <p class="p-note">正答率は各和音の直近20回。すべて95%以上×2週間以上×80回以上で次のボタンを提案する（原法「100%正答が2週間つづいたら1つ追加」の機械化）。</p>
     </section>
     <section class="p-card">
       <h3>カレンダー <span class="p-hint">1日3〜5回・毎日つづけるのがいちばん効く</span></h3>
@@ -164,9 +152,11 @@
   </div>
 </section>
 
+<canvas id="fx" aria-hidden="true"></canvas>
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script src="chords.js"></script>
+<script src="fx.js"></script>
 <script src="piano.js"></script>
 <script src="store.js"></script>
 <script src="app.js"></script>
