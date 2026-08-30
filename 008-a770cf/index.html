@@ -13,7 +13,7 @@
   --red:#A63A28;      /* 彩度を落とした煉瓦の朱 */
   --yellow:#D2A02B;   /* 少し落ち着いた黄 */
   --cream:#EDE3CB;    /* 経年の生成り */
-  --lav:#B5A9C6;      /* トーンを合わせた淡い紫 */
+  --lav:#B0A2BF;      /* トーンを合わせた淡い紫（丼画像の地色に実測一致） */
   --navy:#1E2430;     /* イラストの紺 */
   --ink:#15120D;
 }
@@ -54,8 +54,9 @@ img{max-width:100%}
 .dive{position:relative;background:var(--lav)}
 .dive-pin{position:relative;height:100svh;overflow:hidden}
 .gyokai{position:absolute;inset:0;display:grid;place-content:center;font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:min(44vw,52svh);letter-spacing:.06em;color:rgba(52,46,76,.16);z-index:0;user-select:none}
-.fsh{position:absolute;width:clamp(46px,7vw,96px);top:var(--t);left:var(--l);rotate:var(--r);z-index:2;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.08))}
-.bowl-wrap{position:absolute;left:50%;bottom:4svh;transform:translateX(-50%);width:min(72vw,520px);z-index:3}
+.fsh{position:absolute;width:clamp(92px,14vw,210px);top:var(--t);left:var(--l);rotate:var(--r);z-index:2;filter:drop-shadow(3px 6px 8px rgba(20,16,10,.28))}
+.bowl-wrap{position:absolute;left:50%;bottom:2svh;transform:translateX(-50%);width:min(78vw,560px);z-index:3}
+.bowl-wrap img{width:100%;display:block}
 .dive-cap{position:absolute;left:50%;transform:translateX(-50%);bottom:1.2svh;font-size:11.5px;font-weight:700;letter-spacing:.24em;color:var(--navy);z-index:4;opacity:.75}
 
 /* ── メニュー（スタッキングシート） ── */
@@ -73,6 +74,27 @@ img{max-width:100%}
 .sheet.s-red{background:var(--red);color:#F4EAD8}
 .sheet.s-red .price{color:var(--yellow)}
 @media (max-width:700px){.sheet .in{grid-template-columns:1fr;gap:24px}.sheet{padding:8svh 22px 12svh}.sheet .art{max-width:250px}}
+
+/* ── ABOUT ── */
+.about{background:var(--cream);padding:16svh 24px 10svh}
+.a-in{max-width:680px;margin:0 auto}
+.a-eyebrow{font-size:12px;font-weight:900;letter-spacing:.34em;color:#5C544A;margin-bottom:26px;text-align:center}
+.about h2{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(26px,4.6vw,40px);margin-bottom:34px;text-align:center;letter-spacing:.04em}
+.about p{font-size:14.5px;line-height:2.35;letter-spacing:.04em}
+.about p+p{margin-top:24px}
+.about b{font-weight:900}
+
+/* ── GALLERY ── */
+.gallery{background:var(--cream);padding:6svh 0 14svh;text-align:center}
+.gstrip{display:flex;gap:26px;overflow-x:auto;scroll-snap-type:x mandatory;padding:22px 26px 10px;-webkit-overflow-scrolling:touch}
+.gstrip::-webkit-scrollbar{height:0}
+.gframe{flex:0 0 min(74vw,440px);scroll-snap-align:center;background:#FBF6EA;border:1px solid rgba(30,36,48,.35);box-shadow:0 10px 24px rgba(20,16,10,.18);padding:10px 10px 0;margin:0}
+.gframe img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(.85) sepia(.12)}
+.gframe .slot{display:none;aspect-ratio:4/3;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#5C544A;font-size:11px;font-weight:700;letter-spacing:.14em;border:2px dashed rgba(30,36,48,.4)}
+.gframe.empty img{display:none}
+.gframe.empty .slot{display:flex}
+.gframe figcaption{padding:9px 4px;font-size:10.5px;color:#5C544A;letter-spacing:.08em}
+.gnote{font-size:11px;font-weight:700;letter-spacing:.2em;color:#5C544A;margin-top:10px}
 
 footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padding:18px 20px;text-align:center;line-height:2;position:relative;z-index:70}
 
@@ -134,48 +156,19 @@ footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <div class="dive-pin">
     <p class="gyokai" aria-hidden="true">魚介</p>
 
-    <svg class="fsh" style="--t:6%;--l:8%;--r:24deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:3%;--l:26%;--r:-12deg;--fc:#A63A28" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:12%;--l:38%;--r:40deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:5%;--l:55%;--r:-30deg;--fc:#6D8EA4" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:14%;--l:70%;--r:14deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:4%;--l:84%;--r:34deg;--fc:#A63A28" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:22%;--l:16%;--r:56deg;--fc:#6D8EA4" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:26%;--l:47%;--r:-8deg;--fc:#D2A02B" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:24%;--l:78%;--r:70deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
-    <svg class="fsh" style="--t:33%;--l:30%;--r:48deg;--fc:#A63A28" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <img class="fsh" style="--t:6%;--l:6%;--r:24deg" src="img/f-nenbutsu.png" alt="ネンブツダイ（イメージ）">
+    <img class="fsh" style="--t:3%;--l:25%;--r:-12deg" src="img/f-funa.png" alt="フナ（イメージ）">
+    <img class="fsh" style="--t:13%;--l:40%;--r:40deg" src="img/f-haze.png" alt="ドンコ（イメージ）">
+    <img class="fsh" style="--t:5%;--l:57%;--r:-30deg" src="img/f-bera.png" alt="ベラ（イメージ）">
+    <img class="fsh" style="--t:15%;--l:72%;--r:14deg" src="img/f-nenbutsu.png" alt="">
+    <img class="fsh" style="--t:4%;--l:85%;--r:34deg" src="img/f-haze.png" alt="">
+    <img class="fsh" style="--t:24%;--l:14%;--r:56deg" src="img/f-bera.png" alt="">
+    <img class="fsh" style="--t:28%;--l:48%;--r:-8deg" src="img/f-funa.png" alt="">
+    <img class="fsh" style="--t:25%;--l:80%;--r:70deg" src="img/f-nenbutsu.png" alt="">
+    <img class="fsh" style="--t:35%;--l:31%;--r:48deg" src="img/f-funa.png" alt="">
 
     <div class="bowl-wrap">
-      <svg class="bowl-art" viewBox="0 0 520 330" aria-label="雑魚が飛び込むラーメンの丼（イラスト）">
-        <!-- 予め描いた水しぶき -->
-        <g stroke="#1E2430" stroke-width="7" stroke-linecap="round" fill="none">
-          <path d="M96 118 L74 84"/><path d="M140 102 L128 66"/><path d="M420 116 L444 82"/><path d="M382 100 L394 64"/>
-          <path d="M60 150 L30 138"/><path d="M462 148 L492 136"/>
-        </g>
-        <g fill="#6D8EA4">
-          <circle cx="88" cy="64" r="9"/><circle cx="436" cy="60" r="9"/><circle cx="36" cy="118" r="7"/><circle cx="486" cy="114" r="7"/><circle cx="262" cy="44" r="8"/>
-        </g>
-        <!-- 湯気 -->
-        <g stroke="#1E2430" stroke-width="6" stroke-linecap="round" fill="none" opacity=".8">
-          <path d="M196 92 C186 74 206 66 198 46"/><path d="M324 92 C334 74 314 66 322 46"/>
-        </g>
-        <!-- スープと具 -->
-        <ellipse cx="260" cy="140" rx="186" ry="46" fill="#EDE3CB" stroke="#1E2430" stroke-width="8"/>
-        <g stroke="#D2A02B" stroke-width="9" fill="none" stroke-linecap="round">
-          <path d="M150 138 q22 -18 44 0 q22 18 44 0"/>
-          <path d="M250 142 q22 -18 44 0 q22 18 44 0"/>
-        </g>
-        <!-- 飛び込んだ魚のしっぽ -->
-        <path d="M300 108 l26 -34 10 22 22 -8 -20 34z" fill="#1E2430"/>
-        <!-- 丼 -->
-        <path d="M74 150 C74 258 148 312 260 312 C372 312 446 258 446 150 Z" fill="#A63A28" stroke="#1E2430" stroke-width="8"/>
-        <!-- 雷紋帯 -->
-        <g fill="none" stroke="#EDE3CB" stroke-width="7">
-          <path d="M120 196 h30 v26 h-18 v-14 h30 M190 196 h30 v26 h-18 v-14 h30 M260 196 h30 v26 h-18 v-14 h30 M330 196 h30 v26 h-18 v-14 h30"/>
-        </g>
-        <!-- 高台 -->
-        <path d="M198 312 h124 v14 h-124z" fill="#1E2430"/>
-      </svg>
+      <img class="bowl-art" src="img/bowl-real.png" alt="わっしょい雑魚祭りラーメン（イメージ）">
     </div>
     <p class="dive-cap">SCROLL — 雑魚、丼へ。</p>
   </div>
@@ -186,15 +179,7 @@ footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <section class="sheet s-cream">
     <p class="menu-eyebrow">MENU — 01</p>
     <div class="in">
-      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
-        <ellipse cx="150" cy="76" rx="112" ry="28" fill="#FBF4E2" stroke="#1E2430" stroke-width="6"/>
-        <g stroke="#D2A02B" stroke-width="7" fill="none" stroke-linecap="round"><path d="M84 74 q16 -14 32 0 q16 14 32 0"/><path d="M156 76 q16 -14 32 0 q16 14 32 0"/></g>
-        <path d="M176 56 l18 -24 8 16 16 -6 -14 24z" fill="#1E2430"/>
-        <path d="M52 82 C52 148 96 182 150 182 C204 182 248 148 248 82 Z" fill="#A63A28" stroke="#1E2430" stroke-width="6"/>
-        <g fill="none" stroke="#EDE3CB" stroke-width="5"><path d="M84 112 h22 v18 h-13 v-9 h22 M136 112 h22 v18 h-13 v-9 h22 M188 112 h22 v18 h-13 v-9 h22"/></g>
-        <path d="M112 182 h76 v10 h-76z" fill="#1E2430"/>
-        <g stroke="#1E2430" stroke-width="5" stroke-linecap="round" fill="none" opacity=".75"><path d="M120 40 C112 26 126 20 120 6"/><path d="M180 40 C188 26 174 20 180 6"/></g>
-      </svg>
+      <img class="art" src="img/menu-ramen.png" alt="わっしょい雑魚祭りラーメンのスケッチ">
       <div>
         <h2>わっしょい雑魚祭りラーメン</h2>
         <p class="price">¥1,200</p>
@@ -206,17 +191,7 @@ footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <section class="sheet s-blue">
     <p class="menu-eyebrow">MENU — 02</p>
     <div class="in">
-      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
-        <path d="M150 16 v178" stroke="#1E2430" stroke-width="7" stroke-linecap="round"/>
-        <g fill="#EDE3CB" stroke="#1E2430" stroke-width="6">
-          <path d="M150 42 c-30 -18 -30 18 0 0 c30 -18 30 18 0 0Z" transform="translate(0 4) scale(1.55)" transform-origin="150 44"/>
-          <ellipse cx="150" cy="78" rx="40" ry="20"/>
-          <ellipse cx="150" cy="126" rx="44" ry="22"/>
-        </g>
-        <g fill="#1E2430"><circle cx="136" cy="74" r="3.4"/><circle cx="134" cy="122" r="3.4"/></g>
-        <g stroke="#A63A28" stroke-width="6" stroke-linecap="round"><path d="M118 96 h64"/><path d="M114 146 h72"/></g>
-        <g stroke="#1E2430" stroke-width="4.5" stroke-linecap="round" opacity=".7"><path d="M206 70 l16 10"/><path d="M208 120 l16 10"/><path d="M96 70 l-16 10"/><path d="M92 120 l-16 10"/></g>
-      </svg>
+      <img class="art" src="img/menu-suzume.png" alt="雑魚の雀焼きのスケッチ">
       <div>
         <h2>雑魚の雀焼き</h2>
         <p class="price">¥500</p>
@@ -228,13 +203,7 @@ footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <section class="sheet s-yellow">
     <p class="menu-eyebrow">MENU — 03</p>
     <div class="in">
-      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
-        <path d="M96 88 h108 l-10 96 h-88 z" fill="#7FA06A" stroke="#1E2430" stroke-width="6"/>
-        <g stroke="#1E2430" stroke-width="5"><path d="M96 118 h106"/><path d="M100 152 h100"/></g>
-        <circle cx="150" cy="74" r="34" fill="#F6EFDC" stroke="#1E2430" stroke-width="6"/>
-        <path d="M150 40 c10 -12 26 -10 30 2" fill="none" stroke="#1E2430" stroke-width="6" stroke-linecap="round"/>
-        <g stroke="#1E2430" stroke-width="4.5" stroke-linecap="round" opacity=".7"><path d="M64 96 l-18 -8"/><path d="M238 96 l18 -8"/></g>
-      </svg>
+      <img class="art" src="img/menu-ice.png" alt="竹のプラントベースアイスのスケッチ">
       <div>
         <h2>竹のプラントベースアイス</h2>
         <p class="price">¥500</p>
@@ -246,12 +215,7 @@ footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <section class="sheet s-red">
     <p class="menu-eyebrow">MENU — 04</p>
     <div class="in">
-      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
-        <path d="M110 30 h44 v28 l14 22 v96 a10 10 0 0 1 -10 10 h-52 a10 10 0 0 1 -10 -10 v-96 l14 -22 z" fill="#6D8EA4" stroke="#1E2430" stroke-width="6"/>
-        <rect x="106" y="120" width="52" height="34" fill="#EDE3CB" stroke="#1E2430" stroke-width="5"/>
-        <path d="M196 108 h56 l-8 78 h-40 z" fill="#EDE3CB" stroke="#1E2430" stroke-width="6"/>
-        <g stroke="#1E2430" stroke-width="5" stroke-linecap="round" fill="none" opacity=".8"><path d="M214 96 C208 84 218 80 214 68"/><path d="M234 96 C240 84 230 80 234 68"/></g>
-      </svg>
+      <img class="art" src="img/menu-tea.png" alt="お茶と水のスケッチ">
       <div>
         <h2>お茶と水</h2>
         <p class="price">¥200–300</p>
@@ -260,6 +224,30 @@ footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
     </div>
   </section>
 </div>
+
+<!-- 06 ABOUT -->
+<section class="about">
+  <div class="a-in">
+    <p class="a-eyebrow">ABOUT</p>
+    <h2>私たちは、WAZAO-IPPON。</h2>
+    <p>和竿を中心に、日本の釣り文化と地域文化を探索する活動体。竹の釣竿という忘れられかけた道具を現代の釣りに引き戻すことから始まり、竿師の工房を訪ね、産地の竹を学び、世界でひとつの竹製ルアーロッドを現代のアングラーに届けてきた。掲げる言葉は<b>「釣りに、情緒を」</b>。魚が釣れたかどうかだけでは測れない、釣りという行為そのものの豊かさを扱っている。</p>
+    <p>道具も情報も均質になっていく釣りシーンの中で、探してきたのは日本の各地域で培われてきた固有の釣り文化だ。地域の釣法、地域の道具、そして地域の魚食——釣りをめぐる文化の全体を、フィールドワークと制作の両輪で掘り起こし、発信してきた（BRUTUS等メディア掲載多数）。</p>
+    <p>釣りフェスには事業者ブースで2022年より5年連続出展。毎年、空間ごと自分たちの手で作り込み、スローガン「なんなら釣れなくていい」を掲げて、釣果だけではない釣りの楽しみを見せてきた。6年目の今年、釣具の列を離れて食の小間に立つ。<b>雑魚の一杯は、その探索の最新号にあたる。</b></p>
+  </div>
+</section>
+
+<!-- 07 GALLERY -->
+<section class="gallery">
+  <p class="a-eyebrow">GALLERY — 釣りフェス出展のあゆみ</p>
+  <div class="gstrip">
+    <figure class="gframe"><img src="img/booth-1.jpg" alt="過去出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-1.jpg</span></div><figcaption>過去出展ブースより</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-2.jpg" alt="過去出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-2.jpg</span></div><figcaption>過去出展ブースより</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-3.jpg" alt="過去出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-3.jpg</span></div><figcaption>過去出展ブースより</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-4.jpg" alt="過去出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-4.jpg</span></div><figcaption>過去出展ブースより</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-5.jpg" alt="過去出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-5.jpg</span></div><figcaption>過去出展ブースより</figcaption></figure>
+  </div>
+  <p class="gnote">DRAG →</p>
+</section>
 
 <footer>
   本サイトは「釣りフェス2027 in YOKOHAMA 釣りめしスタジアム」出店審査のためにWAZAO-IPPONが制作した専用資料です。掲載の写真・イラストは一部イメージです。
