@@ -9,10 +9,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
 <style>
 :root{
-  --sky:#6F8880;      /* ノイズ前提の褪せた空 */
-  --red:#B72110;      /* ポスターの朱赤 */
-  --yellow:#D79B13;   /* 文字の黄 */
-  --cream:#E8DCC2;    /* 写真フチの生成り */
+  --sky:#6D8EA4;      /* 青寄りに・褪せたブルー */
+  --red:#A63A28;      /* 彩度を落とした煉瓦の朱 */
+  --yellow:#D2A02B;   /* 少し落ち着いた黄 */
+  --cream:#EDE3CB;    /* 経年の生成り */
+  --lav:#B5A9C6;      /* トーンを合わせた淡い紫 */
+  --navy:#1E2430;     /* イラストの紺 */
   --ink:#15120D;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -21,21 +23,16 @@ img{max-width:100%}
 
 /* ── フィルムグレイン（全面2層・固定） ── */
 .grain,.blotch{position:fixed;inset:0;pointer-events:none;z-index:60}
-.grain{opacity:.34;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='280' height='280' filter='url(%23n)'/></svg>")}
-.blotch{opacity:.16;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='900'><filter id='b'><feTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='2' seed='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='900' height='900' filter='url(%23b)'/></svg>")}
+.grain{opacity:.3;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='280' height='280' filter='url(%23n)'/></svg>")}
+.blotch{opacity:.17;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='900'><filter id='b'><feTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='2' seed='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='900' height='900' filter='url(%23b)'/></svg>")}
 
 /* ── ポスター（web再現） ── */
-.poster{position:relative;width:100%;aspect-ratio:4/3;background:var(--red);overflow:hidden}
+.poster{position:relative;width:100%;aspect-ratio:4/3;background:var(--red);overflow:hidden;container-type:inline-size}
 .poster .sky{position:absolute;left:0;top:0;right:0;height:26%;background:var(--sky)}
-.poster .palm{position:absolute;z-index:1;color:#182620;opacity:.92}
+.poster .palm{position:absolute;z-index:1;color:#1A2A24;opacity:.9}
 .poster .palm.p1{top:-4%;right:-3%;width:38%}
-.poster .palm.p2{top:10%;right:22%;width:18%;transform:rotate(18deg);opacity:.8}
-
-/* 写真の額装 */
 .poster .frame{position:absolute;left:2.6%;right:2.6%;top:37.5%;bottom:4.8%;background:var(--cream);padding:.9%;z-index:2;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
-.poster .frame .ph{width:100%;height:100%;background:url("img/pool.jpg") center 30%/cover no-repeat;filter:saturate(.78) contrast(.94) sepia(.16) brightness(1.02)}
-
-/* タイトル（歪みはSVGフィルタ） */
+.poster .frame .ph{width:100%;height:100%;background:url("img/pool.jpg") center 30%/cover no-repeat;filter:saturate(.62) contrast(.92) sepia(.22) brightness(1.03)}
 .tl{position:absolute;left:3.2%;z-index:3;overflow:visible}
 .tl text{font-family:"Abril Fatface",serif;fill:var(--yellow)}
 .t1{top:1.6%;width:64%;height:19.5%;transform:rotate(-1.3deg)}
@@ -43,21 +40,42 @@ img{max-width:100%}
 .t3{top:47.2%;width:56%;height:19.5%;transform:rotate(-1.3deg)}
 .sr{position:absolute;left:-9999px}
 
-/* ── 電光サイン（空と同じノイズブルー） ── */
-.led{background:var(--sky);overflow:hidden;white-space:nowrap;padding:20px 0;border-top:2px solid rgba(0,0,0,.25);border-bottom:2px solid rgba(0,0,0,.25)}
-.led .track{display:inline-block;animation:mq 26s linear infinite;font-weight:900;font-size:clamp(16px,2.9vw,27px);color:#F0EEE4;letter-spacing:.22em;text-shadow:0 0 12px rgba(255,255,240,.35)}
-.led .track i{font-style:normal;color:#2C3B35;margin:0 1.1em;font-size:.55em;vertical-align:.25em}
+/* ── 電光サイン ── */
+.led{background:var(--sky);overflow:hidden;white-space:nowrap;padding:20px 0;border-top:2px solid rgba(0,0,0,.22);border-bottom:2px solid rgba(0,0,0,.22)}
+.led .track{display:inline-block;animation:mq 26s linear infinite;font-weight:900;font-size:clamp(16px,2.9vw,27px);color:#F2EFE3;letter-spacing:.22em;text-shadow:0 0 12px rgba(255,255,240,.35)}
+.led .track i{font-style:normal;color:#243441;margin:0 1.1em;font-size:.55em;vertical-align:.25em}
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* ── THESIS（heroと同じノイズの赤・黒文字センター） ── */
-.thesis{background:var(--red);min-height:86svh;display:grid;place-content:center;text-align:center;padding:16svh 24px}
-.thesis p{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-weight:800;font-size:clamp(26px,5.4vw,54px);line-height:1.72;letter-spacing:.05em;color:#121008;text-wrap:balance}
+/* ── THESIS ── */
+.thesis{background:var(--red);min-height:80svh;display:grid;place-content:center;text-align:center;padding:14svh 24px}
+.thesis p{font-family:"Shippori Mincho B1","Hiragino Mincho ProN",serif;font-weight:800;font-size:clamp(26px,5.4vw,54px);line-height:1.72;letter-spacing:.05em;color:#14100A;text-wrap:balance}
 
-footer{background:#0C0B09;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padding:18px 20px;text-align:center;line-height:2;position:relative;z-index:70}
+/* ── 雑魚ダイブ（pin+scrub） ── */
+.dive{position:relative;background:var(--lav)}
+.dive-pin{position:relative;height:100svh;overflow:hidden}
+.gyokai{position:absolute;inset:0;display:grid;place-content:center;font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:min(44vw,52svh);letter-spacing:.06em;color:rgba(52,46,76,.16);z-index:0;user-select:none}
+.fsh{position:absolute;width:clamp(46px,7vw,96px);top:var(--t);left:var(--l);rotate:var(--r);z-index:2;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.08))}
+.bowl-wrap{position:absolute;left:50%;bottom:4svh;transform:translateX(-50%);width:min(72vw,520px);z-index:3}
+.dive-cap{position:absolute;left:50%;transform:translateX(-50%);bottom:1.2svh;font-size:11.5px;font-weight:700;letter-spacing:.24em;color:var(--navy);z-index:4;opacity:.75}
 
-@media (max-width:640px){
-  .led{padding:14px 0}
-}
+/* ── メニュー（スタッキングシート） ── */
+.stack{position:relative;z-index:5}
+.sheet{position:sticky;top:0;min-height:96svh;border-radius:38px 38px 0 0;padding:9svh 24px 12svh;box-shadow:0 -14px 34px rgba(20,16,10,.25)}
+.sheet .in{max-width:880px;margin:0 auto;display:grid;grid-template-columns:.9fr 1.1fr;gap:40px;align-items:center}
+.sheet .art{width:100%;max-width:340px;margin-inline:auto}
+.sheet .menu-eyebrow{font-size:12px;font-weight:900;letter-spacing:.34em;margin-bottom:26px;text-align:center}
+.sheet h2{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(22px,3.8vw,34px);line-height:1.5;letter-spacing:.04em;text-wrap:balance}
+.sheet .price{font-family:"Abril Fatface",serif;font-size:clamp(22px,3.6vw,32px);margin:10px 0 16px}
+.sheet p.desc{font-size:14.5px;line-height:2.1;letter-spacing:.04em}
+.sheet.s-cream{background:var(--cream);color:var(--ink)}
+.sheet.s-blue{background:var(--sky);color:#10151C}
+.sheet.s-yellow{background:var(--yellow);color:#191307}
+.sheet.s-red{background:var(--red);color:#F4EAD8}
+.sheet.s-red .price{color:var(--yellow)}
+@media (max-width:700px){.sheet .in{grid-template-columns:1fr;gap:24px}.sheet{padding:8svh 22px 12svh}.sheet .art{max-width:250px}}
+
+footer{background:#0F0D0A;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padding:18px 20px;text-align:center;line-height:2;position:relative;z-index:70}
+
 @media (prefers-reduced-motion: reduce){
   .led .track{animation:none}
 }
@@ -65,18 +83,24 @@ footer{background:#0C0B09;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
 </head>
 <body>
 
-<!-- 歪みフィルタ定義 -->
+<!-- 歪みフィルタと魚シンボル -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <filter id="warp" x="-8%" y="-8%" width="116%" height="116%">
     <feTurbulence type="fractalNoise" baseFrequency="0.009 0.02" numOctaves="2" seed="7" result="n"/>
     <feDisplacementMap in="SourceGraphic" in2="n" scale="10" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
+  <symbol id="fsh-s" viewBox="0 0 110 54">
+    <path d="M10 27C24 12 50 5 72 13l16-10-3 16 3 16-16-10C50 49 24 42 10 27Z" fill="var(--fc,#1E2430)"/>
+    <path d="M46 10l12-9 3 12z" fill="var(--fc,#1E2430)"/>
+    <circle cx="27" cy="24" r="3.6" fill="#EDE3CB"/>
+    <path d="M52 15c7 5 7 17 0 23" stroke="#EDE3CB" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  </symbol>
 </svg>
 
 <div class="grain" aria-hidden="true"></div>
 <div class="blotch" aria-hidden="true"></div>
 
-<!-- HERO: ポスターのweb再現 -->
+<!-- 01 HERO: ポスターのweb再現 -->
 <header class="poster">
   <div class="sky"></div>
   <svg class="palm p1" viewBox="0 0 360 260" fill="currentColor" aria-hidden="true">
@@ -97,17 +121,186 @@ footer{background:#0C0B09;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <svg class="tl t3" viewBox="0 0 560 100" preserveAspectRatio="none" aria-hidden="true"><g filter="url(#warp)"><text x="2" y="85" font-size="97" textLength="550" lengthAdjust="spacingAndGlyphs">RAMEN</text></g></svg>
 </header>
 
-<!-- 電光サイン -->
+<!-- 02 電光サイン -->
 <div class="led" aria-hidden="true"><span class="track">釣りフェス限定メニュー<i>●</i>わっしょい雑魚祭りラーメン ¥1,200<i>●</i>雑魚の雀焼き ¥500<i>●</i>竹のプラントベースアイス ¥500<i>●</i>三陸漁師直送・未利用魚<i>●</i>2027.1.22–24 パシフィコ横浜<i>●</i>釣りフェス限定メニュー<i>●</i>わっしょい雑魚祭りラーメン ¥1,200<i>●</i>雑魚の雀焼き ¥500<i>●</i>竹のプラントベースアイス ¥500<i>●</i>三陸漁師直送・未利用魚<i>●</i>2027.1.22–24 パシフィコ横浜<i>●</i></span></div>
 
-<!-- THESIS -->
+<!-- 03 THESIS -->
 <section class="thesis">
   <p>雑魚ではない。<br>日本の釣り文化を支えた魚たちを<br>詰め込んだ、極上の一杯。</p>
 </section>
 
+<!-- 04 雑魚ダイブ -->
+<section class="dive" id="dive">
+  <div class="dive-pin">
+    <p class="gyokai" aria-hidden="true">魚介</p>
+
+    <svg class="fsh" style="--t:6%;--l:8%;--r:24deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:3%;--l:26%;--r:-12deg;--fc:#A63A28" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:12%;--l:38%;--r:40deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:5%;--l:55%;--r:-30deg;--fc:#6D8EA4" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:14%;--l:70%;--r:14deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:4%;--l:84%;--r:34deg;--fc:#A63A28" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:22%;--l:16%;--r:56deg;--fc:#6D8EA4" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:26%;--l:47%;--r:-8deg;--fc:#D2A02B" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:24%;--l:78%;--r:70deg;--fc:#1E2430" aria-hidden="true"><use href="#fsh-s"/></svg>
+    <svg class="fsh" style="--t:33%;--l:30%;--r:48deg;--fc:#A63A28" aria-hidden="true"><use href="#fsh-s"/></svg>
+
+    <div class="bowl-wrap">
+      <svg class="bowl-art" viewBox="0 0 520 330" aria-label="雑魚が飛び込むラーメンの丼（イラスト）">
+        <!-- 予め描いた水しぶき -->
+        <g stroke="#1E2430" stroke-width="7" stroke-linecap="round" fill="none">
+          <path d="M96 118 L74 84"/><path d="M140 102 L128 66"/><path d="M420 116 L444 82"/><path d="M382 100 L394 64"/>
+          <path d="M60 150 L30 138"/><path d="M462 148 L492 136"/>
+        </g>
+        <g fill="#6D8EA4">
+          <circle cx="88" cy="64" r="9"/><circle cx="436" cy="60" r="9"/><circle cx="36" cy="118" r="7"/><circle cx="486" cy="114" r="7"/><circle cx="262" cy="44" r="8"/>
+        </g>
+        <!-- 湯気 -->
+        <g stroke="#1E2430" stroke-width="6" stroke-linecap="round" fill="none" opacity=".8">
+          <path d="M196 92 C186 74 206 66 198 46"/><path d="M324 92 C334 74 314 66 322 46"/>
+        </g>
+        <!-- スープと具 -->
+        <ellipse cx="260" cy="140" rx="186" ry="46" fill="#EDE3CB" stroke="#1E2430" stroke-width="8"/>
+        <g stroke="#D2A02B" stroke-width="9" fill="none" stroke-linecap="round">
+          <path d="M150 138 q22 -18 44 0 q22 18 44 0"/>
+          <path d="M250 142 q22 -18 44 0 q22 18 44 0"/>
+        </g>
+        <!-- 飛び込んだ魚のしっぽ -->
+        <path d="M300 108 l26 -34 10 22 22 -8 -20 34z" fill="#1E2430"/>
+        <!-- 丼 -->
+        <path d="M74 150 C74 258 148 312 260 312 C372 312 446 258 446 150 Z" fill="#A63A28" stroke="#1E2430" stroke-width="8"/>
+        <!-- 雷紋帯 -->
+        <g fill="none" stroke="#EDE3CB" stroke-width="7">
+          <path d="M120 196 h30 v26 h-18 v-14 h30 M190 196 h30 v26 h-18 v-14 h30 M260 196 h30 v26 h-18 v-14 h30 M330 196 h30 v26 h-18 v-14 h30"/>
+        </g>
+        <!-- 高台 -->
+        <path d="M198 312 h124 v14 h-124z" fill="#1E2430"/>
+      </svg>
+    </div>
+    <p class="dive-cap">SCROLL — 雑魚、丼へ。</p>
+  </div>
+</section>
+
+<!-- 05 メニュー（上辺ラウンドのレイヤーが重なる） -->
+<div class="stack">
+  <section class="sheet s-cream">
+    <p class="menu-eyebrow">MENU — 01</p>
+    <div class="in">
+      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
+        <ellipse cx="150" cy="76" rx="112" ry="28" fill="#FBF4E2" stroke="#1E2430" stroke-width="6"/>
+        <g stroke="#D2A02B" stroke-width="7" fill="none" stroke-linecap="round"><path d="M84 74 q16 -14 32 0 q16 14 32 0"/><path d="M156 76 q16 -14 32 0 q16 14 32 0"/></g>
+        <path d="M176 56 l18 -24 8 16 16 -6 -14 24z" fill="#1E2430"/>
+        <path d="M52 82 C52 148 96 182 150 182 C204 182 248 148 248 82 Z" fill="#A63A28" stroke="#1E2430" stroke-width="6"/>
+        <g fill="none" stroke="#EDE3CB" stroke-width="5"><path d="M84 112 h22 v18 h-13 v-9 h22 M136 112 h22 v18 h-13 v-9 h22 M188 112 h22 v18 h-13 v-9 h22"/></g>
+        <path d="M112 182 h76 v10 h-76z" fill="#1E2430"/>
+        <g stroke="#1E2430" stroke-width="5" stroke-linecap="round" fill="none" opacity=".75"><path d="M120 40 C112 26 126 20 120 6"/><path d="M180 40 C188 26 174 20 180 6"/></g>
+      </svg>
+      <div>
+        <h2>わっしょい雑魚祭りラーメン</h2>
+        <p class="price">¥1,200</p>
+        <p class="desc">三陸漁師直送の未利用魚を使った魚介ラーメン。スープはアラを炊いた魚介100%。出汁の香りを活かす中細麺に、チャーシューの代わりの雑魚の姿揚げ、竹の種類ごとに味わいの異なる国産メンマ。名前の通り、丼の上は雑魚の祭り。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet s-blue">
+    <p class="menu-eyebrow">MENU — 02</p>
+    <div class="in">
+      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
+        <path d="M150 16 v178" stroke="#1E2430" stroke-width="7" stroke-linecap="round"/>
+        <g fill="#EDE3CB" stroke="#1E2430" stroke-width="6">
+          <path d="M150 42 c-30 -18 -30 18 0 0 c30 -18 30 18 0 0Z" transform="translate(0 4) scale(1.55)" transform-origin="150 44"/>
+          <ellipse cx="150" cy="78" rx="40" ry="20"/>
+          <ellipse cx="150" cy="126" rx="44" ry="22"/>
+        </g>
+        <g fill="#1E2430"><circle cx="136" cy="74" r="3.4"/><circle cx="134" cy="122" r="3.4"/></g>
+        <g stroke="#A63A28" stroke-width="6" stroke-linecap="round"><path d="M118 96 h64"/><path d="M114 146 h72"/></g>
+        <g stroke="#1E2430" stroke-width="4.5" stroke-linecap="round" opacity=".7"><path d="M206 70 l16 10"/><path d="M208 120 l16 10"/><path d="M96 70 l-16 10"/><path d="M92 120 l-16 10"/></g>
+      </svg>
+      <div>
+        <h2>雑魚の雀焼き</h2>
+        <p class="price">¥500</p>
+        <p class="desc">利根川水系に伝わる小魚の串焼き「雀焼き」。開いて串に打った姿が雀に似ることからの名と伝わる地域魚食を、釣り人に馴染みのある小型淡水魚や「雑魚」と呼ばれながら地域の食文化に生きる魚で仕立てる。甘辛ダレを電気グリラーで香ばしく。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet s-yellow">
+    <p class="menu-eyebrow">MENU — 03</p>
+    <div class="in">
+      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
+        <path d="M96 88 h108 l-10 96 h-88 z" fill="#7FA06A" stroke="#1E2430" stroke-width="6"/>
+        <g stroke="#1E2430" stroke-width="5"><path d="M96 118 h106"/><path d="M100 152 h100"/></g>
+        <circle cx="150" cy="74" r="34" fill="#F6EFDC" stroke="#1E2430" stroke-width="6"/>
+        <path d="M150 40 c10 -12 26 -10 30 2" fill="none" stroke="#1E2430" stroke-width="6" stroke-linecap="round"/>
+        <g stroke="#1E2430" stroke-width="4.5" stroke-linecap="round" opacity=".7"><path d="M64 96 l-18 -8"/><path d="M238 96 l18 -8"/></g>
+      </svg>
+      <div>
+        <h2>竹のプラントベースアイス</h2>
+        <p class="price">¥500</p>
+        <p class="desc">いま注目のプラントベースアイス。使うのは、和竿の材として日本の釣り文化を支えてきた「竹」。乳製品不使用のカップアイスを、魚の一杯のあとの口直しに。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet s-red">
+    <p class="menu-eyebrow">MENU — 04</p>
+    <div class="in">
+      <svg class="art" viewBox="0 0 300 210" aria-hidden="true">
+        <path d="M110 30 h44 v28 l14 22 v96 a10 10 0 0 1 -10 10 h-52 a10 10 0 0 1 -10 -10 v-96 l14 -22 z" fill="#6D8EA4" stroke="#1E2430" stroke-width="6"/>
+        <rect x="106" y="120" width="52" height="34" fill="#EDE3CB" stroke="#1E2430" stroke-width="5"/>
+        <path d="M196 108 h56 l-8 78 h-40 z" fill="#EDE3CB" stroke="#1E2430" stroke-width="6"/>
+        <g stroke="#1E2430" stroke-width="5" stroke-linecap="round" fill="none" opacity=".8"><path d="M214 96 C208 84 218 80 214 68"/><path d="M234 96 C240 84 230 80 234 68"/></g>
+      </svg>
+      <div>
+        <h2>お茶と水</h2>
+        <p class="price">¥200–300</p>
+        <p class="desc">緑茶（冷）・ほうじ茶（温）・ミネラルウォーター。魚の出汁に、日本の茶を合わせる。未開封のまま提供します。</p>
+      </div>
+    </div>
+  </section>
+</div>
+
 <footer>
-  本サイトは「釣りフェス2027 in YOKOHAMA 釣りめしスタジアム」出店審査のためにWAZAO-IPPONが制作した専用資料です。掲載の写真は一部イメージです。
+  本サイトは「釣りフェス2027 in YOKOHAMA 釣りめしスタジアム」出店審査のためにWAZAO-IPPONが制作した専用資料です。掲載の写真・イラストは一部イメージです。
 </footer>
 
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  var STATIC = /static/.test(location.search);
+  var RM = matchMedia('(prefers-reduced-motion: reduce)').matches || STATIC;
+  if (typeof gsap === 'undefined' || RM) return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  var dive = document.getElementById('dive');
+  dive.style.height = '300vh';
+
+  var tl = gsap.timeline({
+    scrollTrigger:{trigger:'#dive',start:'top top',end:'bottom bottom',scrub:.55,pin:'.dive-pin'}
+  });
+
+  /* 背景「魚介」はゆっくり視差 */
+  tl.fromTo('.gyokai',{yPercent:6},{yPercent:-6,ease:'none',duration:1},0);
+
+  /* 魚たちが丼へ飛び込む */
+  var fishes = gsap.utils.toArray('.fsh');
+  fishes.forEach(function(f, i){
+    var start = (i % 7) * 0.055;                 /* ばらけて落ち始める */
+    var lx = 44 + ((i * 13) % 12);               /* 丼の口あたりへ */
+    tl.to(f, {
+      top: '66%', left: lx + '%',
+      rotate: 78 + ((i * 29) % 34) + 'deg',
+      scale: .55, ease: 'power1.in', duration: .5
+    }, start)
+    .to(f, {opacity: 0, duration: .06, ease: 'none'}, start + .47);
+  });
+
+  /* 丼がときどき小さく跳ねる */
+  tl.to('.bowl-art', {scale:1.035, yoyo:true, repeat:5, duration:.045, transformOrigin:'50% 90%'}, .18);
+  tl.to('.dive-cap', {opacity:0, duration:.1}, .55);
+})();
+</script>
 </body>
 </html>
