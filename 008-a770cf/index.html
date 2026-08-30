@@ -33,7 +33,6 @@ img{max-width:100%}
 .loader{position:fixed;inset:0;background:#FBF8F1;z-index:95;display:none;place-content:center;text-align:center;padding:24px}
 .js .loader{display:grid}
 .loader p{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88vw,760px);font-family:"Shippori Mincho B1",serif;font-weight:700;font-size:clamp(20px,4.4vw,38px);line-height:1.8;letter-spacing:.06em;color:var(--blue);opacity:0;text-wrap:balance}
-.loader em{font-style:normal;color:var(--verm)}
 
 /* ── HERO（PCで一画面に収まるポスター） ── */
 .hero-wrap{background:linear-gradient(to bottom,var(--sky) 0 26%,var(--salmon) 26%);display:grid;place-items:center}
@@ -84,6 +83,7 @@ img{max-width:100%}
 .sheet h2{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(22px,3.8vw,34px);line-height:1.5;letter-spacing:.04em;text-wrap:balance}
 .sheet .price{font-family:"Abril Fatface",serif;font-size:clamp(22px,3.6vw,32px);margin:10px 0 16px;color:var(--verm)}
 .sheet p.desc{font-size:14.5px;line-height:2.1;letter-spacing:.04em}
+.sheet p.note{margin-top:12px;font-size:11.5px;font-weight:700;letter-spacing:.1em;opacity:.72}
 .sheet.s-pink{background:#F7D9D3;color:var(--navy)}
 .sheet.s-orange{background:var(--orange);color:#2B1A08}
 .sheet.s-blue{background:var(--sky);color:#10222E}
@@ -129,13 +129,9 @@ img{max-width:100%}
 .hope p{font-size:14.5px;line-height:2.4;letter-spacing:.05em;color:#10222E;text-align:left}
 .hope p+p{margin-top:20px}
 .hope b{font-weight:900}
-.hope ul.pr{list-style:none;margin-top:44px;padding-top:30px;border-top:1px solid rgba(255,248,240,.55);text-align:left}
-.hope ul.pr li{font-size:13.5px;line-height:2.05;letter-spacing:.04em;color:#10222E;padding-left:1.4em;text-indent:-1.4em}
-.hope ul.pr li+li{margin-top:14px}
-.hope ul.pr li::before{content:"■";color:var(--wh);margin-right:.6em;font-size:.82em}
 
 /* ── ロゴ ── */
-.logo-sec{background:var(--cream);padding:19svh 24px 18svh;display:grid;place-items:center}
+.logo-sec{background:var(--cream);padding:38svh 24px 36svh;display:grid;place-items:center}
 .logo-sec img{width:min(36vw,161px);display:block}
 .logo-sec .slot{width:min(36vw,161px);aspect-ratio:5/3;display:none;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#5C544A;font-size:11px;font-weight:700;letter-spacing:.14em;border:2px dashed rgba(30,36,48,.4);text-align:center}
 .logo-sec.empty img{display:none}
@@ -165,7 +161,7 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
 <!-- ローディング -->
 <div class="loader" id="loader" aria-hidden="true">
   <p id="ld1">我々が愛する"雑魚"をご馳走に</p>
-  <p id="ld2">釣り人のための、<br><em>釣りフェスだけのラーメン</em></p>
+  <p id="ld2">釣り人のための、<br>釣りフェスだけのラーメン</p>
 </div>
 
 <!-- 01 HERO -->
@@ -250,7 +246,7 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
       <div>
         <h2>わっしょい雑魚祭りラーメン</h2>
         <p class="price">¥1,200</p>
-        <p class="desc">三陸漁師直送の未利用魚を使った魚介ラーメン。スープはアラを炊いた魚介100%。出汁の香りを活かす中細麺に、チャーシューの代わりの雑魚の姿揚げ、竹の種類ごとに味わいの異なる国産メンマ。名前の通り、丼の上は雑魚の祭り。</p>
+        <p class="desc">三陸漁師直送の未利用魚をはじめとした、釣り人に馴染みのある&quot;雑魚&quot;を使った魚介ラーメン。スープはアラを炊いた魚介100%。出汁の香りを活かす中細麺に、雑魚の姿揚げ、竹の種類ごとに味わいの異なるメンマ。名前の通り、雑魚を凝縮した至極の一杯。</p>
       </div>
     </div>
   </section>
@@ -270,11 +266,12 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <section class="sheet s-blue">
     <p class="menu-eyebrow">MENU — 03</p>
     <div class="in">
-      <img class="art" src="img/menu-ice3.png" alt="竹のプラントベースアイスのスケッチ">
+      <img class="art" src="img/menu-ice3.png" alt="プラントベースアイスのスケッチ">
       <div>
-        <h2>竹のプラントベースアイス</h2>
+        <h2>プラントベースアイス</h2>
         <p class="price">¥500</p>
-        <p class="desc">いま注目のプラントベースアイス。使うのは、和竿の材として日本の釣り文化を支えてきた「竹」。乳製品不使用のカップアイスを、魚の一杯のあとの口直しに。</p>
+        <p class="desc">いま注目のプラントベースアイス。竹や鮎の香りと称されるきゅうりなど、乳製品不使用のカップアイスを、魚の一杯のあとの口直しに。</p>
+        <p class="note">※企画中</p>
       </div>
     </div>
   </section>
@@ -282,11 +279,11 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   <section class="sheet s-lemon">
     <p class="menu-eyebrow">MENU — 04</p>
     <div class="in">
-      <img class="art" src="img/menu-tea3.png" alt="お茶と水のスケッチ">
+      <img class="art" src="img/menu-tea3.png" alt="ドリンクのスケッチ">
       <div>
-        <h2>お茶と水</h2>
+        <h2>ドリンク</h2>
         <p class="price">¥200–300</p>
-        <p class="desc">緑茶（冷）・ほうじ茶（温）・ミネラルウォーター。魚の出汁に、日本の茶を合わせる。未開封のまま提供します。</p>
+        <p class="desc">お茶・水・ジュースなどのソフトドリンクや、ビールなどのアルコール類を提供予定（酒類販売業免許が不要な形式にて提供）。</p>
       </div>
     </div>
   </section>
@@ -303,10 +300,9 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
     <figure class="aframe"><img src="img/about.jpg" alt="WAZAO-IPPONの活動" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>ABOUT写真</span><span>img/about.jpg</span></div></figure>
     <div>
       <p class="a-eyebrow">ABOUT</p>
-      <h2>私たちは、WAZAO-IPPON。</h2>
-      <p>和竿を中心に、日本の釣り文化と地域文化を探索する活動体。竹の釣竿という忘れられかけた道具を現代の釣りに引き戻すことから始まり、竿師の工房を訪ね、産地の竹を学び、世界でひとつの竹製ルアーロッドをアングラーに届けてきた。魚が釣れたかどうかだけでは測れない、釣りという行為そのものの面白さを掘り下げている。</p>
-      <p>道具も情報も均質になっていく釣りシーンの中で、探してきたのは日本の各地域で培われてきた固有の釣り文化だ。地域の釣法、地域の道具、そして地域の魚食——釣りをめぐる文化の全体を、フィールドワークと制作の両輪で掘り起こし、発信してきた（BRUTUS等メディア掲載多数）。</p>
-      <p>釣りフェスには事業者ブースで2022年より5年連続出展。毎年、空間ごと自分たちの手で作り込み、スローガン「なんなら釣れなくていい」を掲げて、釣果だけではない釣りの楽しみを見せてきた。6年目の今年、釣具の列を離れて食の小間に立つ。<b>雑魚の一杯は、その探索の最新号にあたる。</b></p>
+      <h2>WAZAO-IPPON</h2>
+      <p>和竿を中心に、日本の釣り文化と地域文化を探索する活動体。「なんなら釣れなくてもいい。」を掲げ、釣りを巡るプロセスを追い求める。道具や情報が均質化されていくシーンの中で、各地域が固有に育ててきた釣法・道具・魚食を、フィールドワークと制作の両輪で掘り起こしてきた（BRUTUS等メディア掲載多数）。</p>
+      <p>釣りフェスには事業者ブースで2022年より5年連続出展。6年目の今年、釣具の列を離れて食の小間に立つ。かつて釣り人が眼差してきたその土地や自然との折り合いの付け方を、雑魚と呼ばれてきた魚を通じて提供する。</p>
     </div>
   </div>
 </section>
@@ -315,10 +311,11 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
 <section class="gallery">
   <p class="a-eyebrow" style="text-align:center">GALLERY — 釣りフェス出展のあゆみ</p>
   <div class="gstrip">
-    <figure class="gframe"><img src="img/booth-1.jpg" alt="2026年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-1.jpg</span></div><figcaption><b>2026</b>B-232「The Wall Patchwork」。壁一面を情報で埋め尽くした。</figcaption></figure>
-    <figure class="gframe"><img src="img/booth-2.jpg" alt="2025年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-2.jpg</span></div><figcaption><b>2025</b>サイの頭部と緑の壁。和竿と道具を並べて見せた。</figcaption></figure>
-    <figure class="gframe"><img src="img/booth-3.jpg" alt="2024年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-3.jpg</span></div><figcaption><b>2024</b>森をそのまま持ち込んだブース。「なんなら、釣れなくてもいい。」を掲げた。</figcaption></figure>
-    <figure class="gframe"><img src="img/booth-4.jpg" alt="2023年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-4.jpg</span></div><figcaption><b>2023</b>植栽の壁を自分たちの手で組み上げる。搬入日の一枚。</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-1.jpg" alt="2026年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-1.jpg</span></div><figcaption><b>2026</b>「The Wall」釣りを巡る嘘とホント（のような情報）の境界線を揺るがし、釣り人に自ら探求する意味を問うた。</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-2.jpg" alt="2025年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-2.jpg</span></div><figcaption><b>2025</b>等身大の絶滅危惧種である「キタシロサイ」の彫刻作品を展示。失われゆくモノの価値を示す。</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-3.jpg" alt="2024年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-3.jpg</span></div><figcaption><b>2024</b>4面全てに天然の植物を配置。釣り人の見ている森をフェスに持ち込む。</figcaption></figure>
+    <figure class="gframe"><img src="img/booth-4.jpg" alt="2023年の出展ブース" onerror="this.parentElement.classList.add('empty')"><div class="slot"><span>BOOTH PHOTO</span><span>img/booth-4.jpg</span></div><figcaption><b>2023</b>初のリアル出展。フローリストとともに、生きた植物で壁面を組み上げた。</figcaption></figure>
+    <figure class="gframe empty"><div class="slot"><span>ONLINE</span><span>2022</span></div><figcaption><b>2022</b>コロナ禍のオンライン開催に初出展。</figcaption></figure>
   </div>
   <p class="gnote">DRAG →</p>
 </section>
@@ -327,14 +324,8 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
 <section class="hope">
   <div class="h-in">
     <h2>私たちの想い</h2>
-    <p>竿一の活動は、忘れられかけた道具や土地の文化に光を当てて、釣りの面白さをいまの釣り人に手渡すことだった。今回の出店は、その延長線上にある。</p>
-    <p>日本の文化が育んできた釣りと魚の楽しさを、道具からだけでなく、一杯の丼からも。釣り場で誰もが出会ってきた"雑魚"たちの本当の味を、釣りの祭典から広めていきたい。<b>わっしょい。</b></p>
-    <ul class="pr">
-      <li><b>出展6年目・初の飲食出店</b>——一般ブース5年の竿一が食の小間に立つ。それ自体が会場の話題になる</li>
-      <li><b>毎年、会場で異彩を放ってきたブース</b>——空間装飾とスローガン「なんなら釣れなくていい」で反響（2026年はB-232「The Wall Patchwork」）。器・掲示物までオリジナルで制作</li>
-      <li><b>企画主旨と重なるメニュー</b>——未利用魚（サステナブル）×漁師直送（協働）×雀焼き・竹（地域文化のPR）</li>
-      <li><b>取材に応えられる素材</b>——どの港の誰の魚か、どの藪の竹か。会期前からの話題づくりに協力できる</li>
-    </ul>
+    <p>釣りフェス出展6年目の本年は、食を通じて釣りの魅力を表現します。</p>
+    <p>WAZAO-IPPONはこれまで、忘れられかけた道具や土地の文化に光を当て、釣りの面白さを手渡すことに挑戦し続けてきました。本年度はそれを、一杯の丼から。釣り場で誰もが出会ってきた&quot;雑魚&quot;を考え直す機会を、釣りフェスから広めます。</p>
   </div>
 </section>
 
