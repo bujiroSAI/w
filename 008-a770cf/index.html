@@ -9,11 +9,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Shippori+Mincho+B1:wght@700;800&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
 <style>
 :root{
-  --salmon:#DE8B76;   /* サーモンピンク（旧・朱の後継） */
-  --sky:#9FB6CB;      /* 明るい青 */
-  --yellow:#D6A83E;   /* 明るめの辛子 */
-  --cream:#F0E7D3;    /* 明るい生成り */
-  --lav:#C4B8D6;      /* 淡い紫 */
+  --salmon:#F19E86;   /* サーモンピンク（参考: MODERN EXPLORERの文字色） */
+  --sky:#43A6D9;      /* ビビッドな空色（参考: CANYON ARIZONAの空） */
+  --yellow:#F7D511;   /* ビビッドなレモンイエロー（参考: CANYONの文字） */
+  --cream:#F5EDDA;    /* 明るい生成り */
+  --lav:#CDC2E0;      /* 淡い紫（明度アップ） */
+  --orange:#F5A028;   /* オレンジ（参考: MODERN EXPLORERの地色） */
+  --verm:#E8492B;     /* 朱赤（参考: MÉMOIREの文字色・アクセント用） */
   --navy:#1E2430;
   --blue:#3D5C9E;     /* ローディングの青 */
   --wh:#FFF8F0;
@@ -33,7 +35,7 @@ img{max-width:100%}
 .loader p{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(88vw,760px);font-family:"Shippori Mincho B1",serif;font-weight:700;font-size:clamp(20px,4.4vw,38px);line-height:1.8;letter-spacing:.06em;color:var(--blue);opacity:0;text-wrap:balance}
 
 /* ── HERO（PCで一画面に収まるポスター） ── */
-.hero-wrap{background:var(--cream);display:grid;place-items:center}
+.hero-wrap{background:linear-gradient(to bottom,var(--sky) 0 26%,var(--salmon) 26%);display:grid;place-items:center}
 .poster{position:relative;width:100%;aspect-ratio:4/3;background:var(--salmon);overflow:hidden;container-type:inline-size}
 @media (min-aspect-ratio:5/4){
   .poster{width:min(100vw,calc(100svh * 4 / 3));height:100svh}
@@ -42,12 +44,12 @@ img{max-width:100%}
 .poster .palm{position:absolute;z-index:1;color:#47635A;opacity:.92}
 .poster .palm.p1{top:-4%;right:-3%;width:38%}
 .poster .frame{position:absolute;left:2.6%;right:2.6%;top:37.5%;bottom:4.8%;background:var(--cream);padding:.9%;z-index:2;box-shadow:0 0 0 1px rgba(0,0,0,.1)}
-.poster .frame .ph{width:100%;height:100%;background:url("img/pool.jpg") center 30%/cover no-repeat;filter:saturate(.6) contrast(.9) sepia(.2) brightness(1.06)}
+.poster .frame .ph{width:100%;height:100%;background:url("img/pool.jpg") center 30%/cover no-repeat;filter:saturate(1.12) contrast(.98) sepia(.05) brightness(1.04)}
 .tl{position:absolute;left:3.2%;z-index:3;overflow:visible}
 .tl text{font-family:"Abril Fatface",serif;fill:var(--yellow)}
 .t1{top:1.6%;width:64%;height:19.5%;transform:rotate(-1.3deg)}
-.t2{top:24.2%;width:94%;height:19.5%;transform:rotate(-1deg)}
-.t3{top:47.2%;width:56%;height:19.5%;transform:rotate(-1.3deg)}
+.t2{top:22.7%;width:94%;height:19.5%;transform:rotate(-1deg)}
+.t3{top:44%;width:56%;height:19.5%;transform:rotate(-1.3deg)}
 .sr{position:absolute;left:-9999px}
 
 /* ── 電光サイン ── */
@@ -79,28 +81,29 @@ img{max-width:100%}
 .sheet .art{width:100%;max-width:340px;margin-inline:auto}
 .sheet .menu-eyebrow{font-size:12px;font-weight:900;letter-spacing:.34em;margin-bottom:26px;text-align:center}
 .sheet h2{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(22px,3.8vw,34px);line-height:1.5;letter-spacing:.04em;text-wrap:balance}
-.sheet .price{font-family:"Abril Fatface",serif;font-size:clamp(22px,3.6vw,32px);margin:10px 0 16px;color:#A85A44}
+.sheet .price{font-family:"Abril Fatface",serif;font-size:clamp(22px,3.6vw,32px);margin:10px 0 16px;color:var(--verm)}
 .sheet p.desc{font-size:14.5px;line-height:2.1;letter-spacing:.04em}
-.sheet.s-cream{background:var(--cream);color:var(--navy)}
-.sheet.s-blue{background:var(--sky);color:#15202B}
-.sheet.s-yellow{background:#D9B25F;color:#20180A}
-.sheet.s-salmon{background:var(--salmon);color:#2B1A14}
+.sheet.s-pink{background:#F7D9D3;color:var(--navy)}
+.sheet.s-orange{background:var(--orange);color:#2B1A08}
+.sheet.s-blue{background:var(--sky);color:#10222E}
+.sheet.s-lemon{background:#F6D023;color:#241C06}
+.sheet.s-orange .price,.sheet.s-blue .price{color:#FFF6E8}
 @media (max-width:700px){.sheet .in{grid-template-columns:1fr;gap:24px}.sheet{padding:8svh 22px 12svh}.sheet .art{max-width:250px}}
 
 /* ── シュノーケル ── */
-.snorkel img{width:100%;display:block;filter:saturate(.65) sepia(.16) brightness(1.04) contrast(.94)}
+.snorkel img{width:100%;display:block;filter:saturate(1.15) sepia(.04) brightness(1.02)}
 
 /* ── ABOUT（魚柄の背景・左画像） ── */
 .about{background-color:var(--cream);background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='120'><path d='M18 60c14-14 40-20 62-12l14-9-2 14 2 14-14-9c-22 8-48 2-62-12Z' fill='%231E2430' fill-opacity='0.05'/><path d='M128 26c9-9 26-13 40-8l9-6-1 9 1 9-9-6c-14 5-31 2-40-7Z' fill='%231E2430' fill-opacity='0.04'/><path d='M132 92c8-8 22-11 34-7l8-5-1 8 1 8-8-5c-12 4-26 1-34-6Z' fill='%231E2430' fill-opacity='0.045'/></svg>");background-size:280px auto;padding:14svh 24px 8svh}
 .a-grid{max-width:960px;margin:0 auto;display:grid;grid-template-columns:.85fr 1.15fr;gap:48px;align-items:start}
-@media (max-width:760px){.a-grid{grid-template-columns:1fr;gap:30px}}
+@media (max-width:760px){.a-grid{grid-template-columns:1fr;gap:30px}.aframe{position:static;top:auto}}
 .a-eyebrow{font-size:12px;font-weight:900;letter-spacing:.34em;color:#5C544A;margin-bottom:22px}
 .about h2{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(24px,4vw,36px);margin-bottom:28px;letter-spacing:.04em}
 .about p{font-size:14.5px;line-height:2.3;letter-spacing:.04em}
 .about p+p{margin-top:20px}
 .about b{font-weight:900}
 .aframe{background:#FBF6EA;border:1px solid rgba(30,36,48,.35);box-shadow:0 10px 24px rgba(20,16,10,.16);padding:10px;position:sticky;top:8svh}
-.aframe img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;filter:saturate(.85) sepia(.12)}
+.aframe img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;filter:saturate(1.05) sepia(.04)}
 .aframe .slot{display:none;aspect-ratio:3/4;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#5C544A;font-size:11px;font-weight:700;letter-spacing:.14em;border:2px dashed rgba(30,36,48,.4);text-align:center}
 .aframe.empty img{display:none}
 .aframe.empty .slot{display:flex}
@@ -110,7 +113,7 @@ img{max-width:100%}
 .gstrip{display:flex;gap:26px;overflow-x:auto;scroll-snap-type:x mandatory;padding:22px 26px 10px;-webkit-overflow-scrolling:touch}
 .gstrip::-webkit-scrollbar{height:0}
 .gframe{flex:0 0 min(74vw,440px);scroll-snap-align:center;background:#FBF6EA;border:1px solid rgba(30,36,48,.35);box-shadow:0 10px 24px rgba(20,16,10,.16);padding:10px 10px 0;margin:0}
-.gframe img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(.85) sepia(.12)}
+.gframe img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:saturate(1.05) sepia(.04)}
 .gframe .slot{display:none;aspect-ratio:4/3;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#5C544A;font-size:11px;font-weight:700;letter-spacing:.14em;border:2px dashed rgba(30,36,48,.4)}
 .gframe.empty img{display:none}
 .gframe.empty .slot{display:flex}
@@ -121,10 +124,21 @@ img{max-width:100%}
 /* ── 想い ── */
 .hope{background:var(--sky);padding:15svh 24px}
 .hope .h-in{max-width:640px;margin:0 auto;text-align:center}
-.hope h2{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(24px,4.2vw,38px);margin-bottom:30px;letter-spacing:.06em;color:#15202B}
-.hope p{font-size:14.5px;line-height:2.4;letter-spacing:.05em;color:#15202B;text-align:left}
+.hope h2{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:clamp(24px,4.2vw,38px);margin-bottom:30px;letter-spacing:.06em;color:var(--wh)}
+.hope p{font-size:14.5px;line-height:2.4;letter-spacing:.05em;color:#10222E;text-align:left}
 .hope p+p{margin-top:20px}
 .hope b{font-weight:900}
+.hope ul.pr{list-style:none;margin-top:44px;padding-top:30px;border-top:1px solid rgba(255,248,240,.55);text-align:left}
+.hope ul.pr li{font-size:13.5px;line-height:2.05;letter-spacing:.04em;color:#10222E;padding-left:1.4em;text-indent:-1.4em}
+.hope ul.pr li+li{margin-top:14px}
+.hope ul.pr li::before{content:"■";color:var(--wh);margin-right:.6em;font-size:.82em}
+
+/* ── ロゴ ── */
+.logo-sec{background:var(--cream);padding:10svh 24px 9svh;display:grid;place-items:center}
+.logo-sec img{width:min(52vw,230px);display:block}
+.logo-sec .slot{width:min(52vw,230px);aspect-ratio:5/3;display:none;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:#5C544A;font-size:11px;font-weight:700;letter-spacing:.14em;border:2px dashed rgba(30,36,48,.4);text-align:center}
+.logo-sec.empty img{display:none}
+.logo-sec.empty .slot{display:flex}
 
 footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padding:18px 20px;text-align:center;line-height:2;position:relative;z-index:70}
 
@@ -150,7 +164,7 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
 <!-- ローディング -->
 <div class="loader" id="loader" aria-hidden="true">
   <p id="ld1">我々が愛する"雑魚"をご馳走に</p>
-  <p id="ld2">釣り人のための、釣りフェスだけのラーメン</p>
+  <p id="ld2">釣り人のための、<br>釣りフェスだけのラーメン</p>
 </div>
 
 <!-- 01 HERO -->
@@ -221,17 +235,17 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
     <div class="bowl-wrap">
       <img class="steam" src="img/steam-alpha.png" alt="" aria-hidden="true">
       <img class="bowl-art" src="img/bowl-cut.png" alt="わっしょい雑魚祭りラーメン（イメージ）">
-      <p class="bowl-note">※画像はイメージです　※使用する魚は漁の都合で変わります</p>
+      <p class="bowl-note">※画像はイメージです<br>※使用する魚は漁の都合で変わります</p>
     </div>
   </div>
 </section>
 
 <!-- 05 メニュー -->
 <div class="stack">
-  <section class="sheet s-cream">
+  <section class="sheet s-pink">
     <p class="menu-eyebrow">MENU — 01</p>
     <div class="in">
-      <img class="art" src="img/menu-ramen2.png" alt="わっしょい雑魚祭りラーメンのスケッチ">
+      <img class="art" src="img/menu-ramen3.png" alt="わっしょい雑魚祭りラーメンのスケッチ">
       <div>
         <h2>わっしょい雑魚祭りラーメン</h2>
         <p class="price">¥1,200</p>
@@ -240,10 +254,10 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
     </div>
   </section>
 
-  <section class="sheet s-blue">
+  <section class="sheet s-orange">
     <p class="menu-eyebrow">MENU — 02</p>
     <div class="in">
-      <img class="art" src="img/menu-suzume2.png" alt="雑魚の雀焼きのスケッチ">
+      <img class="art" src="img/menu-suzume3.png" alt="雑魚の雀焼きのスケッチ">
       <div>
         <h2>雑魚の雀焼き</h2>
         <p class="price">¥500</p>
@@ -252,10 +266,10 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
     </div>
   </section>
 
-  <section class="sheet s-yellow">
+  <section class="sheet s-blue">
     <p class="menu-eyebrow">MENU — 03</p>
     <div class="in">
-      <img class="art" src="img/menu-ice2.png" alt="竹のプラントベースアイスのスケッチ">
+      <img class="art" src="img/menu-ice3.png" alt="竹のプラントベースアイスのスケッチ">
       <div>
         <h2>竹のプラントベースアイス</h2>
         <p class="price">¥500</p>
@@ -264,10 +278,10 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
     </div>
   </section>
 
-  <section class="sheet s-salmon">
+  <section class="sheet s-lemon">
     <p class="menu-eyebrow">MENU — 04</p>
     <div class="in">
-      <img class="art" src="img/menu-tea2.png" alt="お茶と水のスケッチ">
+      <img class="art" src="img/menu-tea3.png" alt="お茶と水のスケッチ">
       <div>
         <h2>お茶と水</h2>
         <p class="price">¥200–300</p>
@@ -315,8 +329,20 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
     <h2>私たちの想い</h2>
     <p>竿一の活動は、忘れられかけた道具や土地の文化に光を当てて、釣りの面白さをいまの釣り人に手渡すことだった。今回の出店は、その延長線上にある。</p>
     <p>日本の文化が育んできた釣りと魚の楽しさを、道具からだけでなく、一杯の丼からも。釣り場で誰もが出会ってきた"雑魚"たちの本当の味を、釣りの祭典から広めていきたい。<b>わっしょい。</b></p>
+    <ul class="pr">
+      <li><b>出展6年目・初の飲食出店</b>——一般ブース5年の竿一が食の小間に立つ。それ自体が会場の話題になる</li>
+      <li><b>毎年、会場で異彩を放ってきたブース</b>——空間装飾とスローガン「なんなら釣れなくていい」で反響（2026年はB-232「The Wall Patchwork」）。器・掲示物までオリジナルで制作</li>
+      <li><b>企画主旨と重なるメニュー</b>——未利用魚（サステナブル）×漁師直送（協働）×雀焼き・竹（地域文化のPR）</li>
+      <li><b>取材に応えられる素材</b>——どの港の誰の魚か、どの藪の竹か。会期前からの話題づくりに協力できる</li>
+    </ul>
   </div>
 </section>
+
+<!-- 10 LOGO -->
+<div class="logo-sec">
+  <img src="img/logo.png" alt="WAZAO-IPPON ロゴ" onerror="this.parentElement.classList.add('empty')">
+  <div class="slot"><span>LOGO</span><span>img/logo.png</span></div>
+</div>
 
 <footer>
   本サイトは「釣りフェス2027 in YOKOHAMA 釣りめしスタジアム」出店審査のためにWAZAO-IPPONが制作した専用資料です。掲載の写真・イラストは一部イメージです。
@@ -329,16 +355,16 @@ footer{background:#14110D;color:#CFCDC2;font-size:11px;letter-spacing:.08em;padd
   var STATIC = /static/.test(location.search);
   var RM = matchMedia('(prefers-reduced-motion: reduce)').matches || STATIC;
   var loader = document.getElementById('loader');
-  setTimeout(function(){ if(loader){loader.style.display='none';} }, 5000);
+  setTimeout(function(){ if(loader){loader.style.display='none';} }, 9500);
   if (typeof gsap === 'undefined' || RM){ if(loader){loader.style.display='none';} return; }
   gsap.registerPlugin(ScrollTrigger);
 
   /* ローディング: 2文を順に */
   var intro = gsap.timeline({onComplete:function(){loader.style.display='none';}});
   intro.to('#ld1',{opacity:1,duration:.55,ease:'power2.out'})
-       .to('#ld1',{opacity:0,duration:.4,ease:'power2.in'},'+=1.05')
+       .to('#ld1',{opacity:0,duration:.4,ease:'power2.in'},'+=2.1')
        .to('#ld2',{opacity:1,duration:.55,ease:'power2.out'},'-=.05')
-       .to('#ld2',{opacity:0,duration:.4,ease:'power2.in'},'+=1.05')
+       .to('#ld2',{opacity:0,duration:.4,ease:'power2.in'},'+=2.1')
        .to(loader,{yPercent:-100,duration:.6,ease:'expo.inOut'});
 
   /* 雑魚ダイブ */
