@@ -28,7 +28,17 @@ img{max-width:100%}
 ::selection{background:var(--coral);color:#fff}
 
 /* ── 専用資料の帯 ── */
-.band{background:var(--navy);color:var(--cream);font-size:11.5px;font-weight:700;letter-spacing:.08em;padding:9px 16px;text-align:center;line-height:1.7}
+.band{background:#0B0B0A;color:#DEDED8;font-size:11.5px;font-weight:700;letter-spacing:.08em;padding:9px 16px;text-align:center;line-height:1.7}
+
+/* ── HEROポスター ── */
+.hero-poster{background:#0B0B0A}
+.hero-poster img{width:100%;display:block}
+
+/* ── 電光サイン ── */
+.led{background:#0B0B0A;overflow:hidden;white-space:nowrap;padding:22px 0;border-top:1px solid #1C1C1A;border-bottom:1px solid #1C1C1A}
+.led .track{display:inline-block;animation:mq 24s linear infinite;font-weight:900;font-size:clamp(17px,3vw,28px);color:#E9E9E2;letter-spacing:.22em;text-shadow:0 0 14px rgba(255,255,240,.28)}
+.led .track i{font-style:normal;color:#7C7C74;margin:0 1.1em;font-size:.55em;vertical-align:.25em}
+@media (prefers-reduced-motion: reduce){.led .track{animation:none}}
 
 /* ── ローダー ── */
 .veil{position:fixed;inset:0;background:var(--navy);z-index:90;display:none;align-items:center;justify-content:center}
@@ -179,23 +189,13 @@ footer b{font-weight:700}
 
 <div class="veil" id="veil" aria-hidden="true"><div class="v-t"><span>雑</span><span>魚</span><span>祭</span><span>り</span></div></div>
 
-<!-- HERO -->
-<header class="hero">
-  <div class="hero-ph" id="heroPh">
-    <img src="img/hero.jpg" alt="真夏の防波堤で釣り竿を立てる人（イメージ）" onerror="this.parentElement.classList.add('empty')">
-    <div class="slot">HERO写真（海・防波堤・釣り竿）<br>img/hero.jpg</div>
-    <p class="hero-for"><span class="oval">FOR 釣りフェス運営事務局</span></p>
-  </div>
-  <div id="heroTitle">
-    <p class="hero-w"><span class="oval">わっしょい</span></p>
-    <div class="crop"><p class="hz">雑魚祭り</p></div>
-    <p class="hero-r">ラーメン</p>
-  </div>
-  <p class="hero-sub">三陸漁師直送・未利用魚の魚介ラーメン<br><em>スープは、雑魚のアラ100%</em></p>
-  <p class="hero-brand lat">WAZAO-IPPON ｜ TSURIMESHI STADIUM 2027</p>
+<!-- HERO: ポスター1枚 -->
+<header class="hero-poster">
+  <img src="img/hero-poster-final.png" alt="WASSHOI ZAKOMATSURI RAMEN — わっしょい雑魚祭りラーメン（釣りフェス2027 出店企画）">
 </header>
 
-<svg class="blot" viewBox="0 0 1200 44" preserveAspectRatio="none" aria-hidden="true" style="background:var(--sky)"><path d="M60 24c14-10 44-14 62-5 16 8 8 18-12 20-24 3-66-5-50-15Zm190-4c22-9 58-6 66 4 8 11-16 18-44 16-26-2-42-12-22-20Zm240 2c12-12 52-12 68-2 14 9-2 17-26 18-26 1-56-6-42-16Zm230-2c18-9 50-8 62 2 10 9-8 17-32 16-26 0-48-9-30-18Zm220 3c14-10 46-11 60-2 12 8-4 16-26 16-24 1-50-5-34-14Zm190-1c12-8 38-8 48 0 9 7-5 14-22 14-19 0-38-6-26-14Z"/></svg>
+<!-- 電光サイン -->
+<div class="led" aria-hidden="true"><span class="track">釣りフェス限定メニュー<i>●</i>わっしょい雑魚祭りラーメン ¥1,200<i>●</i>雑魚の雀焼き ¥500<i>●</i>竹のプラントベースアイス ¥500<i>●</i>三陸漁師直送・未利用魚<i>●</i>2027.1.22–24 パシフィコ横浜<i>●</i>釣りフェス限定メニュー<i>●</i>わっしょい雑魚祭りラーメン ¥1,200<i>●</i>雑魚の雀焼き ¥500<i>●</i>竹のプラントベースアイス ¥500<i>●</i>三陸漁師直送・未利用魚<i>●</i>2027.1.22–24 パシフィコ横浜<i>●</i></span></div>
 
 <!-- 主題 -->
 <section class="field cream center">
@@ -398,9 +398,8 @@ footer b{font-weight:700}
     var intro=gsap.timeline({onComplete:function(){veil.style.display='none';}});
     intro.to('.veil .v-t span',{y:0,duration:.55,stagger:.07,ease:'power3.out'})
          .to(veil,{yPercent:-100,duration:.6,ease:'expo.inOut'},'+=.3')
-         .from('.hero-ph',{opacity:0,duration:.5},'-=.3')
-         .from('.hz',{y:80,opacity:0,duration:.7,ease:'power3.out'},'-=.2')
-         .from('.hero-w,.hero-r,.hero-sub,.hero-brand',{opacity:0,y:16,duration:.5,stagger:.08},'-=.3');
+         .from('.hero-poster img',{opacity:0,scale:1.02,duration:.8,ease:'power2.out'},'-=.25')
+         .from('.led .track',{opacity:0,duration:.5},'-=.3');
 
     gsap.utils.toArray('[data-rv]').forEach(function(el){
       gsap.from(el,{y:30,opacity:0,duration:.8,ease:'power3.out',
