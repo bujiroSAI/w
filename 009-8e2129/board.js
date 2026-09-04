@@ -59,7 +59,7 @@
     seg(223, 292, 223, 304, { tag: 'stage' }); seg(237, 292, 237, 304, { tag: 'stage' });
     world.addZone({ id: 'stage_center', type: 'pass', x1: 224, x2: 236, y1: 296, y2: 303 });
     world.addZone({ id: 'warp', type: 'pass', x1: 153, x2: 169, y1: 200, y2: 210 });
-    L.stageZone = { x1: F.wallL + 2, x2: F.wallR - 2, y1: 262, y2: 293 };
+    L.stageZone = { x1: F.wallL + 2, x2: F.wallR - 2, y1: 262, y2: 293 }; L.stageDropRate = opts.stageDropRate || 7.0;
 
     // ---- 釘 ----
     for (let x = 150; x <= 310; x += 20) nail(x, 62, 'ten');                 // 天釘
@@ -85,12 +85,16 @@
     world.addZone({ id: 'railR_on', type: 'pass', x1: 275, x2: 352, y1: 290, y2: 305 });
     world.addZone({ id: 'railR_end', type: 'pass', x1: 255, x2: 270, y1: 296, y2: 315 });
     const jdx = opts.jumpDX != null ? opts.jumpDX : 13, jdy = opts.jumpDY != null ? opts.jumpDY : 0; // ジャンプ釘: 道釘末端の12mm先・同じ高さ（手前の隙間が「こぼし」）
-    michi('michiL', 108, 300, 8, 12.5, 1.7);
+    const rx0 = opts.railX0 != null ? opts.railX0 : 133;            // 道釘の左端（右へ寄せるほど左こぼしが増える＝回転率が下がる）
+    const nL = Math.round((195.5 - rx0) / 12.5) + 1;
+    michi('michiL', 195.5 - (nL - 1) * 12.5, 311.9 - (nL - 1) * 1.7, nL, 12.5, 1.7);
     nail(195.5 + jdx, 311.9 + jdy, 'jumpL');
     // 右袖: 仕切りと枠壁の間の細い通路。ぶっこみ右の玉が右道釘へ落ちる
     [[342, 150], [356, 168], [342, 190], [356, 212], [331, 258], [356, 264]].forEach(p => nail(p[0], p[1], 'rightSleeve')); // 331,258 は壁際ブロッカー
     // 道釘（右）: 鏡像
-    michi('michiR', 340, 301.7, 7, -12.5, 1.7);
+    const rx1 = opts.railX1 != null ? opts.railX1 : 315;            // 道釘（右）の右端
+    const nR = Math.round((rx1 - 264.5) / 12.5) + 1;
+    michi('michiR', 264.5 + (nR - 1) * 12.5, 311.9 - (nR - 1) * 1.7, nR, -12.5, 1.7);
     nail(264.5 - jdx, 311.9 + jdy, 'jumpR');
     // 命釘（ヘソ釘）
     const hesoGap = opts.hesoGap || 14.4;
@@ -168,7 +172,7 @@
   // 毎フレームの補助処理: ①レールを抜けた玉に inPlay を立てる（戻り防止片の通過判定）②ステージ前面へのこぼれ
   function updateBalls(world, L, dt) {
     const { cx, cy, flapDeg } = BOARD;
-    const sz = L && L.stageZone, dropRate = (L && L.stageDropRate) || 4.0; // 1秒あたりのこぼれ確率
+    const sz = L && L.stageZone, dropRate = (L && L.stageDropRate) || 7.0; // 1秒あたりのこぼれ確率
     for (const b of world.balls) {
       if (b.inPlay) {
         if (sz && b.x > sz.x1 && b.x < sz.x2 && b.y > sz.y1 && b.y < sz.y2 && Math.abs(b.x - 230) > 12 && world.rand() < dropRate * dt) {
