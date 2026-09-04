@@ -1,0 +1,38 @@
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #0b0b10; color: #e8e2d0; font-family: -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; overscroll-behavior: none; }
+#app { display: flex; height: 100%; }
+#stage { flex: 1 1 auto; min-width: 0; position: relative; }
+#machine { width: 100%; height: 100%; display: block; touch-action: pan-y; }
+#handleZone { position: absolute; touch-action: none; background: transparent; }
+#side { flex: 0 0 260px; overflow-y: auto; padding: 10px 12px; background: #15121c; border-left: 1px solid #2c2540; font-size: 12px; }
+#side h1 { font-size: 15px; margin: 4px 0 8px; color: #e8c56a; letter-spacing: .04em; }
+#side h2 { font-size: 11px; margin: 12px 0 6px; color: #9a8a5a; border-bottom: 1px solid #2c2540; padding-bottom: 3px; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0; }
+button { background: #2a2140; color: #f0e8d8; border: 1px solid #5a4a7a; border-radius: 6px; padding: 7px 10px; font-size: 12px; cursor: pointer; }
+button:hover { background: #3a2f58; }
+button:active { background: #4a3f70; }
+button.primary { background: #7a1a1a; border-color: #c04040; }
+button.big { flex: 1 1 auto; padding: 10px; font-weight: bold; }
+button.red { background: #8a1a1a; border-color: #ff8080; font-weight: bold; }
+input[type=range] { width: 100%; }
+table.stats { width: 100%; border-collapse: collapse; }
+table.stats td { padding: 2px 4px; border-bottom: 1px solid #221c30; }
+table.stats td:last-child { text-align: right; font-family: "Courier New", monospace; font-weight: bold; color: #ffd24a; }
+table.stats tr.hot td { color: #ff6a6a; }
+label.chk { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+select { background: #2a2140; color: #f0e8d8; border: 1px solid #5a4a7a; border-radius: 6px; padding: 5px; }
+#help { display: none; font-size: 11px; line-height: 1.5; color: #c8c0b0; }
+#help.open { display: block; }
+#help kbd { background: #2a2140; border: 1px solid #5a4a7a; border-radius: 3px; padding: 0 4px; font-size: 10px; }
+.note { color: #8a8070; font-size: 10px; }
+@media (max-width: 760px) {
+  html, body { height: auto; min-height: 100%; }
+  #app { flex-direction: column; height: auto; }
+  #stage { flex: 0 0 auto; height: min(calc(100vw * 880 / 560), 84vh); height: min(calc(100vw * 880 / 560), 84dvh); }
+  #side { flex: 1 1 auto; border-left: none; border-top: 1px solid #2c2540; font-size: 14px; padding-bottom: 40px; }
+  button { padding: 12px 12px; font-size: 14px; min-height: 44px; }
+  .row { gap: 8px; margin: 6px 0; }
+  input[type=range] { height: 32px; }
+  table.stats td { padding: 5px 4px; }
+}

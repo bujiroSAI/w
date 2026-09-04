@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>P-STAGE パチンコ台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="stage"><canvas id="machine"></canvas><div id="handleZone" aria-label="ハンドル"></div></div>
+  <aside id="side">
+    <h1>パチンコ台シミュレータ</h1>
+    <div class="row">
+      <button id="btnMoney" class="big">千円投入</button>
+      <button id="btnLend" class="big primary">玉貸（500円=125玉）</button>
+    </div>
+    <div class="row">
+      <button id="btnLift">下皿→上皿</button>
+      <button id="btnBox">下皿→箱</button>
+      <button id="btnPush" class="red">PUSH</button>
+    </div>
+    <h2>ハンドル <span id="sStrength" class="note"></span></h2>
+    <input id="strength" type="range" min="0" max="100" value="0">
+    <div class="row">
+      <button id="btnOff">離す</button>
+      <button id="btnLeft">左打ち（ぶっこみ）</button>
+      <button id="btnRight">右打ち</button>
+      <button id="btnStop" class="red">止め打ち（押している間）</button>
+    </div>
+    <h2>収支</h2>
+    <table class="stats">
+      <tr><td>残高</td><td>¥<span id="sBalance">0</span></td></tr>
+      <tr><td>投資</td><td>¥<span id="sInvest">0</span></td></tr>
+      <tr><td>持ち玉（上皿/下皿/箱）</td><td><span id="sBalls">0</span>（<span id="sTray">0</span>/<span id="sLower">0</span>/<span id="sBox">0</span>）</td></tr>
+      <tr><td>差玉</td><td><span id="sDiff">0</span></td></tr>
+      <tr><td>換金（等価4円）</td><td>¥<span id="sYen">0</span></td></tr>
+      <tr><td>総回転 / 大当り</td><td><span id="sSpins">0</span> / <span id="sHits">0</span></td></tr>
+      <tr><td>千円あたり回転</td><td><span id="sRate">-</span></td></tr>
+      <tr><td>状態</td><td><span id="sMode">通常</span></td></tr>
+    </table>
+    <h2>設定</h2>
+    <div class="row">
+      <select id="optSpec">
+        <option value="middle">ミドル 1/319（ST100）</option>
+        <option value="light">ライトミドル 1/199（ST100）</option>
+        <option value="ama">甘デジ 1/99（ST50）</option>
+      </select>
+    </div>
+    <div class="row">
+      <label class="chk"><input type="checkbox" id="optSound">音</label>
+      <label class="chk"><input type="checkbox" id="optSpeech">音声案内</label>
+      <label class="chk"><input type="checkbox" id="optTurbo">演出短縮</label>
+      <label class="chk"><input type="checkbox" id="optAuto">上皿が空なら自動補給</label>
+    </div>
+    <div class="row"><span class="note">音量</span><input id="optVolume" type="range" min="0" max="100" value="80"></div>
+    <div class="row">
+      <button id="btnFull">全画面</button>
+      <button id="btnHelp">遊び方</button>
+      <button id="btnReset">新台にする（データ消去）</button>
+    </div>
+    <div id="help">
+      <p><b>1.</b> 「千円投入」→「玉貸」で上皿に玉が入る。<b>2.</b> ハンドル（右下の円）をドラッグして回すと発射（100発/分）。左打ちは40〜45%あたりが「ぶっこみ」。<b>3.</b> ヘソ（START）に入ると液晶が回る。保留は4個まで。<b>4.</b> 図柄が3つ揃うと大当り。<b>右打ち</b>（ハンドル90%〜）でアタッカーに入れる（10個で1ラウンド、賞球15）。<b>5.</b> 大当り後は確変（RUSH・ST）か時短。右打ちを続けると電チューが開いて玉持ちよく回る。ST/時短が終わったら左打ちに戻す。</p>
+      <p>キー: <kbd>←</kbd><kbd>→</kbd> ハンドル微調整 <kbd>↑</kbd><kbd>↓</kbd> 大きく <kbd>L</kbd> 左打ち <kbd>R</kbd> 右打ち <kbd>0</kbd> 離す <kbd>Space</kbd> 止め打ち <kbd>Enter</kbd> PUSHボタン <kbd>K</kbd> 玉貸 <kbd>U</kbd> 下皿→上皿</p>
+      <p class="note">賞球 3&1&3&15・10カウント。普図は通常時1/25（開放0.2秒）・電サポ中ほぼ1/1（開放2.6秒）。抽選は入賞時に乱数取得、変動開始時に現在の確率で判定（先読み保留の色は事前判定）。遊技状態・収支はこのブラウザに保存される。</p>
+    </div>
+  </aside>
+</div>
+<script src="physics.js"></script>
+<script src="board.js"></script>
+<script src="spec.js"></script>
+<script src="game.js"></script>
+<script src="audio.js"></script>
+<script src="lcd.js"></script>
+<script src="render.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
