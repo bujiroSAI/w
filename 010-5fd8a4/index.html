@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>おとはた モック — 全 UX を体験する</title>
+<style>
+  :root { --ink: #111; --line: #ccc; --bg: #fff; --soft: #f4f4f4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; font-size: 13.5px; line-height: 1.6; }
+  .wrap { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+  aside { border-right: 1px solid var(--line); padding: 16px 14px 40px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+  main { padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  h1 { font-size: 16px; margin: 0 0 2px; }
+  h2 { font-size: 12.5px; margin: 18px 0 6px; color: #444; letter-spacing: .04em; border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+  .lead { font-size: 12px; color: #555; margin: 0 0 6px; }
+  button { font: inherit; color: var(--ink); background: #fff; border: 1px solid var(--ink); border-radius: 6px; padding: 5px 9px; cursor: pointer; text-align: left; }
+  button:hover { background: var(--soft); }
+  button.on { background: var(--ink); color: #fff; }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .preset { display: block; width: 100%; margin-bottom: 6px; }
+  .preset small { display: block; color: #666; font-size: 11px; line-height: 1.4; }
+  .preset.on small { color: #ddd; }
+  .frame { position: relative; background: #fff; border: 1px solid var(--ink); border-radius: 22px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,.08); transform-origin: top center; }
+  .frame iframe { border: 0; display: block; background: #FAF3E3; }
+  .status { font-size: 12px; color: #555; min-height: 1.4em; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; width: 100%; max-width: 1200px; margin-top: 20px; }
+  .gallery figure { margin: 0; }
+  .gallery img { width: 100%; border: 1px solid var(--line); display: block; cursor: zoom-in; }
+  .gallery figcaption { font-size: 11.5px; color: #555; margin-top: 3px; }
+  kbd { font: 11px ui-monospace, Menlo, monospace; border: 1px solid #999; border-radius: 3px; padding: 0 4px; background: #fafafa; }
+  .note { font-size: 11.5px; color: #666; }
+  a { color: var(--ink); }
+  @media (max-width: 860px) { .wrap { grid-template-columns: 1fr; } aside { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside>
+  <h1>おとはた モック</h1>
+  <p class="lead">右の端末枠の中で <b>本物のアプリ</b> が動く。左で「状態」を入れて「画面」へ飛ぶ。音が出る（端末の音量に注意）。記録はこのブラウザだけに保存され、状態を入れ直すと上書きされる。</p>
+
+  <h2>1. 状態（記録を入れ替える）</h2>
+  <div id="presets"></div>
+
+  <h2>2. 画面へ飛ぶ</h2>
+  <div class="row">
+    <button data-act="home">ホーム</button>
+    <button data-act="play">あそぶ</button>
+    <button data-act="free">じぶんで ならす</button>
+    <button data-act="stickers">シールちょう</button>
+    <button data-act="parent">おうちのかた（3秒ホールドを代行）</button>
+    <button data-act="demo3">おためし（3本・記録なし）</button>
+  </div>
+  <p class="note">「おうちのかた」の中は本物と同じ（設定・計器・ガイド・記録のコピー/削除）。「はじめから」を押すと状態が消えるので、左の状態を入れ直す。</p>
+
+  <h2>3. 端末枠</h2>
+  <div class="row">
+    <button data-size="768x1024">iPad 縦</button>
+    <button data-size="1024x768">iPad 横</button>
+    <button data-size="390x844">iPhone 縦</button>
+    <button data-size="844x390" class="on">iPhone 横（テレビ投影）</button>
+  </div>
+
+  <h2>4. 物理ボタンの代わり</h2>
+  <div class="row" id="keys"></div>
+  <p class="note">キーボードの <kbd>1</kbd>〜<kbd>9</kbd> もそのまま効く（左から n 番目の色ボタン）。BT テンキーを Mac にペアリングすれば、このページで物理ボタンの体験を先取りできる。きくじかん中は無視される。</p>
+
+  <h2>5. 見かた</h2>
+  <p class="note">正本の設計は <a href="../README.html" target="_blank">README</a>。レビューの観点は <code>research/UXレビュー依頼_2026-10-07.md</code>。下の「全画面一覧」は代表状態の静止画（自動撮影・架空データ）。</p>
+</aside>
+
+<main>
+  <div class="status" id="status">状態: 保存されているまま（何も入れ替えていない）</div>
+  <div class="frame" id="frame"><iframe id="app" src="app/index.html" title="おとはた"></iframe></div>
+  <div class="status" id="status2"></div>
+  <h2 style="width:100%;max-width:1200px">全画面一覧（自動撮影・代表状態）</h2>
+  <div class="gallery" id="gallery"></div>
+</main>
+</div>
+
+<script src="app/chords.js"></script>
+<script src="seeds.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const iframe = $('#app'), frame = $('#frame'), status = $('#status'), status2 = $('#status2');
+  const KEY = 'otohata_v1';
+  let size = [844, 390];
+  let current = null;
+
+  // ---- 端末枠（ウィンドウ幅に合わせて縮小） ----
+  function fit() {
+    const [w, h] = size;
+    iframe.style.width = w + 'px'; iframe.style.height = h + 'px';
+    const avail = Math.min(frame.parentElement.clientWidth - 32, 1100);
+    const sc = Math.min(1, avail / w, (window.innerHeight - 140) / h);
+    frame.style.width = w + 'px'; frame.style.height = h + 'px';
+    frame.style.transform = `scale(${sc})`;
+    frame.style.marginBottom = (h * sc - h) + 'px';
+  }
+  document.querySelectorAll('[data-size]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-size]').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    size = b.dataset.size.split('x').map(Number); fit(); reload();
+  }));
+  window.addEventListener('resize', fit);
+
+  // ---- 状態 ----
+  const box = $('#presets');
+  Object.entries(MOCK_SEEDS.presets).forEach(([k, p]) => {
+    const b = document.createElement('button'); b.className = 'preset'; b.dataset.preset = k;
+    b.innerHTML = `${p.label}<small>${p.desc}</small>`;
+    b.addEventListener('click', () => applyPreset(k));
+    box.appendChild(b);
+  });
+  function applyPreset(k) {
+    const p = MOCK_SEEDS.presets[k]; const data = p.data();
+    try { if (data) localStorage.setItem(KEY, JSON.stringify(data)); else localStorage.removeItem(KEY); } catch (e) {}
+    current = k;
+    document.querySelectorAll('.preset').forEach(x => x.classList.toggle('on', x.dataset.preset === k));
+    status.textContent = '状態: ' + p.label + (data ? `（色 ${data.unlocked.length}・試行 ${data.trials.length}・セッション ${data.sessions.length}）` : '（記録なし）');
+    reload();
+  }
+  function reload() { iframe.src = 'app/index.html?m=' + Date.now(); }
+
+  // ---- 画面へ飛ぶ（本物の DOM にイベントを送る） ----
+  const doc = () => iframe.contentDocument;
+  const pd = sel => { const el = doc() && doc().querySelector(sel); if (!el) return false; el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); el.dispatchEvent(new MouseEvent('click', { bubbles: true })); return true; };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  async function afterLoad(fn) { reload(); await new Promise(r => iframe.addEventListener('load', r, { once: true })); await wait(300); return fn(); }
+  async function openParent() {
+    const el = doc().querySelector('#btn-parent'); if (!el) return;
+    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    await wait(2800);
+    el.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+  }
+  const acts = {
+    home: () => reload(),
+    play: () => afterLoad(() => pd('#btn-play')),
+    free: () => afterLoad(() => pd('#btn-freeplay')),
+    stickers: () => afterLoad(() => pd('#btn-stickers')),
+    parent: () => afterLoad(openParent),
+    demo3: () => afterLoad(async () => {
+      await openParent(); await wait(200);
+      const b = Array.from(doc().querySelectorAll('#p-settings button')).find(x => x.dataset.v === '3' && /おためし|本/.test(x.closest('.p-set-row')?.textContent || x.textContent));
+      if (b) pd('#p-settings button[data-v="3"]'); else status2.textContent = 'おためしボタンが見つからない（親画面の設定にある）';
+    }),
+  };
+  document.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => { status2.textContent = ''; acts[b.dataset.act](); }));
+
+  // ---- 物理ボタンの代わり ----
+  const keys = $('#keys');
+  for (let i = 1; i <= 9; i++) { const b = document.createElement('button'); b.textContent = i; b.style.minWidth = '36px'; b.style.textAlign = 'center'; b.addEventListener('click', () => sendKey(i)); keys.appendChild(b); }
+  function sendKey(n) {
+    const d = doc(); if (!d) return;
+    d.dispatchEvent(new KeyboardEvent('keydown', { key: String(n), code: 'Digit' + n, bubbles: true }));
+    const w = iframe.contentWindow; const t = w && w.Input && w.Input.targets ? w.Input.targets().length : '?';
+    status2.textContent = `キー ${n} を送った（いま押せるボタン: ${t}）`;
+  }
+  document.addEventListener('keydown', e => { const m = /^[1-9]$/.exec(e.key); if (m && !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) { sendKey(Number(m[1])); e.preventDefault(); } });
+
+  // ---- 全画面一覧 ----
+  fetch('gallery/index.json').then(r => r.ok ? r.json() : []).then(list => {
+    const g = $('#gallery');
+    list.forEach(it => { const f = document.createElement('figure'); f.innerHTML = `<a href="gallery/${it.file}" target="_blank"><img src="gallery/${it.file}" alt="${it.title}" loading="lazy"></a><figcaption>${it.title}</figcaption>`; g.appendChild(f); });
+  }).catch(() => {});
+
+  fit();
+})();
+</script>
+</body>
+</html>

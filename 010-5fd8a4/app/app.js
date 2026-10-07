@@ -1,0 +1,1239 @@
+// おとはた — アプリ本体
+// 流れ: ホーム → セッション(12試行・約2分) → シール → おしまい
+// 方法論: 和音は完全同時提示 / 間違いは叱らず正解旗を光らせて同じ和音を再提示 /
+//         新しい和音は混ぜる前に単独導入 / 効果音は非音程
+
+'use strict';
+
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+  // ============ キャラクター（おどるひつじ・画像ポーズ切替） ============
+  // 性格: 陽気で楽しげ・小刻みなステップワークでよく踊る・オーバーリアクション。
+  // 待機中は常にステップダンス（CSS）。出来事に応じてポーズ画像を差し替える。
+  const Char = (() => {
+    const POSES = ['neutral', 'listen', 'clap', 'joy', 'sing', 'wave', 'sleep'];
+    POSES.forEach(pz => { const i = new Image(); i.src = `char/${pz}.png`; }); // プリロード
+    const timers = new Map();
+    const rig = typeof Char3D !== 'undefined' && Char3D.supported; // Live2D風レンダラが使えるか
+    function mount(el) {
+      if (!el || el.querySelector('.char-img')) return;
+      if (rig) {
+        el.innerHTML = `<span class="char-img char-rig"><canvas class="c3-gl"></canvas><canvas class="c3-eyes"></canvas></span>
+          <span class="char-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
+        Char3D.attach(el.querySelector('.char-rig'));
+      } else {
+        el.innerHTML = `<img class="char-img" src="char/neutral.png" alt="" draggable="false">
+          <span class="char-notes" aria-hidden="true"><i>♪</i><i>♫</i></span>`;
+      }
+    }
+    function setImg(el, name) {
+      const w = el.querySelector('.char-rig');
+      if (w) { Char3D.setPose(w, name); return; }
+      const img = el.querySelector('.char-img');
+      if (img) img.src = `char/${name}.png`;
+    }
+    // pose(el, name, holdMs): holdMs後にneutralへ戻る。holdMs省略で戻らない。
+    function pose(el, name, holdMs) {
+      if (!el || !el.querySelector('.char-img')) return;
+      setImg(el, name);
+      if (timers.has(el)) { clearTimeout(timers.get(el)); timers.delete(el); }
+      if (holdMs) timers.set(el, setTimeout(() => { setImg(el, 'neutral'); el.classList.remove('overreact', 'groove'); }, holdMs));
+    }
+    // オーバーリアクション（2連ぴょんジャンプ+のけぞり）
+    function overreact(el) {
+      if (!el) return;
+      el.classList.remove('overreact');
+      void el.offsetWidth;
+      el.classList.add('overreact');
+    }
+    // 音に乗る（ビート揺れ）
+    function groove(el, ms) {
+      if (!el) return;
+      el.classList.add('groove');
+      setTimeout(() => el.classList.remove('groove'), ms || 1600);
+    }
+    return { mount, pose, overreact, groove };
+  })();
+
+  // ============ 旗のしるし（色覚多様性への冗長コード・WCAG 1.4.1） ============
+  // 色が見分けられなくても旗を同定できるようにする。2歳児は「見分けられない」と言えないため、
+  // 気づかれないまま「才能がない」と誤解される事故を防ぐのが目的。
+  const MARKS = {
+    dot:    '<circle cx="12" cy="12" r="8"/>',
+    star:   '<path d="M12 3l2.6 6.1 6.6.5-5 4.3 1.5 6.4L12 17l-5.7 3.3 1.5-6.4-5-4.3 6.6-.5z"/>',
+    tri:    '<path d="M12 3.5l8.5 15h-17z"/>',
+    sq:     '<rect x="4.5" y="4.5" width="15" height="15" rx="2"/>',
+    heart:  '<path d="M12 20.5S3.5 15 3.5 9.4A4.4 4.4 0 0 1 12 7.6a4.4 4.4 0 0 1 8.5 1.8c0 5.6-8.5 11.1-8.5 11.1z"/>',
+    dia:    '<path d="M12 2.5l9.5 9.5L12 21.5 2.5 12z"/>',
+    cross:  '<path d="M9.4 3h5.2v6.4H21v5.2h-6.4V21H9.4v-6.4H3V9.4h6.4z"/>',
+    flower: '<g><circle cx="12" cy="5.6" r="3.6"/><circle cx="12" cy="18.4" r="3.6"/><circle cx="5.6" cy="12" r="3.6"/><circle cx="18.4" cy="12" r="3.6"/></g>',
+    pent:   '<path d="M12 2.5l9.5 6.9-3.6 11.1H6.1L2.5 9.4z"/>',
+    hex:    '<path d="M12 2.5l8.2 4.75v9.5L12 21.5l-8.2-4.75v-9.5z"/>',
+    moon:   '<path d="M16.5 3a9.5 9.5 0 1 0 0 18 11 11 0 0 1 0-18z"/>',
+    ring:   '<path d="M12 2.5A9.5 9.5 0 1 0 12 21.5 9.5 9.5 0 0 0 12 2.5zm0 5.2a4.3 4.3 0 1 1 0 8.6 4.3 4.3 0 0 1 0-8.6z"/>',
+    bar:    '<rect x="2.5" y="9" width="19" height="6" rx="2"/>',
+    up:     '<path d="M12 2.5l8.5 9h-5v10h-7v-10h-5z"/>',
+  };
+  const markSvg = (id) =>
+    `<svg class="flag-mark" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">${MARKS[id] || MARKS.dot}</svg>`;
+
+  const chordColor = (c) => (Store.data.settings.cudPalette && c.cud) ? c.cud : c.color;
+
+  // ============ こえ（読み上げ） ============
+  const Voice = (() => {
+    let ja = null;
+    function pick() {
+      if (!('speechSynthesis' in window)) return;
+      const vs = speechSynthesis.getVoices();
+      ja = vs.find(v => v.lang === 'ja-JP' && /Kyoko/i.test(v.name)) ||
+           vs.find(v => v.lang && v.lang.indexOf('ja') === 0) || null;
+    }
+    if ('speechSynthesis' in window) {
+      pick();
+      speechSynthesis.onvoiceschanged = pick;
+    }
+    function speak(text) {
+      if (!Store.data.settings.voice) return;
+      if (!('speechSynthesis' in window)) return;
+      try {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        if (ja) u.voice = ja;
+        u.lang = 'ja-JP';
+        u.rate = 1.0;
+        u.pitch = 1.1;
+        u.volume = Math.min(1, Store.data.settings.volume + 0.15);
+        speechSynthesis.speak(u);
+      } catch (e) { /* 声はなくても遊べる */ }
+    }
+    function stop() { try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {} }
+    return { speak, stop };
+  })();
+
+  // ============ 紙吹雪（正解した旗の色だけで降らせる＝連合の強化） ============
+  const Confetti = (() => {
+    const cv = $('#confetti');
+    const cx = cv.getContext('2d');
+    let parts = [];
+    let raf = null;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function size() {
+      const d = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = innerWidth * d;
+      cv.height = innerHeight * d;
+      cx.setTransform(d, 0, 0, d, 0, 0);
+    }
+    window.addEventListener('resize', size);
+    size();
+
+    function mk(x, y, vx, vy, color) {
+      const kind = Math.random();
+      return {
+        x, y, vx, vy,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.5,
+        w: 7 + Math.random() * 9,
+        h: 5 + Math.random() * 7,
+        c: Math.random() < 0.28 ? '#FFFDF6' : color,
+        shape: kind < 0.55 ? 'rect' : kind < 0.8 ? 'dot' : 'flag', // 紙片・丸・小旗
+        sw: Math.random() * Math.PI * 2,   // ひらひらの位相
+        swf: 0.08 + Math.random() * 0.1,   // ひらひらの速さ
+        t: 0,
+        life: 1,
+      };
+    }
+    function burst(color, x, y, n) {
+      if (reduced) return;
+      for (let i = 0; i < (n || 60); i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = 5 + Math.random() * 10;
+        parts.push(mk(x, y, Math.cos(a) * sp, Math.sin(a) * sp - 7, color));
+      }
+      if (!raf) tick();
+    }
+    // 画面上部からその色の紙吹雪を降らせる（big演出用）
+    function rain(color, n) {
+      if (reduced) return;
+      for (let i = 0; i < (n || 50); i++) {
+        parts.push(mk(Math.random() * innerWidth, -20 - Math.random() * 120,
+                      (Math.random() - 0.5) * 2, 1 + Math.random() * 3, color));
+      }
+      if (!raf) tick();
+    }
+    function clear() {
+      parts = [];
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      cx.clearRect(0, 0, innerWidth, innerHeight);
+    }
+    let lastT = 0;
+    function tick(now) {
+      raf = requestAnimationFrame(tick);
+      const dt = lastT ? Math.min(3, (now - lastT) / 16.7) : 1; // フレーム落ちでも実時間で減衰する（UX-14）
+      lastT = now || 0;
+      cx.clearRect(0, 0, innerWidth, innerHeight);
+      parts = parts.filter(p => p.life > 0);
+      if (parts.length === 0) { cancelAnimationFrame(raf); raf = null; lastT = 0; return; }
+      for (const p of parts) {
+        p.t++;
+        p.vy += p.vy < 2.6 ? 0.32 : 0.06; // 終端速度でひらひら落ちる
+        p.vx *= 0.985;
+        p.x += p.vx + Math.sin(p.t * p.swf + p.sw) * 1.1;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.life -= 0.0085 * dt;
+        cx.save();
+        cx.translate(p.x, p.y);
+        cx.rotate(p.rot);
+        cx.globalAlpha = Math.max(0, Math.min(1, p.life * 1.6));
+        cx.fillStyle = p.c;
+        // ひらひら感: 位相で片軸を潰す（紙が翻る見え方）
+        cx.scale(1, 0.35 + 0.65 * Math.abs(Math.sin(p.t * p.swf * 1.6 + p.sw)));
+        if (p.shape === 'dot') {
+          cx.beginPath(); cx.arc(0, 0, p.w * 0.42, 0, Math.PI * 2); cx.fill();
+        } else if (p.shape === 'flag') {
+          cx.beginPath();
+          cx.moveTo(-p.w / 2, -p.h / 2); cx.lineTo(p.w / 2, 0); cx.lineTo(-p.w / 2, p.h / 2);
+          cx.closePath(); cx.fill();
+        } else {
+          cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        }
+        cx.restore();
+      }
+    }
+    return { burst, rain, clear };
+  })();
+
+  // ============ 画面切替 ============
+  function show(id) {
+    $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+  }
+
+  // ============ ホーム ============
+  function renderHome() {
+    const st = Store.data.settings;
+    const n = Store.todaySessions().filter(x => !x.partial).length;
+    const box = $('#today-dots');
+    box.innerHTML = '';
+    const cap = Math.max(st.dailyTarget, Math.min(n, 8));
+    for (let i = 0; i < Math.min(cap, 8); i++) {
+      const d = document.createElement('span');
+      d.className = 'td' + (i < n ? ' on' : '');
+      box.appendChild(d);
+    }
+    if (n > 8) {
+      const p = document.createElement('span');
+      p.className = 'td-plus';
+      p.textContent = '+' + (n - 8);
+      box.appendChild(p);
+    }
+    $('#parent-badge').classList.toggle('hidden',
+      !(st.autoSuggest && Store.advanceReady()));
+
+    // 旅の地図: 14個のボタンのみち。とれた色だけ塗られていく
+    const j = $('#journey');
+    j.innerHTML = '';
+    CHORDS.forEach((c, i) => {
+      const dot = document.createElement('span');
+      const got = i < Store.data.unlocked.length;
+      const now2 = i === Store.data.unlocked.length - 1;
+      dot.className = 'j-dot' + (got ? ' got' : '') + (now2 ? ' now' : '');
+      if (got) dot.style.setProperty('--jc', chordColor(c));
+      j.appendChild(dot);
+    });
+
+  }
+
+  // ============ セッション（試行の状態機械） ============
+  let S = null;
+  let lastDemo = null; // 直近の「おためし」設定（もういっかい用）
+  // セッションに紐づく予約処理。stopSession で全部消える。trial:true なら試行が進んだ時点でも無効（古い声・音の割り込み防止・UX-28/29）
+  const timers = new Set();
+  function later(fn, ms, opt) {
+    if (!S) return null;
+    const sid = S.id, tn = S.trialNo;
+    const t = setTimeout(() => {
+      timers.delete(t);
+      if (!S || S.id !== sid) return;
+      if (opt && opt.trial && S.trialNo !== tn) return;
+      fn();
+    }, ms);
+    timers.add(t);
+    return t;
+  }
+  let wakeLock = null;
+
+  async function keepAwake(on) {
+    try {
+      if (on && 'wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+      } else if (!on && wakeLock) {
+        await wakeLock.release();
+        wakeLock = null;
+      }
+    } catch (e) { /* 非対応なら諦める */ }
+  }
+
+  // demo = {flags: n} を渡すと「おためしモード」: 先頭n本の旗で出題し、記録を一切残さない
+  function startSession(demo) {
+    const st = Store.data.settings;
+    Piano.ensure();
+    Piano.setVolume(st.volume);
+    const intro = !demo && Store.data.introPending;
+    S = {
+      id: Date.now(),
+      start: Date.now(),
+      demo: demo || null,
+      pool: demo ? CHORDS.slice(0, demo.flags).map(c => c.id) : Store.data.unlocked.slice(),
+      idx: 0,
+      total: st.trialsPerSession,
+      correct: 0,
+      mode: intro ? 'intro' : 'mix',
+      introChord: intro ? Store.data.introPending : null,
+      introLeft: intro ? INTRO_TRIALS : 0,
+      current: null,
+      corrective: false,
+      locked: true,
+      lastPicks: [],
+      autoReplays: 0,
+      waitTimer: null,
+      listening: false,
+      lastListenAt: -1,
+      currentShift: 0,
+      promptAt: null,
+      manualReplays: 0,
+      streak: 0,
+      trialNo: 0,
+      paused: false,
+    };
+    $('#demo-badge').classList.toggle('hidden', !S.demo);
+    keepAwake(true);
+    renderDots();
+    show('screen-play');
+    later(nextTrial, 500);
+  }
+
+  function stopSession() {
+    if (S) {
+      if (S.waitTimer) clearTimeout(S.waitTimer);
+      S.listening = false; // きくじかんのループを止める
+    }
+    timers.forEach(clearTimeout); timers.clear();   // 予約処理を全部捨てる（UX-28）
+    Voice.stop();
+    Confetti.clear();
+    $('#pause').classList.add('hidden');
+    S = null;
+    keepAwake(false);
+  }
+
+  // ホームを押しても即終了しない（2歳児の誤タップ対策・UX-08）: 一時停止して「つづける／おしまい」
+  function pauseSession() {
+    if (!S || S.paused) return;
+    S.paused = true;
+    S.locked = true;
+    if (S.waitTimer) clearTimeout(S.waitTimer);
+    Voice.stop();
+    $('#flags').classList.add('lock');
+    $('#pause').classList.remove('hidden');
+  }
+  function resumeSession() {
+    if (!S || !S.paused) return;
+    S.paused = false;
+    $('#pause').classList.add('hidden');
+    if (S.listening || !S.current) { if (!S.listening) later(nextTrial, 300); return; }
+    // いまの和音をもう一度鳴らしてから受け付ける
+    $('#flags').classList.add('lock');
+    later(() => {
+      playChord(S.current, S.currentShift, true);
+      later(() => { S.locked = false; S.promptAt = Date.now(); $('#flags').classList.remove('lock'); $('#char-btn').classList.remove('still'); armWaitTimer(); }, 400, { trial: true });
+    }, 200, { trial: true });
+  }
+  function quitSession() {
+    if (!S) return;
+    // 途中でやめた記録（partial）。完了回数とは分けて数える（UX-08）
+    if (!S.demo && S.idx > 0) {
+      Store.addSession({ id: S.id, start: S.start, end: Date.now(), total: S.idx, correct: S.correct, stage: Store.data.unlocked.length, partial: true });
+    }
+    stopSession();
+    renderHome();
+    show('screen-home');
+  }
+
+  function renderDots() {
+    const box = $('#trial-dots');
+    box.innerHTML = '';
+    for (let i = 0; i < S.total; i++) {
+      const d = document.createElement('span');
+      d.className = 'dot' + (i < S.idx ? ' done' : i === S.idx ? ' now' : '');
+      box.appendChild(d);
+    }
+  }
+
+  function speech(text) { $('#speech').textContent = text; }
+
+  function visibleChords() {
+    if (S.mode === 'intro') return [CHORD_BY_ID[S.introChord]];
+    return S.pool.map(id => CHORD_BY_ID[id]);
+  }
+
+  // ボタン幅: 縦持ちは5個まで1列（最小 76px≒2cm・それ以下なら折り返す・UX-03）、横持ち（テレビ投影）は全部を1列に収める（UX-27）
+  function flagWidthExpr(n, fw) {
+    const land = window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches;
+    if (land) return `max(64px, min(${fw}px, ${Math.floor(84 / Math.min(n, 9))}vw, 36vh))`;
+    return `max(76px, min(${fw}px, ${Math.floor(88 / Math.min(n, 5))}vw))`;
+  }
+
+  function renderFlags() {
+    const box = $('#flags');
+    box.innerHTML = '';
+    const list = visibleChords();
+    // 旗の幅を枚数から決める。14本（最終形）でも1画面に収める。
+    // 2歳児のタップ精度（平均4.5mmずれ）を考慮し、下限は実寸2cm角を割らない値に置く。
+    const n = list.length;
+    const fw = n <= 1 ? 380 : n <= 3 ? 270 : n <= 6 ? 205 : n <= 9 ? 152 : 118;
+    box.style.setProperty('--fw', flagWidthExpr(n, fw));
+    for (const c of list) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'flag' + (S.mode === 'intro' ? ' intro' : '');
+      b.dataset.chord = c.id;
+      b.setAttribute('aria-label', c.label);
+      b.style.setProperty('--flag', chordColor(c));
+      b.style.setProperty('--labscale', String(Math.min(1, 3.6 / c.label.length)));
+      const mark = Store.data.settings.marks ? markSvg(c.mark) : '';
+      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}">${mark}<span class="flag-label">${c.label}</span></span>`;
+      b.addEventListener('pointerdown', () => onFlag(c.id, b));
+      box.appendChild(b);
+    }
+  }
+
+  function pickChord() {
+    const ids = S.pool;
+    if (ids.length === 1) return ids[0];
+    const newest = ids[ids.length - 1];
+    let boost = false;
+    if (!S.demo) {
+      const { acc, n } = Store.chordAccuracy(newest, NEW_CHORD_BOOST.window);
+      boost = (n < NEW_CHORD_BOOST.window) || (acc !== null && acc < NEW_CHORD_BOOST.untilAccuracy);
+    }
+    for (let tries = 0; tries < 6; tries++) {
+      let pick;
+      if (boost && Math.random() < NEW_CHORD_BOOST.probability) {
+        pick = newest;
+      } else {
+        pick = ids[Math.floor(Math.random() * ids.length)];
+      }
+      const L = S.lastPicks;
+      if (L.length >= 2 && L[L.length - 1] === pick && L[L.length - 2] === pick) continue;
+      return pick;
+    }
+    return ids[Math.floor(Math.random() * ids.length)];
+  }
+
+  // 和音ごとに許されるオクターブシフト（音域クランプ）
+  function allowedShifts(c) {
+    const ms = c.notes.map(NOTE_MIDI);
+    const lo = Math.min(...ms), hi = Math.max(...ms);
+    return OCTAVE_PLAY.shifts.filter(sh =>
+      lo + 12 * sh >= OCTAVE_PLAY.lowestMidi && hi + 12 * sh <= OCTAVE_PLAY.highestMidi);
+  }
+
+  // 出題シフトの抽選。基準形をpZeroで出し、残りを他シフトで等分。
+  function pickShift(chordId) {
+    if (!Store.data.settings.octaveRange) return 0;
+    const pool = allowedShifts(CHORD_BY_ID[chordId]);
+    const others = pool.filter(sh => sh !== 0);
+    if (others.length === 0) return 0;
+    if (Math.random() < OCTAVE_PLAY.pZero) return 0;
+    return others[Math.floor(Math.random() * others.length)];
+  }
+
+  // still=true: 出題・きくじかん中は踊らず「聴く姿勢」で静止する（注意を音に向ける・UX-13）
+  function playChord(chordId, shift, still) {
+    const c = CHORD_BY_ID[chordId];
+    const midis = c.notes.map(n => NOTE_MIDI(n) + 12 * (shift || 0));
+    const char = $('#char-btn');
+    if (still) {
+      char.classList.add('still');
+      char.classList.remove('bounce', 'groove');
+    } else {
+      char.classList.remove('still', 'bounce');
+      void char.offsetWidth; // アニメ再発火
+      char.classList.add('bounce');
+      Char.groove(char, 1400); // 音が鳴っているあいだリズムに乗る
+    }
+    return Piano.chord(midis, { a4: Store.data.settings.pitchA });
+  }
+
+  function armWaitTimer() {
+    if (S.waitTimer) clearTimeout(S.waitTimer);
+    S.waitTimer = later(() => {
+      if (!S || S.locked) return;
+      if (S.autoReplays < 2) {
+        S.autoReplays++;
+        playChord(S.current, S.currentShift, true);
+        armWaitTimer();
+      }
+    }, 9000, { trial: true });
+  }
+
+  // 次の試行へ。parentPaced（親子共同モード）では、おとなの「キャラタッチ」を待つ。
+  function proceed(delay) {
+    if (Store.data.settings.parentPaced) {
+      S.pendingNext = true;
+      later(() => {
+        if (S && S.pendingNext) speech('ひつじを タッチで つぎへ');
+      }, delay);
+    } else {
+      later(nextTrial, delay);
+    }
+  }
+
+  // ============ きくじかん（受動的曝露ブロック） ============
+  // 答えさせずに「和音→その旗が光る→色名を読み上げ」を数回。Little 2019 の交互配置の実装。
+  function runListenBlock(done) {
+    if (!S) return;
+    S.locked = true;
+    S.listening = true;
+    renderFlags();
+    $('#flags').classList.add('lock');
+    Char.pose($('#char-btn'), 'sing');
+    speech('きくじかん');
+    Voice.speak('きくじかん');
+
+    // 同じ和音が連続すると曝露の多様性が落ちるので、直前と同じものは引き直す
+    const pool = S.pool.slice();
+    const picks = [];
+    for (let i = 0; i < LISTEN_BLOCK.chords; i++) {
+      let pick = pool[Math.floor(Math.random() * pool.length)];
+      for (let t = 0; t < 5 && pool.length > 1 && pick === picks[picks.length - 1]; t++) {
+        pick = pool[Math.floor(Math.random() * pool.length)];
+      }
+      picks.push(pick);
+    }
+
+    let i = 0;
+    const step = () => {
+      if (!S || !S.listening) return;
+      if (S.paused) { later(step, 400); return; } // 一時停止中は進めない（F-01）
+      if (i >= picks.length) {
+        S.listening = false;
+        $('#char-btn').classList.remove('still');
+        later(() => { if (S) done(); }, 500);
+        return;
+      }
+      const id = picks[i++];
+      const c = CHORD_BY_ID[id];
+      $$('#flags .flag').forEach(f => f.classList.remove('glow', 'fade'));
+      playChord(id, pickShift(id), true); // 曝露も高さ違いで（chroma汎化）
+      const el = flagEl(id);
+      if (el) {
+        el.classList.add('glow');
+        $$('#flags .flag').forEach(f => { if (f !== el) f.classList.add('fade'); });
+      }
+      speech(c.label);
+      later(() => Voice.speak(c.label), 700);
+      later(step, 2600);
+    };
+    later(step, 900);
+  }
+
+  function nextTrial() {
+    if (!S) return;
+    S.pendingNext = false;
+    if (S.idx >= S.total) { endSession(); return; }
+    // きくじかんを挟む（intro中は単独提示そのものが曝露なので挟まない）
+    if (Store.data.settings.listenBlocks && S.mode !== 'intro' && S.pool.length >= 2 &&
+        S.idx > 0 && S.idx % LISTEN_BLOCK.everyNTrials === 0 && S.lastListenAt !== S.idx) {
+      S.lastListenAt = S.idx;
+      runListenBlock(nextTrial);
+      return;
+    }
+    S.corrective = false;
+    S.autoReplays = 0;
+    S.manualReplays = 0;
+    S.locked = true;
+    S.trialNo++;
+    Confetti.clear(); // 前の問題の紙吹雪を次の出題に持ち越さない（UX-14）
+
+    if (S.mode === 'intro' && S.introLeft <= 0) {
+      Store.clearIntro();
+      // 導入の連鎖: 未紹介の和音が続いていれば、混ぜる前にそれも単独導入する（2本開始）
+      const nextIntro = Store.data.introPending;
+      if (nextIntro && S.pool.includes(nextIntro)) {
+        S.introChord = nextIntro;
+        S.introLeft = INTRO_TRIALS;
+      } else {
+        S.mode = 'mix';
+      }
+    }
+    S.current = S.mode === 'intro' ? S.introChord : pickChord();
+    // intro（導入）は基準形で固定。混合出題からは高さ違いを混ぜる（chords.js OCTAVE_PLAY）
+    S.currentShift = S.mode === 'intro' ? 0 : pickShift(S.current);
+    S.lastPicks.push(S.current);
+
+    renderFlags();
+    renderDots();
+    const box = $('#flags');
+    box.classList.add('lock');
+    Char.pose($('#char-btn'), S.mode === 'intro' ? 'sing' : 'listen');
+    speech(S.mode === 'intro' ? 'あたらしい ボタン！' : 'きいてね');
+
+    later(() => {
+      if (!S) return;
+      playChord(S.current, S.currentShift, true);
+      if (S.mode === 'intro') {
+        const c = CHORD_BY_ID[S.current];
+        later(() => Voice.speak('これは ' + c.label), 900, { trial: true });
+      }
+      later(() => {
+        if (!S) return;
+        S.locked = false;
+        S.promptAt = Date.now(); // 反応時間の起点（ロック解除時）
+        box.classList.remove('lock');
+        Char.pose($('#char-btn'), 'neutral');
+        $('#char-btn').classList.remove('still');
+        if (S.mode !== 'intro') speech('どの ボタン かな？');
+        armWaitTimer();
+      }, 350, { trial: true });
+    }, 600, { trial: true });
+  }
+
+  function flagEl(chordId) {
+    return $(`#flags .flag[data-chord="${chordId}"]`);
+  }
+
+  // 演出レベル: small(訂正成功) < normal < big(3連続ごと・セッション最終問)
+  function celebrate(chordId, small) {
+    const c = CHORD_BY_ID[chordId];
+    const el = flagEl(chordId);
+    const finale = S.idx + 1 >= S.total;
+    const big = !small && (finale || (S.streak > 0 && S.streak % 3 === 0));
+    if (el) {
+      el.classList.add('win');
+      if (big) el.classList.add('win-big');
+      $$('#flags .flag').forEach(f => {
+        if (f !== el) f.classList.add('fade');
+      });
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height * 0.4;
+      if (small) {
+        FX.explode(chordColor(c), cx, cy, 0);
+        Confetti.burst(chordColor(c), cx, cy, 22);
+      } else if (big) {
+        FX.explode(chordColor(c), cx, cy, 2);
+        Confetti.burst(chordColor(c), cx, cy, 70);
+        Confetti.rain(chordColor(c), 40);
+        later(() => { if (S) Confetti.burst(chordColor(c), cx, cy - 60, 50); }, 240);
+      } else {
+        FX.explode(chordColor(c), cx, cy, 1);
+        Confetti.burst(chordColor(c), cx, cy, 60);
+      }
+    }
+    const char = $('#char-btn');
+    Char.pose(char, big ? 'joy' : 'clap', big ? 2100 : 1500);
+    Char.overreact(char);
+    if (Store.data.settings.sfx) { if (big) Piano.sfxFanfare(); else Piano.sfxCorrect(); }
+    const praise = big
+      ? ['すごーい！', 'めちゃくちゃ すごい！', 'かんぺき！']
+      : ['せいかい！', 'すごい！', 'やったね！', 'いいね！'];
+    Voice.speak(c.label + '。' + praise[Math.floor(Math.random() * praise.length)]);
+    speech('せいかい！ ' + c.label);
+  }
+
+  function logTrial(ok, corr, tapped) {
+    if (S.demo) return; // おためしは記録しない
+    Store.addTrial({
+      t: Date.now(),
+      chord: S.current,
+      tapped: tapped || null, // 押した旗（誤答の質の分析に使う）
+      ok,
+      corr: !!corr || S.mode === 'intro', // 導入試行は正答率統計から除外
+      stage: Store.data.unlocked.length,
+      sess: S.id,
+      oct: S.currentShift || 0,                       // 提示オクターブ（chroma分析の要）
+      rt: S.promptAt ? Date.now() - S.promptAt : null, // 反応時間ms（方略転換の計器）
+      rep: (S.autoReplays || 0) + (S.manualReplays || 0), // この試行での再聴回数
+      src: (typeof Input !== 'undefined' && Input.lastSource()) || null, // 入力元 key/pad（物理ボタン試作）・タッチは null
+    });
+  }
+
+  function onFlag(chordId, el) {
+    if (!S || S.locked) return;
+    if (S.waitTimer) clearTimeout(S.waitTimer);
+    Voice.stop(); // 古い読み上げ（導入の「これは○○」等）を割り込ませない（UX-29）
+    // 押した瞬間の手応え（正誤の前に必ず返す——「押すと反応する」の学習）。判定前なので色は付けない（UX-15）
+    el.classList.remove('tapped');
+    void el.offsetWidth;
+    el.classList.add('tapped');
+    {
+      const r0 = el.getBoundingClientRect();
+      FX.tap('#FFFDF6', r0.left + r0.width / 2, r0.top + r0.height / 2);
+    }
+
+    if (S.corrective) {
+      // 訂正モード: 光っている正解旗を探してもらう
+      if (chordId === S.current) {
+        S.locked = true;
+        logTrial(true, true, chordId);
+        const g = flagEl(S.current);
+        if (g) g.classList.remove('glow');
+        celebrate(chordId, true);
+        if (S.mode === 'intro') S.introLeft--; else S.idx++; // 導入は問題数に数えない（UX-10）
+        proceed(1300);
+      } else {
+        // 揺らさない・鳴らさない。正解の光だけが手がかり（罰にしない・UX-05）
+        armWaitTimer();
+      }
+      return;
+    }
+
+    if (chordId === S.current) {
+      S.locked = true;
+      logTrial(true, false, chordId);
+      S.correct++;
+      S.streak++;
+      celebrate(chordId, false);
+      if (S.mode === 'intro') S.introLeft--; else S.idx++; // 導入は問題数に数えない（UX-10）
+      proceed(1500);
+    } else {
+      // まちがい: 叱らない・考えさせない。すぐ正解旗を光らせ、同じ和音をもう一度聞いてタッチしてもらう。
+      logTrial(false, false, chordId);
+      S.streak = 0; // 演出レベルが下がるだけ。何も言わない（罰にしない）
+      S.corrective = true;
+      if (Store.data.settings.sfx) Piano.sfxSoft();
+      const c = CHORD_BY_ID[S.current];
+      const g = flagEl(S.current);
+      if (g) g.classList.add('glow');
+      Char.pose($('#char-btn'), 'sing', 1400);
+      speech('ひかってる ボタンを タッチ');
+      Voice.speak('これは ' + c.label);
+      // 正解が光った瞬間から受け付ける（待たせない・UX-05）。同じ和音はその後に鳴らす
+      S.locked = false;
+      S.promptAt = Date.now();
+      later(() => {
+        if (!S || !S.corrective) return;
+        playChord(S.current, S.currentShift, true);
+        later(() => { if (S) { $('#char-btn').classList.remove('still'); armWaitTimer(); } }, 350, { trial: true });
+      }, 1100, { trial: true });
+    }
+  }
+
+  // ============ じぶんで ならす（自由演奏・記録なし） ============
+  // 「押すと楽しいことが起きる」をタップ回数の制約なしで教える遊び場。
+  // 序盤（旗1本の時期）の退屈対策の柱。試行としては一切記録しない。
+  let freeLock = 0;
+  function renderFreeplay() {
+    const box = $('#free-flags');
+    box.innerHTML = '';
+    const list = Store.data.unlocked.map(id => CHORD_BY_ID[id]);
+    const n = list.length;
+    const fw = n <= 1 ? 300 : n <= 3 ? 230 : n <= 6 ? 185 : n <= 9 ? 145 : 112;
+    box.style.setProperty('--fw', flagWidthExpr(n, fw));
+    for (const c of list) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'flag';
+      b.dataset.chord = c.id;
+      b.setAttribute('aria-label', c.label);
+      b.style.setProperty('--flag', chordColor(c));
+      b.style.setProperty('--labscale', String(Math.min(1, 3.6 / c.label.length)));
+      const mark = Store.data.settings.marks ? markSvg(c.mark) : '';
+      b.innerHTML = `<span class="btn-face" style="--ink2:${c.ink}">${mark}<span class="flag-label">${c.label}</span></span>`;
+      b.addEventListener('pointerdown', () => {
+        const now = Date.now();
+        if (now - freeLock < 350) return; // 連打で音が濁るのを防ぐ
+        freeLock = now;
+        b.classList.remove('tapped'); void b.offsetWidth; b.classList.add('tapped');
+        Piano.ensure();
+        const midis = c.notes.map(x => NOTE_MIDI(x));
+        Piano.chord(midis, { a4: Store.data.settings.pitchA });
+        Voice.speak(c.label);
+        const fc = $('#free-char');
+        Char.pose(fc, 'sing', 1100);
+        Char.groove(fc, 1100);
+        const r = b.getBoundingClientRect();
+        FX.explode(chordColor(c), r.left + r.width / 2, r.top + r.height * 0.4, 0);
+      });
+      box.appendChild(b);
+    }
+  }
+
+  // ============ セッション終了 → シール ============
+  const STICKERS = ['🦁', '🐘', '🐰', '🐼', '🚀', '🚂', '🍓', '🌟', '🐬', '🦒',
+                    '🍎', '🐤', '⚽', '🧁', '🦖', '🚒', '🐢', '🎈', '🍌', '🐸'];
+
+  function endSession() {
+    if (S.demo) {
+      // おためし: 記録・シールなしでそのまま締める
+      lastDemo = S.demo;
+      stopSession();
+      if (Store.data.settings.sfx) Piano.sfxFanfare();
+      $('#reward-title').textContent = 'おためし おしまい';
+      $('.reward-sub').classList.add('hidden');
+      $('#sticker-choices').innerHTML = '';
+      $('#reward-actions').classList.remove('hidden');
+      show('screen-reward');
+      return;
+    }
+    lastDemo = null;
+    const sess = {
+      id: S.id, start: S.start, end: Date.now(),
+      total: S.total, correct: S.correct,
+      stage: Store.data.unlocked.length,
+    };
+    Store.addSession(sess);
+    stopSession();
+    if (Store.data.settings.sfx) Piano.sfxFanfare();
+    Char.mount($('#reward-char'));
+    Char.pose($('#reward-char'), 'joy');
+    Char.overreact($('#reward-char'));
+    Voice.speak('よくできました！');
+    $('#reward-title').textContent = 'よくできました！';
+    $('.reward-sub').classList.remove('hidden');
+
+    const box = $('#sticker-choices');
+    box.innerHTML = '';
+    $('#reward-actions').classList.remove('hidden'); // シールを選ばなくても終われる（UX-17）
+    const pool = STICKERS.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+    let picked = false;
+    pool.forEach(emoji => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'sticker-choice';
+      b.textContent = emoji;
+      b.addEventListener('pointerdown', () => {
+        if (picked) return;
+        picked = true;
+        Store.addSticker(emoji);
+        b.classList.add('picked');
+        $$('.sticker-choice').forEach(x => { if (x !== b) x.classList.add('unpicked'); });
+        if (Store.data.settings.sfx) Piano.sfxCorrect();
+        Voice.speak('シール ゲット！');
+        const r = b.getBoundingClientRect();
+        Confetti.burst('#C8B48D', r.left + r.width / 2, r.top + r.height / 2, 40);
+      });
+      box.appendChild(b);
+    });
+    show('screen-reward');
+  }
+
+  // ============ シールちょう ============
+  function renderStickers() {
+    const box = $('#sticker-book');
+    box.innerHTML = '';
+    const xs = Store.data.stickers;
+    if (xs.length === 0) {
+      const p = document.createElement('p');
+      p.className = 'sticker-book-empty';
+      p.textContent = 'ここに えらんだ シールが ならぶよ';
+      box.appendChild(p);
+      return;
+    }
+    xs.slice().reverse().forEach(s => {
+      const d = document.createElement('div');
+      d.className = 'sticker-slot';
+      d.textContent = s.emoji;
+      box.appendChild(d);
+    });
+  }
+
+  // ============ おうちのかた ============
+  function pct(x) { return Math.round(x * 100) + '%'; }
+
+  function renderParent() {
+    // 記録の健康状態（UX-23）: 保存できていない／壊れていたデータを退避した
+    {
+      const h = Store.health();
+      let box = $('#p-health');
+      if (!box) { box = document.createElement('div'); box.id = 'p-health'; box.className = 'p-advance-status'; $('.parent-scroll').prepend(box); }
+      const msgs = [];
+      if (h.saveError) msgs.push('⚠️ この端末に記録を保存できていない（' + new Date(h.saveError).toLocaleTimeString('ja-JP') + '）。Safari のプライベートブラウズや容量不足が原因のことが多い。下の「記録をコピー」で控えを取ってから、ホーム画面に追加した版で開き直す。');
+      if (h.loadError) msgs.push('⚠️ 前回の記録が読めなかったため、控えを残して初期状態から始めている。「記録をコピー」で取った控えがあれば連絡を。');
+      box.classList.toggle('hidden', msgs.length === 0);
+      box.textContent = msgs.join(' ');
+    }
+    const d = Store.data;
+    // きょう
+    const todayS = Store.todaySessions();
+    const todayKey = Store.dayKey(Date.now());
+    const todayTrials = d.trials.filter(r => Store.dayKey(r.t) === todayKey && !r.corr);
+    const todayOk = todayTrials.filter(r => r.ok).length;
+    const week = d.sessions.filter(s => Date.now() - s.start < 7 * 86400e3).length;
+    $('#p-today').innerHTML = `
+      <div class="p-stat"><b>${todayS.length}<small>/${d.settings.dailyTarget}</small></b><span>セッション</span></div>
+      <div class="p-stat"><b>${todayTrials.length}</b><span>もんだい</span></div>
+      <div class="p-stat"><b>${todayTrials.length ? pct(todayOk / todayTrials.length) : '—'}</b><span>正答率</span></div>
+      <div class="p-stat"><b>${(week / 7).toFixed(1)}</b><span>回/日（7日平均・原法は4〜5）</span></div>
+      <div class="p-stat"><b>${d.stickers.length}</b><span>シール累計</span></div>`;
+
+    // すすみぐあい
+    $('#p-stage-label').textContent = `いまのボタン: ${d.unlocked.length} / ${CHORDS.length}本`;
+    const rows = CHORDS.map((c, i) => {
+      const unlocked = i < d.unlocked.length;
+      if (!unlocked) {
+        return `<div class="p-chord-row locked">
+          <span class="p-chip" style="background:${chordColor(c)}"></span>
+          <span class="p-chord-name">${c.label}</span>
+          <span class="p-chord-yomi">${c.yomi}</span>
+          <span class="p-bar"><i style="width:0"></i></span>
+          <span class="p-chord-acc">未解放</span></div>`;
+      }
+      const { acc, n } = Store.chordAccuracy(c.id, ADVANCE_RULE.perChordWindow);
+      const w = acc === null ? 0 : Math.round(acc * 100);
+      const good = acc !== null && acc >= ADVANCE_RULE.minAccuracy;
+      return `<div class="p-chord-row">
+        <span class="p-chip" style="background:${chordColor(c)}"></span>
+        <span class="p-chord-name">${c.label}</span>
+        <span class="p-chord-yomi">${c.yomi}</span>
+        <span class="p-bar${good ? ' good' : ''}"><i style="width:${w}%"></i></span>
+        <span class="p-chord-acc">${acc === null ? 'まだ' : pct(acc)}<small> (${n})</small></span></div>`;
+    }).join('');
+
+    // まちがいの質（榊原1999のエラー分類）
+    // 同じ響きグループ内の混同（例: ドミソ↔ミソド）＝クロマ依存エラー＝
+    // 音の高さでなく響きの質を聴き始めたサインで、縦断研究では前進の指標。
+    let eq = '';
+    const stageSize = d.unlocked.length;
+    const groupCount = {};
+    d.unlocked.forEach(id => {
+      const g = CHORD_BY_ID[id].group;
+      groupCount[g] = (groupCount[g] || 0) + 1;
+    });
+    const hasGroupPair = Object.values(groupCount).some(n => n >= 2);
+    const wrongs = d.trials.filter(r => r.stage === stageSize && !r.ok && !r.corr && r.tapped).slice(-50);
+    if (hasGroupPair && wrongs.length > 0) {
+      let chroma = 0, height = 0;
+      wrongs.forEach(r => {
+        const a = CHORD_BY_ID[r.chord], b = CHORD_BY_ID[r.tapped];
+        if (a && b && a.group === b.group) chroma++; else height++;
+      });
+      eq = `<p class="p-note">まちがいの質（直近${wrongs.length}件）: <b>響きグループ内 ${chroma}</b> ／ グループ外 ${height}。
+      同じ響きグループ内（ドミソ↔ミソド↔ソドミ等）の混同は「高さ」でなく「響きの質」を聴き始めたサインで、研究上は前進の指標。
+      6〜7本目で数ヶ月の停滞期が来るのは全事例共通の正常な過程。</p>`;
+    }
+    $('#p-chords').innerHTML = rows + eq;
+
+    // 進級ステータスカード（常設・「いつ終わるのか」を親に見せる）
+    const stat = Store.advanceStatus();
+    const statBox = $('#p-advance-status');
+    if (stat && !stat.ready) {
+      const parts = [];
+      parts.push('日数 ' + Math.min(stat.daysDone, stat.daysNeed) + '/' + stat.daysNeed + '日');
+      parts.push('練習 ' + Math.min(stat.trialsDone, stat.trialsNeed) + '/' + stat.trialsNeed + '回');
+      parts.push(stat.accOk ? '正答率 ✔' : ('正答率 ' + (stat.weakest && stat.weakest.acc !== null ? Math.round(stat.weakest.acc*100)+'%' : '記録中') + '（' + (stat.weakest ? CHORD_BY_ID[stat.weakest.id].label : '') + '）'));
+      statBox.innerHTML = '<b>つぎのボタン「' + (stat.next ? stat.next.label : '') + '」まで</b>: ' + parts.join(' ／ ') +
+        '<small>基準: 全部のボタンが直近' + ADVANCE_RULE.perChordWindow + '回で' + Math.round(ADVANCE_RULE.minAccuracy*100) + '%以上 × 練習日 ' + stat.daysNeed + '日 × ' + stat.trialsNeed + '回（原法の「誤りが生じない範囲で最速2週間ごと」の機械化。序盤は短い）。' + (Store.data.unlocked.length === 5 ? '次の6色目あたりから、研究では数か月の停滞期が観察されている。誤りの質（下の「まちがいの質」）を見る時期。' : '') + 'お子さまの様子で早めたい場合は下の設定「手動で追加」から。</small>';
+      statBox.classList.remove('hidden');
+    } else {
+      statBox.classList.add('hidden');
+    }
+
+    // 進級バナー
+    const banner = $('#advance-banner');
+    const next = CHORDS[d.unlocked.length];
+    if (Store.advanceReady() && next) {
+      banner.classList.remove('hidden');
+      banner.innerHTML = `<span>すべてのボタンが安定しました。次のボタン「<b>${next.label}</b>（${next.yomi}）」を追加できます。</span>
+        <button class="pill-btn pill-primary" id="btn-advance" type="button">追加する</button>`;
+      $('#btn-advance').addEventListener('click', () => {
+        const c = Store.unlockNext();
+        if (c) {
+          banner.classList.add('hidden');
+          renderParent();
+          alert(`「${c.label}」を追加しました。次のセッションのはじめに、単独で${INTRO_TRIALS}回きかせて導入します。`);
+        }
+      });
+    } else {
+      banner.classList.add('hidden');
+    }
+
+    // カレンダー
+    const cal = Store.calendar(8);
+    const cols = [];
+    for (let w = 0; w < 8; w++) {
+      const cells = cal.slice(w * 7, w * 7 + 7).map(c => {
+        const cls = c.count === 0 ? '' : c.count === 1 ? ' c1' : c.count <= 3 ? ' c2' : ' c3';
+        return `<span class="p-cal-cell${cls}" title="${c.key}: ${c.count}回"></span>`;
+      }).join('');
+      cols.push(`<div class="p-cal-col">${cells}</div>`);
+    }
+    $('#p-cal').innerHTML = cols.join('');
+
+    renderSettings();
+    renderGuide();
+  }
+
+  function renderSettings() {
+    const st = Store.data.settings;
+    const box = $('#p-settings');
+    box.innerHTML = `
+      <div class="p-set-row"><span class="p-set-label">基準ピッチ<small>家のピアノに合わせる（国内の調律は442Hzが多い）</small></span>
+        <span class="seg" id="set-pitch">
+          <button type="button" data-v="440" class="${st.pitchA === 440 ? 'on' : ''}">440</button>
+          <button type="button" data-v="442" class="${st.pitchA === 442 ? 'on' : ''}">442</button>
+        </span></div>
+      <div class="p-set-row"><span class="p-set-label">すすめかた<small>「おとなと」は、おとなが キャラクターをタッチして次の問題へ</small></span>
+        <span class="seg" id="set-paced">
+          <button type="button" data-v="0" class="${!st.parentPaced ? 'on' : ''}">じどう</button>
+          <button type="button" data-v="1" class="${st.parentPaced ? 'on' : ''}">おとなと</button>
+        </span></div>
+      <div class="p-set-row"><span class="p-set-label">1回の問題数<small>2〜3分で終わる量に</small></span>
+        <span class="stepper">
+          <button type="button" id="set-tri-minus">−</button><b id="set-tri-val">${st.trialsPerSession}</b><button type="button" id="set-tri-plus">＋</button>
+        </span></div>
+      <div class="p-set-row"><span class="p-set-label">おとの たかさを かえて だす<small>同じ和音を高いオクターブ・低いオクターブでも鳴らす。1つの高さだけで練習すると「音の高さ」で丸暗記してしまい、高さが変わると当てられなくなることが研究で示されている。響きそのものを覚えるために推奨オン</small></span>
+        <button type="button" class="switch ${st.octaveRange ? 'on' : ''}" id="set-oct" aria-label="おとのたかさ"></button></div>
+      <div class="p-set-row"><span class="p-set-label">きくじかんを はさむ<small>${LISTEN_BLOCK.everyNTrials}問ごとに、答えずに聴くだけの時間を挟む。研究では、同じ問題数でも答えさせる練習だけだと学習が起きず、聴くだけの時間を交互に挟むと大きく伸びた</small></span>
+        <button type="button" class="switch ${st.listenBlocks ? 'on' : ''}" id="set-listen" aria-label="きくじかん"></button></div>
+      <div class="p-set-row"><span class="p-set-label">ボタンに しるしをつける<small>色が見分けにくいお子さま向け（日本人男性の約5%）。色に加えて形でも区別できる</small></span>
+        <button type="button" class="switch ${st.marks ? 'on' : ''}" id="set-marks" aria-label="しるし"></button></div>
+      <div class="p-set-row"><span class="p-set-label">色覚配慮パレット<small>Okabe-Ito配色に切替。市販の旗教材と色が変わる点に注意</small></span>
+        <button type="button" class="switch ${st.cudPalette ? 'on' : ''}" id="set-cud" aria-label="色覚配慮パレット"></button></div>
+      <div class="p-set-row"><span class="p-set-label">こえ（色名の読み上げ）</span>
+        <button type="button" class="switch ${st.voice ? 'on' : ''}" id="set-voice" aria-label="こえ"></button></div>
+      <div class="p-set-row"><span class="p-set-label">効果音</span>
+        <button type="button" class="switch ${st.sfx ? 'on' : ''}" id="set-sfx" aria-label="効果音"></button></div>
+      <div class="p-set-row"><span class="p-set-label">おんりょう</span>
+        <input type="range" id="set-vol" min="0.2" max="1" step="0.05" value="${st.volume}"></div>
+      <div class="p-set-row"><span class="p-set-label">進級の提案<small>基準を満たしたら知らせる</small></span>
+        <button type="button" class="switch ${st.autoSuggest ? 'on' : ''}" id="set-suggest" aria-label="進級の提案"></button></div>
+      <div class="p-set-row"><span class="p-set-label">ボタンを手動で追加<small>基準を待たずに次の和音へ（非推奨）</small></span>
+        <button type="button" class="pill-btn" id="set-force-add" style="padding:8px 20px;font-size:14px">追加</button></div>
+      <div class="p-set-row"><span class="p-set-label">おためしプレイ<small>おとなの確認用と「おして みせる」用。記録には一切残らない</small></span>
+        <span class="seg" id="set-demo">
+          <button type="button" data-v="2">2本</button>
+          <button type="button" data-v="3">3本</button>
+          <button type="button" data-v="9">9本</button>
+          <button type="button" data-v="14">14本</button>
+        </span></div>`;
+
+    $('#set-pitch').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      st.pitchA = parseInt(b.dataset.v, 10);
+      Store.save();
+      renderSettings();
+    });
+    $('#set-paced').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      st.parentPaced = b.dataset.v === '1';
+      Store.save();
+      renderSettings();
+    });
+    $('#set-tri-minus').addEventListener('click', () => {
+      st.trialsPerSession = Math.max(6, st.trialsPerSession - 2);
+      Store.save(); $('#set-tri-val').textContent = st.trialsPerSession;
+    });
+    $('#set-tri-plus').addEventListener('click', () => {
+      st.trialsPerSession = Math.min(30, st.trialsPerSession + 2);
+      Store.save(); $('#set-tri-val').textContent = st.trialsPerSession;
+    });
+    const toggle = (id, key) => {
+      $(id).addEventListener('click', () => {
+        st[key] = !st[key];
+        Store.save();
+        $(id).classList.toggle('on', st[key]);
+      });
+    };
+    toggle('#set-oct', 'octaveRange');
+    toggle('#set-listen', 'listenBlocks');
+    toggle('#set-voice', 'voice');
+    toggle('#set-sfx', 'sfx');
+    toggle('#set-suggest', 'autoSuggest');
+    ['#set-marks:marks', '#set-cud:cudPalette'].forEach(pair => {
+      const [sel, key] = pair.split(':');
+      $(sel).addEventListener('click', () => {
+        st[key] = !st[key];
+        Store.save();
+        $(sel).classList.toggle('on', st[key]);
+        renderParent(); // 一覧の色見本も即反映
+      });
+    });
+    $('#set-vol').addEventListener('input', (e) => {
+      st.volume = parseFloat(e.target.value);
+      Store.save();
+      Piano.setVolume(st.volume);
+    });
+    $('#set-force-add').addEventListener('click', () => {
+      const next = CHORDS[Store.data.unlocked.length];
+      if (!next) { alert('すべての旗を解放済みです。'); return; }
+      if (confirm(`「${next.label}（${next.yomi}）」を追加しますか？\n方法論上は、いまの旗が全て95%を超えてから足すのが安全です。`)) {
+        Store.unlockNext();
+        renderParent();
+      }
+    });
+    $('#set-demo').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      startSession({ flags: parseInt(b.dataset.v, 10) });
+    });
+  }
+
+  function renderGuide() {
+    $('#p-guide').innerHTML = `
+      <h4>このプログラムは なにをするのか</h4>
+      <p>和音を聞いて色のボタンで答える遊びを毎日くり返し、<b>音を「響きごと」覚える耳</b>（絶対音感の土台）を育てる。方法は、2〜6歳の縦断研究で継続者全員の習得が報告されている唯一の訓練法「和音同定法」の家庭向け実装。色は飾りではなく<b>音につける名札</b>——だからこのアプリは、ボタン以外に色を使わない。</p>
+      <p>色と和音の組み合わせは本アプリ独自の14色（方法は論文どおり・色は画面・物のボタン・光のどれでも同じに見える色を選んである）。道のりは長い（目安2.5〜4年）: <b>14色のボタンをそろえる</b>（いまここ）→ 単音の聞き分け → 卒業テスト → 相対音感の段階。1日の負担は2分×4〜5回だけ。研究では短時間の反復を1日4〜5回、数年続けている。間が空いた日は、いまの色からそのまま再開でよい。計器（きょう・すすみぐあい・カレンダー）は続けるための道具で、成績表ではない。</p>
+      <h4>1回の あそびかた（2〜3分）</h4>
+      <p>「あそぶ」を押すと ♪が鳴る →「どの ボタン かな？」→ 子どもがボタンを押す → 正解ならその色の光と紙吹雪でお祝い。まちがえたら正解のボタンが光るので、それをタッチすれば同じ和音でやり直せる（叱る要素はどこにもない）。キャラクターをタッチすると同じ和音をもう一度聞ける。とちゅうの「きくじかん」は答えずに聴くだけの時間——飛ばさないこと（下の要点⑦）。${Store.data.settings.trialsPerSession}問で自動的に終わり、シールがもらえる。</p>
+      <h4>はじめの1〜2週間: 「おして みせる」から</h4>
+      <p>最初は<b>おとなが押して、子どもは見ている</b>だけでよい。「音が鳴る→あかを押す→あか！と光る」を見せるのは、原法で親がやってみせるのと同じ導入で、2歳児は大人のまねから入るのが自然。<b>設定の「おためしプレイ（2本）」を使えば記録に残らない</b>ので、見せる期間は正答率の統計を汚さずに済む。子どもがボタンへ手を伸ばし始めたら「あそぶ」（本編）へ切り替える。「じぶんで ならす」（ホーム）も、押せば必ず音が出る遊び場として導入期に効く。</p>
+      <h4>要点</h4>
+      <ol>
+        <li><b>1日4〜5回、1回2〜3分。</b>原法の処方どおり。長く1回やるより、短く毎日。</li>
+        <li><b>必ずおとなが隣に。</b>2〜5歳のメディア利用は「親と一緒に」が小児科学会・WHOの原則。正解したら一緒によろこぶのが最強のごほうび。設定「すすめかた: おとなと」にすると出題テンポをおとなが握れる。</li>
+        <li><b>始まりは「あか（ドミソ）」と「きいろ（ドファラ）」の2本。</b>1色ずつ単独で紹介してから混ぜる。3本目からは、全部のボタンが正解し続けるようになってから1本ずつ（原法基準の機械化・アプリが提案する）。あせって増やさないことが近道。</li>
+        <li><b>間違えても教え直すだけ。</b>正解のボタンが光り、同じ和音をもう一度。叱る・がっかりした顔を見せない。</li>
+        <li><b>習得中にやらないこと（原法の禁止事項）:</b> 単音あてクイズ／ドレミで歌わせる（階名唱）／和音をバラして弾く（分散）／移調あそび。どれも「響きを丸ごと覚える」プロセスを壊す。単音・相対音感は全部のボタンが終わってからの段階。</li>
+        <li><b>本物のピアノとの併用は最良。</b>同じ和音を弾いてボタンあそびをするのが原法そのもの（このアプリはその持ち歩き版・補助輪）。</li>
+        <li><b>同じ和音が高くなったり低くなったりするのは仕様。</b>1つの高さだけで練習すると「音の高さ」で丸暗記してしまい、オクターブが変わっただけで当てられなくなることが研究で確認されている。高さを変えても同じボタン——それが「響きで聴けている」ということ。別の和音への移調は絶対に混ぜない（学習を壊すため。設定にも存在しない）。</li>
+        <li><b>「きくじかん」は飛ばさない。</b>${LISTEN_BLOCK.everyNTrials}問ごとに、答えずにただ聴くだけの時間が入る。海外の研究で、<b>同じ問題数でも答えさせる練習だけでは学習が起きず、聴くだけの時間を交互に挟んだ群だけが大きく伸びた</b>。子どもにとっては休憩にもなる。</li>
+        <li><b>色が見分けにくいお子さまへ。</b>男性の約5%（日本）は赤と緑の区別が難しい。2歳児は「見分けられない」と言えないため、「向いていない」と誤解されやすい。設定の<b>「ボタンに しるしをつける」</b>で、色に加えて形でも区別できる。訓練上の効果は変わらない。</li>
+        <li><b>iPadは「ホーム画面に追加」で使う。</b>Safariのままだと7日間使わないと記録が消えることがある（iOSの仕様）。共有ボタン→「ホーム画面に追加」。誤操作防止にはiOSの「アクセスガイド」が便利。</li>
+      </ol>
+      <p class="p-warn">⚠️ 開始年齢: 縦断研究で習得が確認されているのは2〜6歳開始（継続22人全員が習得・n=24）。7歳以降の開始は急に難しくなる。<br>
+      ⚠️ 絶対音感は万能ではない: 音楽性の必須条件ではなく、移調が苦手になる等の指摘もある。このアプリは習得後に相対音感の段階へ進むロードマップを前提にしている。<br>
+      ⚠️ 1日の合計は10〜15分（WHOの「2〜4歳は1日60分以内」の枠内）。記録はすべてこの端末の中だけに保存され、どこにも送信されない。<br>
+      ※ 本アプリは公刊の学術論文（和音同定法の縦断研究）に基づく独立実装であり、特定の教室・団体・書籍の公認や提携によるものではない。</p>`;
+  }
+
+  // ============ ペアレンタルゲート（3秒ながおし） ============
+  (() => {
+    const btn = $('#btn-parent');
+    let t0 = null;
+    let timer = null;
+    const HOLD = 2600;
+    // rAFでなくintervalで進める: ホールド中に画面が非表示になっても止まらない
+    function tick() {
+      const p = Math.min(1, (Date.now() - t0) / HOLD);
+      btn.style.setProperty('--hold', p);
+      if (p >= 1) {
+        cancel();
+        renderParent();
+        show('screen-parent');
+      }
+    }
+    function cancel() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      btn.classList.remove('holding');
+      btn.style.setProperty('--hold', 0);
+    }
+    btn.addEventListener('pointerdown', () => {
+      t0 = Date.now();
+      btn.classList.add('holding');
+      if (timer) clearInterval(timer);
+      timer = setInterval(tick, 90);
+    });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev =>
+      btn.addEventListener(ev, () => {
+        if (timer && Date.now() - t0 < HOLD) {
+          const txt = btn.querySelector('.corner-text');
+          if (txt) {
+            txt.textContent = '3びょう おす';
+            setTimeout(() => { txt.textContent = 'おうちのかた'; }, 1500);
+          }
+        }
+        cancel();
+      }));
+  })();
+
+  // ============ データ操作 ============
+  $('#btn-export').addEventListener('click', async () => {
+    const json = Store.exportJSON();
+    try {
+      await navigator.clipboard.writeText(json);
+      $('#p-data-msg').textContent = `記録をクリップボードにコピーしました（${Store.data.trials.length}試行）。`;
+    } catch (e) {
+      $('#p-data-msg').textContent = 'コピーできませんでした。';
+    }
+  });
+  $('#btn-reset').addEventListener('click', () => {
+    if (!confirm('すべての記録・シール・進級状況を消しますか？')) return;
+    if (!confirm('元に戻せません。本当に消しますか？')) return;
+    Store.reset();
+    renderParent();
+    renderHome();
+  });
+
+  // ============ 配線 ============
+  $('#btn-play').addEventListener('pointerdown', () => {
+    Piano.unlock();
+    startSession();
+  });
+  $('#btn-home').addEventListener('pointerdown', () => {
+    if (S && !S.demo && S.trialNo > 0) { pauseSession(); return; } // 途中なら止まって聞く（UX-08）
+    stopSession();
+    renderHome();
+    show('screen-home');
+  });
+  $('#pause-resume').addEventListener('pointerdown', resumeSession);
+  $('#pause-quit').addEventListener('pointerdown', quitSession);
+  $('#btn-again').addEventListener('pointerdown', () => startSession(lastDemo));
+  $('#btn-finish').addEventListener('pointerdown', () => {
+    renderHome();
+    show('screen-home');
+    Char.pose($('#home-char'), 'wave', 2000);
+    Voice.speak('また あそぼうね');
+  });
+  $('#btn-stickers').addEventListener('pointerdown', () => {
+    renderStickers();
+    show('screen-stickers');
+  });
+  $$('.js-back-home').forEach(b => b.addEventListener('pointerdown', () => {
+    renderHome();
+    show('screen-home');
+  }));
+  $('#home-char').addEventListener('pointerdown', () => {
+    const hc = $('#home-char');
+    const pz = ['joy', 'clap', 'wave', 'sing'][Math.floor(Math.random() * 4)];
+    Char.pose(hc, pz, 1400);
+    Char.overreact(hc);
+    if (Store.data.settings.sfx) Piano.sfxTap();
+  });
+  $('#char-btn').addEventListener('pointerdown', () => {
+    if (!S || S.paused) return;
+    if (S.pendingNext) { nextTrial(); return; }
+    if (S.listening || S.locked) return; // 提示中・きくじかん中は別の和音を重ねない（UX-07）
+    if (S.current) {
+      S.manualReplays = (S.manualReplays || 0) + 1;
+      S.locked = true; $('#flags').classList.add('lock');
+      playChord(S.current, S.currentShift, true);
+      later(() => { if (S) { S.locked = false; $('#flags').classList.remove('lock'); $('#char-btn').classList.remove('still'); } }, 900, { trial: true });
+    }
+  });
+
+  $('#btn-freeplay').addEventListener('pointerdown', () => {
+    Piano.unlock();
+    Char.mount($('#free-char'));
+    renderFreeplay();
+    show('screen-freeplay');
+    Char.pose($('#free-char'), 'wave', 1500);
+  });
+
+  // 最初のタッチでオーディオをアンロック（iOS）
+  document.addEventListener('pointerdown', function once() {
+    Piano.unlock();
+    document.removeEventListener('pointerdown', once);
+  }, { once: true });
+
+  // 右クリック・長押しメニュー抑止
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Service Worker（https/localhostのみ）
+  if ('serviceWorker' in navigator &&
+      (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    /* mock: SW は登録しない */
+  }
+
+  // ============ 起動 ============
+  Store.load();
+  Char.mount($('#home-char'));
+  Char.mount($('#char-btn'));
+  renderHome();
+  Char.pose($('#home-char'), 'wave', 1800); // ごあいさつして踊りはじめる
+})();

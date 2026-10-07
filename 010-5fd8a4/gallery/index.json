@@ -1,0 +1,114 @@
+[
+ {
+  "file": "home_fresh.png",
+  "title": "ホーム — はじめて（2色・導入前）",
+  "preset": "fresh",
+  "action": null,
+  "size": "768x1024"
+ },
+ {
+  "file": "home_two.png",
+  "title": "ホーム — 2色・3日目（きょうのドット・旅の地図）",
+  "preset": "two",
+  "action": null,
+  "size": "768x1024"
+ },
+ {
+  "file": "play_intro.png",
+  "title": "あそぶ — 初回の単独導入（あか1本）",
+  "preset": "fresh",
+  "action": "play",
+  "size": "768x1024"
+ },
+ {
+  "file": "play_two.png",
+  "title": "あそぶ — 2色の出題",
+  "preset": "two",
+  "action": "play",
+  "size": "768x1024"
+ },
+ {
+  "file": "play_tv.png",
+  "title": "あそぶ — iPhone 横持ち（テレビ投影）",
+  "preset": "two",
+  "action": "play",
+  "size": "844x390"
+ },
+ {
+  "file": "play_iphone.png",
+  "title": "あそぶ — iPhone 縦（既知: 吹き出しがドットに重なる）",
+  "preset": "two",
+  "action": "play",
+  "size": "390x844"
+ },
+ {
+  "file": "play_all14.png",
+  "title": "あそぶ — 14色の収まり",
+  "preset": "all14",
+  "action": "play",
+  "size": "768x1024"
+ },
+ {
+  "file": "reward.png",
+  "title": "よくできました — シール3択",
+  "preset": "short3",
+  "action": "reward",
+  "size": "768x1024"
+ },
+ {
+  "file": "stickers.png",
+  "title": "シールちょう",
+  "preset": "all14",
+  "action": "stickers",
+  "size": "768x1024"
+ },
+ {
+  "file": "free.png",
+  "title": "じぶんで ならす",
+  "preset": "two",
+  "action": "free",
+  "size": "768x1024"
+ },
+ {
+  "file": "parent_two.png",
+  "title": "おうちのかた — 計器（2色）",
+  "preset": "two",
+  "action": "parent",
+  "size": "768x1024"
+ },
+ {
+  "file": "parent_ready.png",
+  "title": "おうちのかた — 進級提案が出た状態",
+  "preset": "five_ready",
+  "action": "parent",
+  "size": "768x1024"
+ },
+ {
+  "file": "parent_plateau.png",
+  "title": "おうちのかた — 停滞期（まちがいの質）",
+  "preset": "plateau",
+  "action": "parent",
+  "size": "768x1024"
+ },
+ {
+  "file": "parent_settings.png",
+  "title": "おうちのかた — 設定・ガイド（長い）",
+  "preset": "two",
+  "action": "parent_settings",
+  "size": "768x1400"
+ },
+ {
+  "file": "home_cud.png",
+  "title": "ホーム — 色覚配慮パレット＋しるし（9色）",
+  "preset": "cud",
+  "action": null,
+  "size": "768x1024"
+ },
+ {
+  "file": "play_cud.png",
+  "title": "あそぶ — 色覚配慮パレット＋しるし",
+  "preset": "cud",
+  "action": "play",
+  "size": "768x1024"
+ }
+]
