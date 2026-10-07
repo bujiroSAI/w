@@ -16,8 +16,8 @@ const Store = (() => {
       settings: Object.assign({}, DEFAULT_SETTINGS),
       // 2本開始（2026-08-28 施主裁定B）: 1本だけの期間は選択肢がなく弁別が始まらない上に
       // 退屈で挫折を生む。単独導入は clearIntro の連鎖で1色ずつ丁寧に行う。
-      unlocked: ['aka', 'kiiro'],
-      introPending: 'aka',      // 次セッション冒頭で単独導入する和音id（導入は連鎖する）
+      unlocked: [CHORDS[0].id, CHORDS[1].id],
+      introPending: CHORDS[0].id, // 次セッション冒頭で単独導入する和音id（導入は連鎖する）
       trials: [],               // {t, chord, tapped, ok, corr(訂正試行か), stage, sess}
       sessions: [],             // {id, start, end, total, correct, stage, sticker}
       stickers: [],             // {emoji, t}
@@ -34,6 +34,15 @@ const Store = (() => {
     }
     // 設定の欠損キーを補完
     data.settings = Object.assign({}, DEFAULT_SETTINGS, data.settings || {});
+    // 移行（2026-10-07 14色v2）: 色名 id → 構成音 id。古い記録もそのまま生きる
+    if (typeof CHORD_ID_MIGRATE !== 'undefined') {
+      const mig = (id) => (id && CHORD_ID_MIGRATE[id]) || id;
+      let touched = false;
+      const u2 = (data.unlocked || []).map(mig); if (u2.some((x, i) => x !== data.unlocked[i])) { data.unlocked = u2; touched = true; }
+      if (data.introPending && CHORD_ID_MIGRATE[data.introPending]) { data.introPending = mig(data.introPending); touched = true; }
+      (data.trials || []).forEach(t => { if (CHORD_ID_MIGRATE[t.chord] || CHORD_ID_MIGRATE[t.tapped]) { t.chord = mig(t.chord); t.tapped = mig(t.tapped); touched = true; } });
+      if (touched) { data.palette = 'v2'; save(); }
+    }
     // 移行（2026-08-28 裁定B）: 1本だけで始まっている既存データに2本目を足す
     if (data.unlocked && data.unlocked.length === 1) {
       data.unlocked.push(CHORDS[1].id);

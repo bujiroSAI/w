@@ -784,3 +784,5 @@ input[type='range'] { width: 150px; accent-color: var(--wood-deep); }
 .pause-btn:active { transform: translateY(3px); box-shadow: none; }
 .pause-quit { background: var(--paper); }
 @media (orientation: landscape) and (max-height: 520px) { .pause-btn { width: 120px; } }
+/* 14色v2「しろ」: 画用紙地に白ボタンが溶けないよう、面に細い縁を付ける（色は付けない） */
+.flag[data-chord="GCE"] .btn-face { box-shadow: inset 0 -12px 0 rgba(0, 0, 0, 0.10), inset 0 0 0 3px #D8CCAC, 0 9px 0 rgba(0, 0, 0, 0.22), 0 15px 0 rgba(74, 59, 46, 0.16); }

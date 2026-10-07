@@ -22,25 +22,33 @@ const NOTE_MIDI = (() => {
 // mark: 旗の「しるし」。色覚多様性への冗長コード（WCAG 1.4.1・日本人男性の約5%）。
 // cud: 色覚配慮パレット（Okabe-Ito 8色を骨格に、明度差で14本を分離）。
 const CHORDS = [
-  // ---- 白鍵9和音（導入順は榊原1999/2004 Figure 1 で確認済み） ----
-  { id: 'aka',      label: 'あか',     color: '#E8382F', ink: '#FFFFFF', notes: ['C4', 'E4', 'G4'],  yomi: 'ドミソ',   group: 'C',  mark: 'dot',    cud: '#D55E00' },
-  { id: 'kiiro',    label: 'きいろ',   color: '#F5C518', ink: '#4A3B2E', notes: ['C4', 'F4', 'A4'],  yomi: 'ドファラ', group: 'F',  mark: 'star',   cud: '#F0E442' },
-  { id: 'ao',       label: 'あお',     color: '#2A6BD4', ink: '#FFFFFF', notes: ['B3', 'D4', 'G4'],  yomi: 'シレソ',   group: 'G',  mark: 'tri',    cud: '#0072B2' },
-  { id: 'kuro',     label: 'くろ',     color: '#38332F', ink: '#FFFFFF', notes: ['A3', 'C4', 'F4'],  yomi: 'ラドファ', group: 'F',  mark: 'sq',     cud: '#1A1A1A' },
-  { id: 'midori',   label: 'みどり',   color: '#2E9E4F', ink: '#FFFFFF', notes: ['D4', 'G4', 'B4'],  yomi: 'レソシ',   group: 'G',  mark: 'heart',  cud: '#009E73' },
-  { id: 'daidai',   label: 'だいだい', color: '#EE7B23', ink: '#FFFFFF', notes: ['E4', 'G4', 'C5'],  yomi: 'ミソド',   group: 'C',  mark: 'dia',    cud: '#E69F00' },
-  { id: 'murasaki', label: 'むらさき', color: '#8B4FB8', ink: '#FFFFFF', notes: ['F4', 'A4', 'C5'],  yomi: 'ファラド', group: 'F',  mark: 'cross',  cud: '#8E4FA8' },
-  { id: 'momoiro',  label: 'ももいろ', color: '#F08CB0', ink: '#4A3B2E', notes: ['G3', 'B3', 'D4'],  yomi: 'ソシレ',   group: 'G',  mark: 'flower', cud: '#F7B6D2' },
-  { id: 'chairo',   label: 'ちゃいろ', color: '#8D6238', ink: '#FFFFFF', notes: ['G3', 'C4', 'E4'],  yomi: 'ソドミ',   group: 'C',  mark: 'pent',   cud: '#6E4B1F' },
-  // ---- 黒鍵和音5個（構成音は実践記録2本が独立に一致・導入順のみ未確定） ----
-  { id: 'kimidori', label: 'きみどり', color: '#9DB92C', ink: '#4A3B2E', notes: ['A3', 'C#4', 'E4'],  yomi: 'ラ ド#ミ',  group: 'A',  mark: 'hex',  cud: '#C7E020' },
-  { id: 'usudaidai',label: 'うすだいだい', color: '#F3C193', ink: '#4A3B2E', notes: ['D4', 'F#4', 'A4'], yomi: 'レ ファ#ラ', group: 'D', mark: 'moon', cud: '#F7C59F' },
-  { id: 'fujiiro',  label: 'ふじいろ', color: '#A58FC9', ink: '#4A3B2E', notes: ['E4', 'G#4', 'B4'],  yomi: 'ミ ソ#シ',  group: 'E',  mark: 'ring', cud: '#B3A6E8' },
-  { id: 'haiiro',   label: 'はいいろ', color: '#9A948C', ink: '#FFFFFF', notes: ['Bb3', 'D4', 'F4'],  yomi: 'シ♭レファ', group: 'Bb', mark: 'bar',  cud: '#8C8C8C' },
-  { id: 'mizuiro',  label: 'みずいろ', color: '#6FC3E0', ink: '#4A3B2E', notes: ['Eb4', 'G4', 'Bb4'], yomi: 'ミ♭ソシ♭', group: 'Eb', mark: 'up',   cud: '#56B4E9' },
+  // ---- 白鍵9和音（導入順は榊原1999/2004 Figure 1 で確認済み。色は「おとはた14色v2」＝本アプリ独自・2026-10-07 施主裁定） ----
+  // 色↔和音の対応は方法の慣習であって学習機序ではない（物理ボタン試作_2026-10.md §3-6）。画面・顔料・光の3媒体で同じになる色を選ぶ。
+  // id は和音の構成音（移行前の色名 id は store.js が読み込み時に変換する）
+  { id: 'CEG',  label: 'あか',     color: '#E8382F', ink: '#FFFFFF', notes: ['C4', 'E4', 'G4'],  yomi: 'ドミソ',   group: 'C',  mark: 'dot',    cud: '#D55E00' },
+  { id: 'CFA',  label: 'きいろ',   color: '#F5C518', ink: '#4A3B2E', notes: ['C4', 'F4', 'A4'],  yomi: 'ドファラ', group: 'F',  mark: 'star',   cud: '#F0E442' },
+  { id: 'BDG',  label: 'あお',     color: '#2A6BD4', ink: '#FFFFFF', notes: ['B3', 'D4', 'G4'],  yomi: 'シレソ',   group: 'G',  mark: 'tri',    cud: '#0072B2' },
+  { id: 'ACF',  label: 'みどり',   color: '#2E9E4F', ink: '#FFFFFF', notes: ['A3', 'C4', 'F4'],  yomi: 'ラドファ', group: 'F',  mark: 'sq',     cud: '#009E73' },
+  { id: 'DGB',  label: 'だいだい', color: '#EE7B23', ink: '#FFFFFF', notes: ['D4', 'G4', 'B4'],  yomi: 'レソシ',   group: 'G',  mark: 'heart',  cud: '#E69F00' },
+  { id: 'EGC',  label: 'むらさき', color: '#8B4FB8', ink: '#FFFFFF', notes: ['E4', 'G4', 'C5'],  yomi: 'ミソド',   group: 'C',  mark: 'dia',    cud: '#8E4FA8' },
+  { id: 'FAC',  label: 'ももいろ', color: '#F08CB0', ink: '#4A3B2E', notes: ['F4', 'A4', 'C5'],  yomi: 'ファラド', group: 'F',  mark: 'cross',  cud: '#F7B6D2' },
+  { id: 'GBD',  label: 'みずいろ', color: '#6FC3E0', ink: '#4A3B2E', notes: ['G3', 'B3', 'D4'],  yomi: 'ソシレ',   group: 'G',  mark: 'flower', cud: '#56B4E9' },
+  { id: 'GCE',  label: 'しろ',     color: '#FFFFFF', ink: '#4A3B2E', notes: ['G3', 'C4', 'E4'],  yomi: 'ソドミ',   group: 'C',  mark: 'pent',   cud: '#FFFFFF' },
+  // ---- 黒鍵和音5個（構成音は実践記録2本が独立に一致・導入順のみ未確定）。色は候補——1年後に画面で見分けテストをしてから確定（§3-6 再々考） ----
+  { id: 'ACsE',  label: 'きみどり',  color: '#9DB92C', ink: '#4A3B2E', notes: ['A3', 'C#4', 'E4'],  yomi: 'ラ ド#ミ',  group: 'A',  mark: 'hex',  cud: '#C7E020' },
+  { id: 'DFsA',  label: 'ふじいろ',  color: '#A58FC9', ink: '#4A3B2E', notes: ['D4', 'F#4', 'A4'],  yomi: 'レ ファ#ラ', group: 'D', mark: 'moon', cud: '#B3A6E8' },
+  { id: 'EGsB',  label: 'あおみどり', color: '#1FA39A', ink: '#FFFFFF', notes: ['E4', 'G#4', 'B4'],  yomi: 'ミ ソ#シ',  group: 'E',  mark: 'ring', cud: '#1FA39A' },
+  { id: 'BbDF',  label: 'こん',      color: '#1F2F6B', ink: '#FFFFFF', notes: ['Bb3', 'D4', 'F4'],  yomi: 'シ♭レファ', group: 'Bb', mark: 'bar',  cud: '#1F2F6B' },
+  { id: 'EbGBb', label: 'はいいろ',  color: '#9A948C', ink: '#FFFFFF', notes: ['Eb4', 'G4', 'Bb4'], yomi: 'ミ♭ソシ♭', group: 'Eb', mark: 'up',   cud: '#8C8C8C' }, // 要検証: 光で出ないので候補差し替え予定
 ];
 
 const CHORD_BY_ID = Object.fromEntries(CHORDS.map(c => [c.id, c]));
+
+// 旧 id（色名）→ 新 id（構成音）。2026-10-07 の14色v2 移行用。store.js が読み込み時に使う
+const CHORD_ID_MIGRATE = {
+  aka: 'CEG', kiiro: 'CFA', ao: 'BDG', kuro: 'ACF', midori: 'DGB', daidai: 'EGC', murasaki: 'FAC', momoiro: 'GBD', chairo: 'GCE',
+  kimidori: 'ACsE', usudaidai: 'DFsA', fujiiro: 'EGsB', haiiro: 'BbDF', mizuiro: 'EbGBb',
+};
 
 // 進級（新しい和音の追加）基準。
 // 原法の原則「既出和音が100%正答になるまで足さない・追加間隔は最低2週間」の機械化。
