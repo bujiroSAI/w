@@ -8,6 +8,8 @@ const Store = (() => {
   const MAX_TRIALS = 8000; // 古い試行は間引く（統計には十分）
 
   let data = null;
+  let saveError = null; // 保存に失敗した時刻（親画面に出す・UX-23）
+  let loadError = false; // 読み込み失敗（壊れたデータは退避して初期化した）
 
   function fresh() {
     return {
@@ -26,10 +28,15 @@ const Store = (() => {
   }
 
   function load() {
+    let raw = null;
     try {
-      const raw = localStorage.getItem(KEY);
+      raw = localStorage.getItem(KEY);
       data = raw ? JSON.parse(raw) : fresh();
+      if (!data || typeof data !== 'object' || !Array.isArray(data.trials)) throw new Error('shape');
     } catch (e) {
+      // 壊れたデータは黙って捨てない: 退避してから初期化（UX-23）
+      try { if (raw) localStorage.setItem(KEY + '_broken_' + Date.now(), raw); } catch (e2) {}
+      loadError = true;
       data = fresh();
     }
     // 設定の欠損キーを補完
@@ -56,7 +63,7 @@ const Store = (() => {
     if (data.trials.length > MAX_TRIALS) {
       data.trials = data.trials.slice(data.trials.length - MAX_TRIALS);
     }
-    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* 容量超過時は無視 */ }
+    try { localStorage.setItem(KEY, JSON.stringify(data)); saveError = null; } catch (e) { saveError = Date.now(); /* 容量超過・プライベートモード等 */ }
   }
 
   function reset() { data = fresh(); save(); }
@@ -178,7 +185,8 @@ const Store = (() => {
     return JSON.stringify(data, null, 1);
   }
 
-  return { load, save, reset, addTrial, addSession, addSticker, unlockNext, clearIntro,
+  function health() { return { saveError, loadError }; }
+  return { load, save, reset, addTrial, addSession, addSticker, unlockNext, clearIntro, health,
            chordAccuracy, stageTrials, stageDays, advanceReady, advanceStatus, todaySessions, calendar,
            exportJSON, dayKey,
            get data() { return data; } };

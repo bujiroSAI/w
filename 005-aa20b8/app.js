@@ -517,6 +517,7 @@
     let i = 0;
     const step = () => {
       if (!S || !S.listening) return;
+      if (S.paused) { later(step, 400); return; } // 一時停止中は進めない（F-01）
       if (i >= picks.length) {
         S.listening = false;
         $('#char-btn').classList.remove('still');
@@ -843,6 +844,17 @@
   function pct(x) { return Math.round(x * 100) + '%'; }
 
   function renderParent() {
+    // 記録の健康状態（UX-23）: 保存できていない／壊れていたデータを退避した
+    {
+      const h = Store.health();
+      let box = $('#p-health');
+      if (!box) { box = document.createElement('div'); box.id = 'p-health'; box.className = 'p-advance-status'; $('.parent-scroll').prepend(box); }
+      const msgs = [];
+      if (h.saveError) msgs.push('⚠️ この端末に記録を保存できていない（' + new Date(h.saveError).toLocaleTimeString('ja-JP') + '）。Safari のプライベートブラウズや容量不足が原因のことが多い。下の「記録をコピー」で控えを取ってから、ホーム画面に追加した版で開き直す。');
+      if (h.loadError) msgs.push('⚠️ 前回の記録が読めなかったため、控えを残して初期状態から始めている。「記録をコピー」で取った控えがあれば連絡を。');
+      box.classList.toggle('hidden', msgs.length === 0);
+      box.textContent = msgs.join(' ');
+    }
     const d = Store.data;
     // きょう
     const todayS = Store.todaySessions();

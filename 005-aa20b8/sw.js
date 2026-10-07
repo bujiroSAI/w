@@ -1,6 +1,6 @@
 // おとはた — Service Worker（オフライン対応・cache-first）
 // バージョンを上げると次回アクセスで全キャッシュが更新される。
-const VERSION = 'otohata-v7';
+const VERSION = 'otohata-v8';
 const FILES = [
   './',
   './index.html',
