@@ -108,7 +108,8 @@
         speechSynthesis.speak(u);
       } catch (e) { /* 声はなくても遊べる */ }
     }
-    return { speak };
+    function stop() { try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) {} }
+    return { speak, stop };
   })();
 
   // ============ 紙吹雪（正解した旗の色だけで降らせる＝連合の強化） ============
@@ -162,11 +163,19 @@
       }
       if (!raf) tick();
     }
-    function tick() {
+    function clear() {
+      parts = [];
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      cx.clearRect(0, 0, innerWidth, innerHeight);
+    }
+    let lastT = 0;
+    function tick(now) {
       raf = requestAnimationFrame(tick);
+      const dt = lastT ? Math.min(3, (now - lastT) / 16.7) : 1; // フレーム落ちでも実時間で減衰する（UX-14）
+      lastT = now || 0;
       cx.clearRect(0, 0, innerWidth, innerHeight);
       parts = parts.filter(p => p.life > 0);
-      if (parts.length === 0) { cancelAnimationFrame(raf); raf = null; return; }
+      if (parts.length === 0) { cancelAnimationFrame(raf); raf = null; lastT = 0; return; }
       for (const p of parts) {
         p.t++;
         p.vy += p.vy < 2.6 ? 0.32 : 0.06; // 終端速度でひらひら落ちる
@@ -174,7 +183,7 @@
         p.x += p.vx + Math.sin(p.t * p.swf + p.sw) * 1.1;
         p.y += p.vy;
         p.rot += p.vr;
-        p.life -= 0.0085;
+        p.life -= 0.0085 * dt;
         cx.save();
         cx.translate(p.x, p.y);
         cx.rotate(p.rot);
@@ -194,7 +203,7 @@
         cx.restore();
       }
     }
-    return { burst, rain };
+    return { burst, rain, clear };
   })();
 
   // ============ 画面切替 ============
@@ -205,7 +214,7 @@
   // ============ ホーム ============
   function renderHome() {
     const st = Store.data.settings;
-    const n = Store.todaySessions().length;
+    const n = Store.todaySessions().filter(x => !x.partial).length;
     const box = $('#today-dots');
     box.innerHTML = '';
     const cap = Math.max(st.dailyTarget, Math.min(n, 8));
@@ -240,6 +249,20 @@
   // ============ セッション（試行の状態機械） ============
   let S = null;
   let lastDemo = null; // 直近の「おためし」設定（もういっかい用）
+  // セッションに紐づく予約処理。stopSession で全部消える。trial:true なら試行が進んだ時点でも無効（古い声・音の割り込み防止・UX-28/29）
+  const timers = new Set();
+  function later(fn, ms, opt) {
+    if (!S) return null;
+    const sid = S.id, tn = S.trialNo;
+    const t = setTimeout(() => {
+      timers.delete(t);
+      if (!S || S.id !== sid) return;
+      if (opt && opt.trial && S.trialNo !== tn) return;
+      fn();
+    }, ms);
+    timers.add(t);
+    return t;
+  }
   let wakeLock = null;
 
   async function keepAwake(on) {
@@ -282,12 +305,14 @@
       promptAt: null,
       manualReplays: 0,
       streak: 0,
+      trialNo: 0,
+      paused: false,
     };
     $('#demo-badge').classList.toggle('hidden', !S.demo);
     keepAwake(true);
     renderDots();
     show('screen-play');
-    setTimeout(nextTrial, 500);
+    later(nextTrial, 500);
   }
 
   function stopSession() {
@@ -295,8 +320,45 @@
       if (S.waitTimer) clearTimeout(S.waitTimer);
       S.listening = false; // きくじかんのループを止める
     }
+    timers.forEach(clearTimeout); timers.clear();   // 予約処理を全部捨てる（UX-28）
+    Voice.stop();
+    Confetti.clear();
+    $('#pause').classList.add('hidden');
     S = null;
     keepAwake(false);
+  }
+
+  // ホームを押しても即終了しない（2歳児の誤タップ対策・UX-08）: 一時停止して「つづける／おしまい」
+  function pauseSession() {
+    if (!S || S.paused) return;
+    S.paused = true;
+    S.locked = true;
+    if (S.waitTimer) clearTimeout(S.waitTimer);
+    Voice.stop();
+    $('#flags').classList.add('lock');
+    $('#pause').classList.remove('hidden');
+  }
+  function resumeSession() {
+    if (!S || !S.paused) return;
+    S.paused = false;
+    $('#pause').classList.add('hidden');
+    if (S.listening || !S.current) { if (!S.listening) later(nextTrial, 300); return; }
+    // いまの和音をもう一度鳴らしてから受け付ける
+    $('#flags').classList.add('lock');
+    later(() => {
+      playChord(S.current, S.currentShift, true);
+      later(() => { S.locked = false; S.promptAt = Date.now(); $('#flags').classList.remove('lock'); $('#char-btn').classList.remove('still'); armWaitTimer(); }, 400, { trial: true });
+    }, 200, { trial: true });
+  }
+  function quitSession() {
+    if (!S) return;
+    // 途中でやめた記録（partial）。完了回数とは分けて数える（UX-08）
+    if (!S.demo && S.idx > 0) {
+      Store.addSession({ id: S.id, start: S.start, end: Date.now(), total: S.idx, correct: S.correct, stage: Store.data.unlocked.length, partial: true });
+    }
+    stopSession();
+    renderHome();
+    show('screen-home');
   }
 
   function renderDots() {
@@ -316,6 +378,13 @@
     return S.pool.map(id => CHORD_BY_ID[id]);
   }
 
+  // ボタン幅: 縦持ちは5個まで1列（最小 76px≒2cm・それ以下なら折り返す・UX-03）、横持ち（テレビ投影）は全部を1列に収める（UX-27）
+  function flagWidthExpr(n, fw) {
+    const land = window.matchMedia('(orientation: landscape) and (max-height: 520px)').matches;
+    if (land) return `max(64px, min(${fw}px, ${Math.floor(84 / Math.min(n, 9))}vw, 36vh))`;
+    return `max(76px, min(${fw}px, ${Math.floor(88 / Math.min(n, 5))}vw))`;
+  }
+
   function renderFlags() {
     const box = $('#flags');
     box.innerHTML = '';
@@ -324,7 +393,7 @@
     // 2歳児のタップ精度（平均4.5mmずれ）を考慮し、下限は実寸2cm角を割らない値に置く。
     const n = list.length;
     const fw = n <= 1 ? 380 : n <= 3 ? 270 : n <= 6 ? 205 : n <= 9 ? 152 : 118;
-    box.style.setProperty('--fw', `min(${fw}px, ${Math.floor(88 / Math.min(n, 5))}vw)`);
+    box.style.setProperty('--fw', flagWidthExpr(n, fw));
     for (const c of list) {
       const b = document.createElement('button');
       b.type = 'button';
@@ -381,38 +450,44 @@
     return others[Math.floor(Math.random() * others.length)];
   }
 
-  function playChord(chordId, shift) {
+  // still=true: 出題・きくじかん中は踊らず「聴く姿勢」で静止する（注意を音に向ける・UX-13）
+  function playChord(chordId, shift, still) {
     const c = CHORD_BY_ID[chordId];
     const midis = c.notes.map(n => NOTE_MIDI(n) + 12 * (shift || 0));
     const char = $('#char-btn');
-    char.classList.remove('bounce');
-    void char.offsetWidth; // アニメ再発火
-    char.classList.add('bounce');
-    Char.groove(char, 1400); // 音が鳴っているあいだリズムに乗る
+    if (still) {
+      char.classList.add('still');
+      char.classList.remove('bounce', 'groove');
+    } else {
+      char.classList.remove('still', 'bounce');
+      void char.offsetWidth; // アニメ再発火
+      char.classList.add('bounce');
+      Char.groove(char, 1400); // 音が鳴っているあいだリズムに乗る
+    }
     return Piano.chord(midis, { a4: Store.data.settings.pitchA });
   }
 
   function armWaitTimer() {
     if (S.waitTimer) clearTimeout(S.waitTimer);
-    S.waitTimer = setTimeout(() => {
+    S.waitTimer = later(() => {
       if (!S || S.locked) return;
       if (S.autoReplays < 2) {
         S.autoReplays++;
-        playChord(S.current, S.currentShift);
+        playChord(S.current, S.currentShift, true);
         armWaitTimer();
       }
-    }, 9000);
+    }, 9000, { trial: true });
   }
 
   // 次の試行へ。parentPaced（親子共同モード）では、おとなの「キャラタッチ」を待つ。
   function proceed(delay) {
     if (Store.data.settings.parentPaced) {
       S.pendingNext = true;
-      setTimeout(() => {
+      later(() => {
         if (S && S.pendingNext) speech('ひつじを タッチで つぎへ');
       }, delay);
     } else {
-      setTimeout(nextTrial, delay);
+      later(nextTrial, delay);
     }
   }
 
@@ -444,23 +519,24 @@
       if (!S || !S.listening) return;
       if (i >= picks.length) {
         S.listening = false;
-        setTimeout(() => { if (S) done(); }, 500);
+        $('#char-btn').classList.remove('still');
+        later(() => { if (S) done(); }, 500);
         return;
       }
       const id = picks[i++];
       const c = CHORD_BY_ID[id];
       $$('#flags .flag').forEach(f => f.classList.remove('glow', 'fade'));
-      playChord(id, pickShift(id)); // 曝露も高さ違いで（chroma汎化）
+      playChord(id, pickShift(id), true); // 曝露も高さ違いで（chroma汎化）
       const el = flagEl(id);
       if (el) {
         el.classList.add('glow');
         $$('#flags .flag').forEach(f => { if (f !== el) f.classList.add('fade'); });
       }
       speech(c.label);
-      setTimeout(() => Voice.speak(c.label), 700);
-      setTimeout(step, 2600);
+      later(() => Voice.speak(c.label), 700);
+      later(step, 2600);
     };
-    setTimeout(step, 900);
+    later(step, 900);
   }
 
   function nextTrial() {
@@ -478,6 +554,8 @@
     S.autoReplays = 0;
     S.manualReplays = 0;
     S.locked = true;
+    S.trialNo++;
+    Confetti.clear(); // 前の問題の紙吹雪を次の出題に持ち越さない（UX-14）
 
     if (S.mode === 'intro' && S.introLeft <= 0) {
       Store.clearIntro();
@@ -502,23 +580,24 @@
     Char.pose($('#char-btn'), S.mode === 'intro' ? 'sing' : 'listen');
     speech(S.mode === 'intro' ? 'あたらしい ボタン！' : 'きいてね');
 
-    setTimeout(() => {
+    later(() => {
       if (!S) return;
-      playChord(S.current, S.currentShift);
+      playChord(S.current, S.currentShift, true);
       if (S.mode === 'intro') {
         const c = CHORD_BY_ID[S.current];
-        setTimeout(() => Voice.speak('これは ' + c.label), 900);
+        later(() => Voice.speak('これは ' + c.label), 900, { trial: true });
       }
-      setTimeout(() => {
+      later(() => {
         if (!S) return;
         S.locked = false;
         S.promptAt = Date.now(); // 反応時間の起点（ロック解除時）
         box.classList.remove('lock');
         Char.pose($('#char-btn'), 'neutral');
+        $('#char-btn').classList.remove('still');
         if (S.mode !== 'intro') speech('どの ボタン かな？');
         armWaitTimer();
-      }, 350);
-    }, 600);
+      }, 350, { trial: true });
+    }, 600, { trial: true });
   }
 
   function flagEl(chordId) {
@@ -544,9 +623,9 @@
         Confetti.burst(chordColor(c), cx, cy, 22);
       } else if (big) {
         FX.explode(chordColor(c), cx, cy, 2);
-        Confetti.burst(chordColor(c), cx, cy, 90);
-        Confetti.rain(chordColor(c), 60);
-        setTimeout(() => { if (S) Confetti.burst(chordColor(c), cx, cy - 60, 50); }, 240);
+        Confetti.burst(chordColor(c), cx, cy, 70);
+        Confetti.rain(chordColor(c), 40);
+        later(() => { if (S) Confetti.burst(chordColor(c), cx, cy - 60, 50); }, 240);
       } else {
         FX.explode(chordColor(c), cx, cy, 1);
         Confetti.burst(chordColor(c), cx, cy, 60);
@@ -560,7 +639,7 @@
       ? ['すごーい！', 'めちゃくちゃ すごい！', 'かんぺき！']
       : ['せいかい！', 'すごい！', 'やったね！', 'いいね！'];
     Voice.speak(c.label + '。' + praise[Math.floor(Math.random() * praise.length)]);
-    speech((big ? '🎉 ' : '') + 'せいかい！ ' + c.label);
+    speech('せいかい！ ' + c.label);
   }
 
   function logTrial(ok, corr, tapped) {
@@ -576,19 +655,21 @@
       oct: S.currentShift || 0,                       // 提示オクターブ（chroma分析の要）
       rt: S.promptAt ? Date.now() - S.promptAt : null, // 反応時間ms（方略転換の計器）
       rep: (S.autoReplays || 0) + (S.manualReplays || 0), // この試行での再聴回数
+      src: (typeof Input !== 'undefined' && Input.lastSource()) || null, // 入力元 key/pad（物理ボタン試作）・タッチは null
     });
   }
 
   function onFlag(chordId, el) {
     if (!S || S.locked) return;
     if (S.waitTimer) clearTimeout(S.waitTimer);
-    // 押した瞬間の手応え（正誤の前に必ず返す——「押すと反応する」の学習）
+    Voice.stop(); // 古い読み上げ（導入の「これは○○」等）を割り込ませない（UX-29）
+    // 押した瞬間の手応え（正誤の前に必ず返す——「押すと反応する」の学習）。判定前なので色は付けない（UX-15）
     el.classList.remove('tapped');
     void el.offsetWidth;
     el.classList.add('tapped');
     {
       const r0 = el.getBoundingClientRect();
-      FX.tap(chordColor(CHORD_BY_ID[chordId]), r0.left + r0.width / 2, r0.top + r0.height / 2);
+      FX.tap('#FFFDF6', r0.left + r0.width / 2, r0.top + r0.height / 2);
     }
 
     if (S.corrective) {
@@ -599,14 +680,10 @@
         const g = flagEl(S.current);
         if (g) g.classList.remove('glow');
         celebrate(chordId, true);
-        S.idx++;
-        if (S.mode === 'intro') S.introLeft--;
+        if (S.mode === 'intro') S.introLeft--; else S.idx++; // 導入は問題数に数えない（UX-10）
         proceed(1300);
       } else {
-        el.classList.remove('shake');
-        void el.offsetWidth;
-        el.classList.add('shake');
-        if (Store.data.settings.sfx) Piano.sfxSoft();
+        // 揺らさない・鳴らさない。正解の光だけが手がかり（罰にしない・UX-05）
         armWaitTimer();
       }
       return;
@@ -618,33 +695,28 @@
       S.correct++;
       S.streak++;
       celebrate(chordId, false);
-      S.idx++;
-      if (S.mode === 'intro') S.introLeft--;
+      if (S.mode === 'intro') S.introLeft--; else S.idx++; // 導入は問題数に数えない（UX-10）
       proceed(1500);
     } else {
       // まちがい: 叱らない・考えさせない。すぐ正解旗を光らせ、同じ和音をもう一度聞いてタッチしてもらう。
       logTrial(false, false, chordId);
       S.streak = 0; // 演出レベルが下がるだけ。何も言わない（罰にしない）
       S.corrective = true;
-      S.locked = true;
       if (Store.data.settings.sfx) Piano.sfxSoft();
-      el.classList.add('shake');
       const c = CHORD_BY_ID[S.current];
       const g = flagEl(S.current);
       if (g) g.classList.add('glow');
       Char.pose($('#char-btn'), 'sing', 1400);
       speech('ひかってる ボタンを タッチ');
       Voice.speak('これは ' + c.label);
-      setTimeout(() => {
-        if (!S) return;
-        playChord(S.current, S.currentShift);
-        setTimeout(() => {
-          if (!S) return;
-          S.locked = false;
-          S.promptAt = Date.now();
-          armWaitTimer();
-        }, 350);
-      }, 1100);
+      // 正解が光った瞬間から受け付ける（待たせない・UX-05）。同じ和音はその後に鳴らす
+      S.locked = false;
+      S.promptAt = Date.now();
+      later(() => {
+        if (!S || !S.corrective) return;
+        playChord(S.current, S.currentShift, true);
+        later(() => { if (S) { $('#char-btn').classList.remove('still'); armWaitTimer(); } }, 350, { trial: true });
+      }, 1100, { trial: true });
     }
   }
 
@@ -658,7 +730,7 @@
     const list = Store.data.unlocked.map(id => CHORD_BY_ID[id]);
     const n = list.length;
     const fw = n <= 1 ? 300 : n <= 3 ? 230 : n <= 6 ? 185 : n <= 9 ? 145 : 112;
-    box.style.setProperty('--fw', `min(${fw}px, ${Math.floor(88 / Math.min(n, 5))}vw)`);
+    box.style.setProperty('--fw', flagWidthExpr(n, fw));
     for (const c of list) {
       const b = document.createElement('button');
       b.type = 'button';
@@ -723,7 +795,7 @@
 
     const box = $('#sticker-choices');
     box.innerHTML = '';
-    $('#reward-actions').classList.add('hidden');
+    $('#reward-actions').classList.remove('hidden'); // シールを選ばなくても終われる（UX-17）
     const pool = STICKERS.slice().sort(() => Math.random() - 0.5).slice(0, 3);
     let picked = false;
     pool.forEach(emoji => {
@@ -741,7 +813,6 @@
         Voice.speak('シール ゲット！');
         const r = b.getBoundingClientRect();
         Confetti.burst('#C8B48D', r.left + r.width / 2, r.top + r.height / 2, 40);
-        setTimeout(() => $('#reward-actions').classList.remove('hidden'), 700);
       });
       box.appendChild(b);
     });
@@ -756,7 +827,7 @@
     if (xs.length === 0) {
       const p = document.createElement('p');
       p.className = 'sticker-book-empty';
-      p.textContent = 'あそぶと シールが もらえるよ';
+      p.textContent = 'ここに えらんだ シールが ならぶよ';
       box.appendChild(p);
       return;
     }
@@ -842,7 +913,7 @@
       parts.push('練習 ' + Math.min(stat.trialsDone, stat.trialsNeed) + '/' + stat.trialsNeed + '回');
       parts.push(stat.accOk ? '正答率 ✔' : ('正答率 ' + (stat.weakest && stat.weakest.acc !== null ? Math.round(stat.weakest.acc*100)+'%' : '記録中') + '（' + (stat.weakest ? CHORD_BY_ID[stat.weakest.id].label : '') + '）'));
       statBox.innerHTML = '<b>つぎのボタン「' + (stat.next ? stat.next.label : '') + '」まで</b>: ' + parts.join(' ／ ') +
-        '<small>基準: 全部のボタンが直近' + ADVANCE_RULE.perChordWindow + '回で' + Math.round(ADVANCE_RULE.minAccuracy*100) + '%以上 × ' + ADVANCE_RULE.minDaysOnStage + '日 × ' + ADVANCE_RULE.minTrialsOnStage + '回（原法の「誤りが生じない範囲で最速2週間ごと」の機械化）。お子さまの様子で早めたい場合は下の設定「手動で追加」から。</small>';
+        '<small>基準: 全部のボタンが直近' + ADVANCE_RULE.perChordWindow + '回で' + Math.round(ADVANCE_RULE.minAccuracy*100) + '%以上 × 練習日 ' + stat.daysNeed + '日 × ' + stat.trialsNeed + '回（原法の「誤りが生じない範囲で最速2週間ごと」の機械化。序盤は短い）。' + (Store.data.unlocked.length === 5 ? '次の6色目あたりから、研究では数か月の停滞期が観察されている。誤りの質（下の「まちがいの質」）を見る時期。' : '') + 'お子さまの様子で早めたい場合は下の設定「手動で追加」から。</small>';
       statBox.classList.remove('hidden');
     } else {
       statBox.classList.add('hidden');
@@ -994,7 +1065,7 @@
     $('#p-guide').innerHTML = `
       <h4>このプログラムは なにをするのか</h4>
       <p>和音を聞いて色のボタンで答える遊びを毎日くり返し、<b>音を「響きごと」覚える耳</b>（絶対音感の土台）を育てる。方法は、2〜6歳の縦断研究で継続者全員の習得が報告されている唯一の訓練法「和音同定法」の家庭向け実装。色は飾りではなく<b>音につける名札</b>——だからこのアプリは、ボタン以外に色を使わない。</p>
-      <p>道のりは長い（目安2.5〜4年）: <b>14色のボタンをそろえる</b>（いまここ）→ 単音の聞き分け → 卒業テスト → 相対音感の段階。1日の負担は2分×4〜5回だけ。<b>続けることがすべて</b>で、このアプリの計器（きょう・すすみぐあい・カレンダー）は全部そのためにある。</p>
+      <p>道のりは長い（目安2.5〜4年）: <b>14色のボタンをそろえる</b>（いまここ）→ 単音の聞き分け → 卒業テスト → 相対音感の段階。1日の負担は2分×4〜5回だけ。研究では短時間の反復を1日4〜5回、数年続けている。間が空いた日は、いまの色からそのまま再開でよい。計器（きょう・すすみぐあい・カレンダー）は続けるための道具で、成績表ではない。</p>
       <h4>1回の あそびかた（2〜3分）</h4>
       <p>「あそぶ」を押すと ♪が鳴る →「どの ボタン かな？」→ 子どもがボタンを押す → 正解ならその色の光と紙吹雪でお祝い。まちがえたら正解のボタンが光るので、それをタッチすれば同じ和音でやり直せる（叱る要素はどこにもない）。キャラクターをタッチすると同じ和音をもう一度聞ける。とちゅうの「きくじかん」は答えずに聴くだけの時間——飛ばさないこと（下の要点⑦）。${Store.data.settings.trialsPerSession}問で自動的に終わり、シールがもらえる。</p>
       <h4>はじめの1〜2週間: 「おして みせる」から</h4>
@@ -1012,7 +1083,7 @@
         <li><b>色が見分けにくいお子さまへ。</b>男性の約5%（日本）は赤と緑の区別が難しい。2歳児は「見分けられない」と言えないため、「向いていない」と誤解されやすい。設定の<b>「ボタンに しるしをつける」</b>で、色に加えて形でも区別できる。訓練上の効果は変わらない。</li>
         <li><b>iPadは「ホーム画面に追加」で使う。</b>Safariのままだと7日間使わないと記録が消えることがある（iOSの仕様）。共有ボタン→「ホーム画面に追加」。誤操作防止にはiOSの「アクセスガイド」が便利。</li>
       </ol>
-      <p class="p-warn">⚠️ 開始年齢がすべて: 縦断研究で習得が確認されているのは2〜6歳開始（継続22人全員が習得・n=24）。7歳以降の開始は急に難しくなる。<br>
+      <p class="p-warn">⚠️ 開始年齢: 縦断研究で習得が確認されているのは2〜6歳開始（継続22人全員が習得・n=24）。7歳以降の開始は急に難しくなる。<br>
       ⚠️ 絶対音感は万能ではない: 音楽性の必須条件ではなく、移調が苦手になる等の指摘もある。このアプリは習得後に相対音感の段階へ進むロードマップを前提にしている。<br>
       ⚠️ 1日の合計は10〜15分（WHOの「2〜4歳は1日60分以内」の枠内）。記録はすべてこの端末の中だけに保存され、どこにも送信されない。<br>
       ※ 本アプリは公刊の学術論文（和音同定法の縦断研究）に基づく独立実装であり、特定の教室・団体・書籍の公認や提携によるものではない。</p>`;
@@ -1083,10 +1154,13 @@
     startSession();
   });
   $('#btn-home').addEventListener('pointerdown', () => {
+    if (S && !S.demo && S.trialNo > 0) { pauseSession(); return; } // 途中なら止まって聞く（UX-08）
     stopSession();
     renderHome();
     show('screen-home');
   });
+  $('#pause-resume').addEventListener('pointerdown', resumeSession);
+  $('#pause-quit').addEventListener('pointerdown', quitSession);
   $('#btn-again').addEventListener('pointerdown', () => startSession(lastDemo));
   $('#btn-finish').addEventListener('pointerdown', () => {
     renderHome();
@@ -1110,9 +1184,15 @@
     if (Store.data.settings.sfx) Piano.sfxTap();
   });
   $('#char-btn').addEventListener('pointerdown', () => {
-    if (!S) return;
+    if (!S || S.paused) return;
     if (S.pendingNext) { nextTrial(); return; }
-    if (S.current) { S.manualReplays = (S.manualReplays || 0) + 1; playChord(S.current, S.currentShift); }
+    if (S.listening || S.locked) return; // 提示中・きくじかん中は別の和音を重ねない（UX-07）
+    if (S.current) {
+      S.manualReplays = (S.manualReplays || 0) + 1;
+      S.locked = true; $('#flags').classList.add('lock');
+      playChord(S.current, S.currentShift, true);
+      later(() => { if (S) { S.locked = false; $('#flags').classList.remove('lock'); $('#char-btn').classList.remove('still'); } }, 900, { trial: true });
+    }
   });
 
   $('#btn-freeplay').addEventListener('pointerdown', () => {

@@ -35,7 +35,7 @@
     <div id="journey" class="journey" aria-label="ボタンのみち"></div>
   </div>
   <button id="btn-stickers" class="corner-btn corner-left" type="button" aria-label="シールちょう">
-    <span class="corner-icon">🦁</span><span class="corner-text">シール</span>
+    <span class="corner-icon corner-star" aria-hidden="true">★</span><span class="corner-text">シール</span>
   </button>
   <button id="btn-parent" class="corner-btn corner-right" type="button" aria-label="おうちのかた（3びょう ながおし）">
     <svg viewBox="0 0 24 24" class="gear-icon" aria-hidden="true"><path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm9.4 4c0-.5 0-.9-.1-1.4l2-1.6-2-3.5-2.4 1a7.6 7.6 0 0 0-2.4-1.4L16 2.6h-4l-.5 2.5c-.9.3-1.7.8-2.4 1.4l-2.4-1-2 3.5 2 1.6c-.1.5-.1.9-.1 1.4s0 .9.1 1.4l-2 1.6 2 3.5 2.4-1c.7.6 1.5 1.1 2.4 1.4l.5 2.5h4l.5-2.5c.9-.3 1.7-.8 2.4-1.4l2.4 1 2-3.5-2-1.6c.1-.5.1-.9.1-1.4Z"/></svg>
@@ -62,6 +62,12 @@
   </div>
   <div id="flags" class="flags"></div>
   <div class="ground ground-play" aria-hidden="true"><div class="track-line"></div></div>
+  <div id="pause" class="pause hidden" aria-label="いったん とまる">
+    <div class="pause-card">
+      <button id="pause-resume" class="pause-btn" type="button" aria-label="つづける"><span class="pause-icon">▶</span><span>つづける</span></button>
+      <button id="pause-quit" class="pause-btn pause-quit" type="button" aria-label="おしまい"><span class="pause-icon">⌂</span><span>おしまい</span></button>
+    </div>
+  </div>
 </section>
 
 <!-- ============ ごほうび（シール選び） ============ -->
@@ -130,7 +136,7 @@
       <p class="p-note">正答率は各和音の直近20回。すべて95%以上×2週間以上×80回以上で次のボタンを提案する（原法「100%正答が2週間つづいたら1つ追加」の機械化）。</p>
     </section>
     <section class="p-card">
-      <h3>カレンダー <span class="p-hint">1日3〜5回・毎日つづけるのがいちばん効く</span></h3>
+      <h3>カレンダー <span class="p-hint">研究では1回2〜3分を1日4〜5回。空いた日は、いまの色から再開でよい</span></h3>
       <div id="p-cal" class="p-cal"></div>
     </section>
     <section class="p-card">
@@ -160,6 +166,7 @@
 <script src="char3d.js"></script>
 <script src="piano.js"></script>
 <script src="store.js"></script>
+<script src="input.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
